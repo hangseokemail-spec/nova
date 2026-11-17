@@ -1,0 +1,5 @@
+편집실/out3/
+편집실/site3/
+편집실/img3/*.jpg
+편집실/__pycache__/
+*.pyc

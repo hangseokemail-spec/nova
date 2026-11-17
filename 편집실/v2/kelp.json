@@ -1,0 +1,224 @@
+{
+ "id": "kelp",
+ "section": "과학",
+ "kicker": "또래 연구자",
+ "title": "14살 린든, 잠수정 몰고 켈프 숲 '회복의 열쇠' 찾아 나섰다",
+ "deck": "미국 캘리포니아의 린든 헌터-핀스키가 위성 자료로 고른 켈프 군락 여섯 곳을 원격 조종 잠수정으로 찍어, 성게는 회복 차이의 원인이 아닐 수 있다는 단서를 얻었어요.",
+ "body": [
+  {
+   "t": "p",
+   "x": "캘리포니아 산타크루즈의 14살 린든 헌터-핀스키가 켈프 숲을 조사했어요. 일부 숲만 회복되는 까닭을 찾는 연구였어요. 이 연구로 2026년 '주니어 이노베이터스 챌린지' 결선에 올랐어요."
+  },
+  {
+   "t": "h",
+   "x": "질문: 왜 일부만 돌아올까"
+  },
+  {
+   "t": "p",
+   "x": "켈프(대개 갈조류인 큰 바닷말)는 물속에서 숲을 이뤄요. 캘리포니아 켈프는 2010년대에 크게 줄었어요. 열파(심한 더위가 이어지는 현상)와 다른 요인 때문이에요. 그런데 산타크루즈 근처 일부 군락은 회복되기 시작했어요."
+  },
+  {
+   "t": "h",
+   "x": "가설: 성게가 적어서일까"
+  },
+  {
+   "t": "p",
+   "x": "성게는 켈프를 뜯어 먹는 동물이에요. 린든은 회복 중인 곳에 성게가 적어서일 수 있다고 생각했어요. 이것이 린든의 가설(관찰로 확인할 잠정적인 답)이에요."
+  },
+  {
+   "t": "h",
+   "x": "조사 지역과 관찰"
+  },
+  {
+   "t": "p",
+   "x": "린든은 켈프워치 사이트의 위성 자료를 살폈어요. 줄어드는 곳, 회복 중인 곳, 변화가 없는 곳을 두 곳씩, 모두 여섯 곳 골랐어요. 그러면 상태가 다른 숲끼리 성게 수를 견줄 수 있어요."
+  },
+  {
+   "t": "p",
+   "x": "관찰에는 동네 비영리 단체에서 빌린 원격 조종 잠수정(ROV)을 썼어요. 군락마다 리모컨으로 잠수정을 몰며 영상을 찍었어요. 모터가 켈프에 걸릴 수 있어 아빠와 노 젓는 배를 타고 나갔어요."
+  },
+  {
+   "t": "h",
+   "x": "결론과 한계"
+  },
+  {
+   "t": "p",
+   "x": "영상 속 어느 군락에도 성게가 많지 않았어요. 성게는 회복 차이의 까닭이 아닐 가능성이 크다는 단서예요. 린든은 빗물 유출(땅을 흘러 바다로 드는 빗물) 같은 요인을 의심해요. 아직 확인되지 않은 짐작이에요. 칠레의 켈프 숲으로 연구를 넓히는 방안도 고민 중이에요."
+  },
+  {
+   "t": "box",
+   "title": "한눈에 보기",
+   "x": "연구 과정",
+   "items": [
+    "질문: 왜 일부만 회복될까",
+    "가설: 회복 중인 곳엔 성게가 적다",
+    "방법: 6곳 골라 잠수정 촬영",
+    "결과: 성게가 어디나 적음",
+    "과제: 다른 요인 확인"
+   ]
+  }
+ ],
+ "terms": [
+  {
+   "w": "켈프",
+   "m": "대개 갈조류에 속하는 큰 바닷말. 물속에서 커다란 숲을 이루어 많은 생물의 보금자리가 됨"
+  },
+  {
+   "w": "열파",
+   "m": "보통보다 훨씬 심한 더위가 여러 날 이어지는 현상"
+  },
+  {
+   "w": "가설",
+   "m": "궁금한 문제에 대해 미리 세워 보는 잠정적인 답. 실험이나 관찰로 맞는지 확인함"
+  },
+  {
+   "w": "원격 조종 잠수정(ROV)",
+   "m": "사람이 타지 않고, 물 위에서 멀리 떨어져 조종하는 전기로 움직이는 잠수 장비"
+  },
+  {
+   "w": "빗물 유출",
+   "m": "땅 위를 흘러 강, 호수, 바다로 가는 빗물. 흙과 화학 물질을 싣고 가서 오염 물질로 남기기도 함"
+  }
+ ],
+ "figs": [
+  {
+   "cap": "린든은 위성 자료로 상태가 다른 켈프 군락 여섯 곳을 고르고, 노 젓는 배 위에서 원격 조종 잠수정으로 성게 수를 살폈다.",
+   "brief": "왼쪽: 산타크루즈 앞바다 해안선 지도 선화에 켈프 군락 6곳 기호 표시(줄어드는 곳 2곳 빨강 삼각형, 회복 중인 곳 2곳 남색 원, 변화 없는 곳 2곳 회색 사각형)와 범례. 오른쪽: 바다 단면도. 수면 위 작은 노 젓는 배에서 조종기를 든 사람 실루엣, 줄로 이어진 원격 조종 잠수정이 켈프 줄기 사이를 비추고, 바닥에 성게 한두 개만 작게 그림. 잉크 선화+빨강·남색, 망점 바다, 글자 라벨 허용."
+  }
+ ],
+ "sources": [
+  {
+   "t": "This teen piloted an underwater robot to study kelp forests",
+   "pub": "Science News Explores (Society for Science)",
+   "date": "2026-11-10",
+   "u": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic",
+   "lang": "en"
+  }
+ ],
+ "facts": [
+  {
+   "claim": "린든 헌터-핀스키(Linden Hunter-Pinsky)는 14살이고 미국 캘리포니아 산타크루즈의 바닷가에 산다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "린든은 일부 켈프 군락만 회복되는 까닭을 알아보려고 조사했다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "이 연구로 2026 Thermo Fisher Scientific Junior Innovators Challenge 결선 진출자가 되었다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "켈프는 대개 갈조류에 속하는 큰 바닷말이고 물속에서 큰 숲을 이루어 많은 생물의 서식지가 된다(기사 용어 풀이)",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "캘리포니아의 켈프는 2010년대에 a heat wave and other factors(열파와 다른 요인들)로 크게 줄었다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "산타크루즈 근처 일부 켈프 군락은 다시 회복되기 시작했다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "린든은 회복 중인 군락에 켈프를 뜯어 먹는 성게가 적어서인지 궁금했다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "켈프워치(Kelpwatch)라는 사이트의 위성 자료로 줄어드는 곳, 회복 중인 곳, 안정된 곳을 2곳씩 모두 6곳 골랐다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "동네 비영리 단체에서 원격 조종 잠수정(ROV)을 빌려, 군락마다 리모컨으로 조종하며 영상을 찍었다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "모터가 켈프에 걸릴 수 있어 모터보트 대신 아빠와 가족의 노 젓는 배를 타고 나갔다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "ROV는 물 위의 무언가(보통 배)와 줄로 연결되어 있고 전기로 움직이며, 사람이 떨어진 곳에서 조종한다(기사 용어 풀이, 용어 정리와 도판 설명의 근거)",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "영상에서 어느 군락에도 성게가 많지 않았고, 성게가 일부 군락만 회복되는 까닭이 아닐 가능성이 크다는 단서를 얻었다",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "린든은 빗물 유출(runoff) 같은 다른 요인이 더 큰 역할을 할 것으로 짐작한다. 빗물 유출은 땅 위를 흘러 강·호수·바다로 가는 빗물로, 흙과 화학 물질을 실어 오염 물질로 남긴다(기사 용어 풀이)",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  },
+  {
+   "claim": "린든은 지금 1년 동안 칠레에 지내고 있으며 칠레의 켈프 숲으로 연구를 넓히는 방법을 생각하고 있다(본문에는 기간을 빼고 씀)",
+   "source": "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic"
+  }
+ ],
+ "quiz": {
+  "쉬움": [
+   {
+    "type": "ox",
+    "q": "켈프 숲을 조사한 14살 린든은 원격 조종 잠수정을 직접 만들었다.",
+    "answer": "X",
+    "explain": "린든은 동네 비영리 단체에서 잠수정을 빌려 썼어요."
+   },
+   {
+    "type": "mc",
+    "q": "린든의 켈프 숲 연구에서, 켈프를 뜯어 먹어 숲의 회복에 영향을 줄 수 있다고 본 동물은?",
+    "options": [
+     "성게",
+     "상어",
+     "문어",
+     "해파리"
+    ],
+    "answer": 0,
+    "explain": "성게는 켈프를 뜯어 먹는 동물이에요. 린든은 회복 중인 곳에 성게가 적을 것이라는 가설을 세웠어요."
+   }
+  ],
+  "보통": [
+   {
+    "type": "short",
+    "q": "린든이 켈프워치 위성 자료로 골라 조사한 켈프 군락은 모두 몇 곳인가요? (숫자로)",
+    "answer": "6",
+    "accept": [
+     "6",
+     "6곳",
+     "여섯",
+     "여섯 곳"
+    ],
+    "explain": "줄어드는 곳, 회복 중인 곳, 변화가 없는 곳을 두 곳씩, 모두 여섯 곳 골랐어요."
+   },
+   {
+    "type": "mc",
+    "q": "린든이 켈프 숲에 갈 때 모터보트 대신 노 젓는 배를 탄 까닭은?",
+    "options": [
+     "모터가 켈프에 걸릴 수 있어서",
+     "모터보트가 바다에서 금지돼서",
+     "노 젓는 배가 더 빨라서",
+     "잠수정을 모터보트에 실을 수 없어서"
+    ],
+    "answer": 0,
+    "explain": "모터가 켈프에 걸릴 수 있어서 린든은 아빠와 노 젓는 배를 타고 나갔어요."
+   }
+  ],
+  "어려움": [
+   {
+    "type": "ox",
+    "q": "린든의 켈프 숲 조사로 빗물 유출이 켈프 숲의 회복을 막는다는 것이 밝혀졌다.",
+    "answer": "X",
+    "explain": "빗물 유출은 린든의 짐작일 뿐, 아직 확인되지 않았어요. 영상으로 알아낸 것은 어느 군락에도 성게가 많지 않았다는 점이에요."
+   },
+   {
+    "type": "mc",
+    "q": "린든이 줄어드는 곳, 회복 중인 곳, 변화가 없는 곳을 두 곳씩 고른 조사 설계의 장점으로 알맞은 것은?",
+    "options": [
+     "상태가 다른 숲끼리 성게 수를 견줄 수 있다",
+     "성게가 가장 많은 곳 하나만 찾을 수 있다",
+     "켈프를 새로 심을 곳을 정할 수 있다",
+     "바다에 나가지 않고 조사를 끝낼 수 있다"
+    ],
+    "answer": 0,
+    "explain": "상태가 다른 숲을 나란히 살펴야, 회복 중인 곳에만 성게가 적은지 비교할 수 있어요."
+   }
+  ]
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "voyager": {
+  "set": {
+   "figs": [
+    {
+     "cap": "1광일은 빛이 24시간 동안 가는 거리예요. 지구에서 보낸 명령이 보이저 1호에 닿는 데 하루, 답이 돌아오는 데 또 하루가 걸려요. 아래 줄은 빛이 달과 태양에서 지구까지 오는 시간과 견준 것이에요.",
+     "brief": ""
+    }
+   ]
+  }
+ },
+ "cute": {
+  "set": {
+   "figs": [
+    {
+     "cap": "어른 얼굴(왼쪽)과 아기 도식이 뚜렷한 얼굴(오른쪽). 빨간 점선은 눈의 높이예요. 아기 도식에서는 머리가 크고, 큰 눈이 얼굴 아래쪽에 있어요.",
+     "brief": ""
+    }
+   ]
+  }
+ },
+ "icecube": {
+  "set": {
+   "sources": [
+    {
+     "t": "Press release: Nobel Prize in Physics 2026",
+     "pub": "스웨덴 왕립과학원(NobelPrize.org)",
+     "date": "2026-10-06",
+     "u": "https://www.nobelprize.org/prizes/physics/2026/press-release/",
+     "lang": "en"
+    },
+    {
+     "t": "Francis Halzen to receive 2026 Nobel Prize in Physics for cosmic neutrino detection",
+     "pub": "Physics Today",
+     "date": "2026-10-06",
+     "u": "https://physicstoday.aip.org/news/francis-halzen-to-receive-2026-nobel-prize-in-physics-for-cosmic-neutrino-detection",
+     "lang": "en"
+    }
+   ]
+  }
+ }
+}
