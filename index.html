@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,900;1,700&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4EFE4;--paper2:#FBF8F1;--ink:#1C1A17;--red:#C8372D;--navy:#1F3A5F;--gray:#6B655C;--line:#CFC7B6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Serif KR',serif;-webkit-text-size-adjust:100%}
+body{background-image:radial-gradient(rgba(28,26,23,.035) 1px,transparent 1px);background-size:4px 4px}
+a{color:inherit}
+.sans{font-family:'Noto Sans KR',sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+/* 제호 */
+.mast{padding-top:14px}
+.dateline{display:flex;justify-content:space-between;gap:8px;font-family:'Noto Sans KR';font-size:11.5px;letter-spacing:.02em;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:5px 0;flex-wrap:wrap}
+.dateline b{font-weight:700}
+.nameplate{text-align:center;padding:10px 0 6px;border-bottom:4px double var(--ink)}
+.nameplate h1{font-family:'Playfair Display','Noto Serif KR',serif;font-weight:900;font-size:clamp(58px,14vw,120px);line-height:.95;margin:0;letter-spacing:-.01em}
+.nameplate .en{font-family:'Noto Sans KR';font-weight:700;letter-spacing:.3em;font-size:11.5px;margin-top:8px}
+.nameplate .motto{font-size:13px;color:var(--gray);margin-top:4px}
+.mast-tools{display:flex;justify-content:flex-end;gap:8px;margin-top:-30px;position:relative}
+.tbtn{font-family:'Noto Sans KR';font-weight:700;font-size:12px;border:1px solid var(--ink);background:var(--paper);padding:4px 8px;cursor:pointer;color:var(--ink)}
+/* 영역 탭 */
+.tabs{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--ink);box-shadow:0 2px 0 rgba(28,26,23,.06)}
+.tabs .wrap{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 6px}
+.tabs .wrap::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;font-family:'Noto Sans KR';font-weight:700;font-size:14.5px;padding:11px 11px 9px;border:0;border-bottom:3px solid transparent;background:none;cursor:pointer;color:var(--ink);white-space:nowrap}
+.tab:hover{color:var(--red)}
+.tab.on{color:var(--red);border-bottom-color:var(--red)}
+/* 쪽 */
+.page{padding-top:20px;padding-bottom:90px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid var(--ink);padding-bottom:6px;margin:6px 0 4px}
+.sec-head h2{font-size:clamp(30px,6vw,44px);font-weight:900;margin:0;line-height:1}
+.sec-head .en{font-family:'Noto Sans KR';font-weight:700;letter-spacing:.3em;font-size:11px;color:var(--red)}
+.sec-sub{font-family:'Noto Sans KR';font-size:12px;color:var(--gray);border-bottom:1px solid var(--ink);padding:5px 0 6px;margin-bottom:22px;display:flex;justify-content:space-between}
+article.art{padding:4px 0 30px;margin-bottom:30px;border-bottom:1px solid var(--ink)}
+article.art:last-of-type{border-bottom:0}
+.kicker{font-family:'Noto Sans KR';font-weight:900;color:var(--red);font-size:12.5px;letter-spacing:.12em}
+.title{font-size:clamp(26px,5.2vw,40px);font-weight:900;line-height:1.22;margin:8px 0 12px;word-break:keep-all;letter-spacing:-.02em}
+.deck{font-size:18px;line-height:1.65;color:#3B3530;margin:0 0 14px;word-break:keep-all;padding-left:12px;border-left:3px solid var(--red)}
+.byline{font-family:'Noto Sans KR';font-size:11.5px;color:var(--gray);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:5px 0;margin-bottom:18px;display:flex;justify-content:space-between;gap:10px}
+figure{margin:0 auto 18px;max-width:880px}
+figure .fig{border:1px solid var(--ink);background:var(--paper2);line-height:0}
+figure .fig svg{width:100%;height:auto;display:block}
+figcaption{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);margin-top:7px;line-height:1.55}
+figcaption b{color:var(--ink);margin-right:6px}
+.body{font-size:17.5px;line-height:1.88;word-break:keep-all}
+.body p{margin:0 0 15px;text-align:justify}
+.body p.first::first-letter{float:left;font-size:3.5em;line-height:.88;font-weight:900;margin:7px 9px 0 0;color:var(--red)}
+.body h4{font-family:'Noto Sans KR';font-size:16.5px;font-weight:900;margin:24px 0 8px;break-after:avoid}
+.body h4::before{content:"";display:inline-block;width:9px;height:9px;background:var(--red);margin-right:8px;vertical-align:1px}
+@media(min-width:780px){.body.cols{column-count:2;column-gap:34px;column-rule:1px solid var(--line)} .body.cols .pull,.body.cols .box{break-inside:avoid}}
+.box{border:1.5px solid var(--ink);background:var(--paper2);margin:18px 0;break-inside:avoid}
+.box .bt{background:var(--ink);color:var(--paper);font-family:'Noto Sans KR';font-weight:700;font-size:12.5px;letter-spacing:.06em;padding:5px 11px}
+.box .bb{padding:11px 13px;font-size:16px;line-height:1.75}
+.box ul{margin:6px 0 0;padding-left:20px}
+.pull{font-size:21px;font-weight:700;line-height:1.55;border-top:3px solid var(--ink);border-bottom:1px solid var(--ink);padding:12px 2px 12px;margin:18px 0;break-inside:avoid;word-break:keep-all}
+.pull::before{content:"핵심";display:block;color:var(--red);font-family:'Noto Sans KR';font-size:11.5px;font-weight:700;letter-spacing:.3em;margin-bottom:6px}
+.terms{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0;border:1.5px solid var(--ink);margin:18px 0}
+.terms .th{grid-column:1/-1;background:var(--ink);color:var(--paper);font-family:'Noto Sans KR';font-weight:700;font-size:12.5px;padding:5px 11px;letter-spacing:.06em}
+.term{padding:9px 12px;border-top:1px solid var(--line);font-size:15px;line-height:1.6}
+.term b{font-family:'Noto Sans KR';font-weight:700;display:block;font-size:14px}
+/* 출처 */
+.srcs{border-top:2px solid var(--ink);margin-top:20px;padding-top:8px}
+.srcs .sh{font-family:'Noto Sans KR';font-weight:900;font-size:12.5px;letter-spacing:.1em;margin-bottom:6px}
+.src{border-bottom:1px dashed var(--line);padding:8px 0}
+.src .st{font-size:15px;line-height:1.5;word-break:break-word}
+.src .sm{font-family:'Noto Sans KR';font-size:11.5px;color:var(--gray);margin-top:2px}
+.lang{font-family:'Noto Sans KR';font-size:10.5px;font-weight:700;border:1px solid var(--ink);padding:0 4px;margin-right:6px;vertical-align:1px}
+.sbtns{display:flex;gap:6px;margin-top:6px}
+.sbtn{font-family:'Noto Sans KR';font-weight:700;font-size:12px;border:1px solid var(--ink);background:var(--paper);padding:4px 10px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.sbtn.on{background:var(--ink);color:var(--paper)}
+.ko{display:none;background:var(--paper2);border-left:3px solid var(--navy);padding:9px 12px;margin-top:8px;font-size:15.5px;line-height:1.75}
+.ko.on{display:block}
+.ko .kh{font-family:'Noto Sans KR';font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:4px}
+/* 반응 */
+.react{display:flex;align-items:center;gap:8px;margin-top:14px;font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray)}
+.rb{font-family:'Noto Sans KR';font-weight:700;font-size:12.5px;border:1px solid var(--ink);background:var(--paper);padding:4px 10px;cursor:pointer;color:var(--ink)}
+.rb.on{background:var(--red);border-color:var(--red);color:#fff}
+.rb.dis.on{background:var(--navy);border-color:var(--navy)}
+/* 표지 */
+.cover{border-bottom:3px solid var(--ink);padding-bottom:18px;margin-bottom:22px}
+.cover-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:780px){.cover-grid{grid-template-columns:1.25fr 1fr}}
+.cover .lead .kicker{font-size:13px}
+.cover .lead h2{font-size:clamp(30px,6.5vw,52px);font-weight:900;line-height:1.15;margin:8px 0 12px;letter-spacing:-.03em;word-break:keep-all}
+.cover .lead p{font-size:17px;line-height:1.75;margin:0 0 10px;word-break:keep-all}
+.go{font-family:'Noto Sans KR';font-weight:700;font-size:13px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);padding:7px 12px;cursor:pointer;display:inline-block;text-decoration:none}
+.go.ghost{background:var(--paper);color:var(--ink)}
+.lines{border-top:1px solid var(--ink)}
+.cl{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:11px 0;border-bottom:1px solid var(--ink);cursor:pointer}
+.cl:hover .ct{color:var(--red)}
+.cl .cs{font-family:'Noto Sans KR';font-weight:900;font-size:12px;color:var(--red);letter-spacing:.06em;padding-top:3px}
+.cl .ct{font-weight:700;font-size:17px;line-height:1.45;word-break:keep-all}
+.toc{margin-top:8px}
+.toc h3{font-size:22px;font-weight:900;margin:0 0 6px;border-bottom:3px solid var(--ink);padding-bottom:4px}
+.toc-row{display:grid;grid-template-columns:72px 1fr 44px;gap:8px;padding:8px 0;border-bottom:1px dotted var(--ink);cursor:pointer;align-items:baseline}
+.toc-row:hover{color:var(--red)}
+.toc-row .ts{font-family:'Noto Sans KR';font-weight:700;font-size:12.5px}
+.toc-row .tt{font-size:16px;word-break:keep-all}
+.toc-row .tp{font-family:'Noto Sans KR';font-size:12.5px;text-align:right}
+.editor{display:flex;gap:12px;align-items:center;border:1.5px solid var(--ink);padding:10px 12px;margin-top:18px;background:var(--paper2)}
+.editor .m{width:70px;flex:0 0 70px}
+.editor p{margin:0;font-size:14.5px;line-height:1.65}
+/* 다음 쪽 */
+.next{display:flex;justify-content:space-between;align-items:center;border-top:3px double var(--ink);padding-top:12px;margin-top:10px;font-family:'Noto Sans KR';font-size:13px}
+/* 퀴즈·스도쿠·검사 */
+.panel{border:1.5px solid var(--ink);background:var(--paper2);padding:16px}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.cbtn{font-family:'Noto Sans KR';font-weight:700;font-size:16px;border:1.5px solid var(--ink);background:var(--paper);padding:14px 8px;cursor:pointer;color:var(--ink)}
+.cbtn small{display:block;font-weight:500;font-size:12px;color:var(--gray);margin-top:3px}
+.cbtn:hover,.cbtn.sel{background:var(--ink);color:var(--paper)}
+.cbtn:hover small,.cbtn.sel small{color:var(--line)}
+.qmeta{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);display:flex;justify-content:space-between}
+.qbar{height:4px;background:var(--line);margin:8px 0 14px}
+.qbar i{display:block;height:100%;background:var(--red)}
+.qtext{font-size:21px;font-weight:700;line-height:1.55;margin:4px 0 12px;word-break:keep-all}
+.opt{display:block;width:100%;text-align:left;border:1.5px solid var(--ink);background:var(--paper);padding:12px 13px;margin:8px 0;font-size:16.5px;font-family:'Noto Serif KR';cursor:pointer;color:var(--ink)}
+.opt b{font-family:'Noto Sans KR';color:var(--red);margin-right:8px}
+.opt:hover{background:#efe8d8}
+.ox{font-family:'Noto Sans KR';font-weight:900;font-size:44px;padding:12px 0}
+.disp{font-family:'Noto Sans KR';font-weight:700;font-size:28px;text-align:center;border:1.5px solid var(--ink);padding:10px;min-height:56px;margin:10px 0;background:#fff}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pad button{font-family:'Noto Sans KR';font-weight:700;font-size:22px;border:1.5px solid var(--ink);background:var(--paper);padding:12px 0;cursor:pointer;color:var(--ink)}
+.pad button.ok{background:var(--ink);color:var(--paper)}
+.fb{border:1.5px solid var(--ink);padding:12px 14px;margin-top:12px;font-size:16px;line-height:1.7;background:#fff}
+.fb b{font-family:'Noto Sans KR';font-weight:900;display:block;font-size:17px;margin-bottom:2px}
+.fb.good b{color:#2D6A3E}.fb.bad b{color:var(--red)}
+.tin{width:100%;font-size:19px;padding:11px;border:1.5px solid var(--ink);font-family:'Noto Serif KR';background:#fff}
+.sgrid{display:grid;grid-template-columns:repeat(6,1fr);max-width:360px;margin:12px auto;border:3px solid var(--ink);background:#fff}
+.scell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans KR';font-weight:700;font-size:23px;border:1px solid var(--line);cursor:pointer;user-select:none}
+.scell.given{background:#EDE6D6;cursor:default}
+.scell.user{color:var(--red)}
+.scell.sel{outline:3px solid var(--navy);outline-offset:-3px}
+.scell.br{border-right:3px solid var(--ink)}.scell.bb{border-bottom:3px solid var(--ink)}
+.spad{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.spad button{min-width:46px;height:46px;font-family:'Noto Sans KR';font-weight:700;font-size:20px;border:1.5px solid var(--ink);background:var(--paper);cursor:pointer;color:var(--ink)}
+.result{border:3px double var(--ink);padding:16px;background:#fff;margin-top:12px}
+.result h3{font-size:26px;font-weight:900;margin:4px 0 8px}
+/* 만화 */
+.strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 14px}
+.pnl{border:2.5px solid var(--ink);background:#fff;position:relative;line-height:0}
+.pnl svg{width:100%;height:auto;display:block}
+.bubs{position:absolute;left:6px;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;line-height:1.35;align-items:flex-start}
+.bub{background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:4px 8px;font-family:'Noto Sans KR';font-weight:700;font-size:12.5px;max-width:92%;box-shadow:2px 2px 0 var(--ink)}
+.bub.r{align-self:flex-end}
+.bub.fx{border:0;background:none;box-shadow:none;color:var(--red);font-weight:900;font-size:15px;padding:0 2px}
+.bub.nar{border-radius:0;background:#FFF6CC}
+.pno{position:absolute;right:5px;bottom:5px;font-family:'Noto Sans KR';font-size:10px;font-weight:700;background:var(--ink);color:#fff;padding:0 4px;line-height:1.5}
+/* 책 */
+.book{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--ink)}
+.book img{width:120px;height:auto;border:1px solid var(--ink);box-shadow:4px 4px 0 rgba(28,26,23,.18);background:#fff}
+.book h4{font-size:20px;font-weight:900;margin:0 0 4px;word-break:keep-all}
+.book .bm{font-family:'Noto Sans KR';font-size:12px;color:var(--gray);margin-bottom:8px}
+.book p{font-size:16px;line-height:1.75;margin:0 0 8px;word-break:keep-all}
+.book .why{border-left:3px solid var(--red);padding-left:10px;font-size:15px}
+/* 영상 */
+.vwrap{position:relative;padding-top:56.25%;border:1.5px solid var(--ink);background:#000;margin:10px 0}
+.vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vrow{display:grid;grid-template-columns:1fr;gap:4px;padding:12px 0;border-bottom:1px solid var(--ink)}
+.vrow h4{margin:0;font-size:17px;font-weight:700;word-break:break-word}
+.vrow .vm{font-family:'Noto Sans KR';font-size:12px;color:var(--gray)}
+/* 질문 */
+.ask{position:fixed;right:14px;bottom:16px;z-index:30;border:2px solid var(--ink);background:var(--paper);border-radius:50%;width:74px;height:74px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:3px 3px 0 var(--ink);padding:0}
+.ask span{font-family:'Noto Sans KR';font-weight:900;font-size:10.5px;color:var(--red);line-height:1.1;margin-top:1px}
+.modal{position:fixed;inset:0;background:rgba(28,26,23,.45);display:none;align-items:flex-end;justify-content:center;z-index:40}
+.modal.on{display:flex}
+.sheet{background:var(--paper);width:100%;max-width:680px;max-height:88vh;overflow-y:auto;border-top:4px double var(--ink);padding:18px 18px 26px}
+.sheet h3{font-size:24px;font-weight:900;margin:0 0 4px}
+.sheet textarea{width:100%;min-height:96px;border:1.5px solid var(--ink);padding:11px;font-family:'Noto Serif KR';font-size:17px;background:#fff}
+.ans{background:#fff;border:1.5px solid var(--ink);padding:12px 14px;margin-top:12px;font-size:16px;line-height:1.75;white-space:pre-wrap}
+.note{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);line-height:1.6;margin-top:10px}
+.pnl.wide{grid-column:1/-1}
+.swipehint{display:none;font-family:'Noto Sans KR';font-size:11px;color:var(--gray);text-align:right;margin-top:4px}
+/* 반응형: 태블릿 이상 */
+@media(min-width:1000px){.strip{grid-template-columns:1fr 1fr 1fr}}
+/* 반응형: 휴대폰 */
+@media(max-width:600px){
+  .wrap{padding:0 14px}
+  .mast{padding-top:10px}
+  .dateline{font-size:10.5px;justify-content:center;text-align:center}
+  .nameplate{padding:8px 0 4px}
+  .nameplate .en{letter-spacing:.3em;font-size:10px}
+  .nameplate .motto{font-size:12px}
+  .mast-tools{margin:6px 0 0;justify-content:center}
+  .tab{font-size:14px;padding:10px 9px 8px}
+  .page{padding-top:16px;padding-bottom:96px}
+  .title{font-size:25px;line-height:1.28}
+  .deck{font-size:16px}
+  .body{font-size:17px;line-height:1.86}
+  .body p{text-align:left}
+  .pull{font-size:18.5px}
+  .sec-head h2{font-size:30px}
+  .terms{grid-template-columns:1fr}
+  .fig.wide-fig{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .fig.wide-fig svg{min-width:620px}
+  .swipehint{display:block}
+  .strip{grid-template-columns:1fr;gap:12px}
+  .pnl{line-height:normal}
+  .bubs{position:static;padding:8px;background:#fff;border-top:1.5px solid var(--ink);gap:5px}
+  .bub{box-shadow:none;font-size:14px;max-width:100%}
+  .bub.r{align-self:flex-start}
+  .book{grid-template-columns:92px 1fr;gap:12px}
+  .book img{width:92px}
+  .book h4{font-size:18px}
+  .toc-row{grid-template-columns:62px 1fr 30px}
+  .cl{grid-template-columns:54px 1fr}
+  .cl .ct{font-size:16px}
+  .cover .lead h2{font-size:30px}
+  .ask{width:60px;height:60px;right:10px;bottom:12px}
+  .ask span{font-size:9px}
+  .qtext{font-size:19px}
+  .ox{font-size:36px}
+  .sheet{max-height:92vh}
+}
+body.inner .dateline{display:none}
+body.inner .nameplate{padding:6px 0 4px;border-bottom-width:3px}
+body.inner .nameplate h1{font-size:38px}
+body.inner .nameplate .en,body.inner .nameplate .motto{display:none}
+body.inner .mast-tools{margin-top:-30px}
+@media(max-width:600px){body.inner .nameplate{text-align:left} body.inner .mast-tools{margin-top:-32px;justify-content:flex-end}}
+.toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:'Noto Sans KR';font-weight:700;padding:9px 14px;z-index:50;display:none}
+.bintro{font-size:16px;line-height:1.75;margin:14px 0}
+.bscore{display:flex;flex-direction:column;gap:3px;margin:10px 0 12px;padding:8px 10px;border:1px solid var(--ink);font-family:'Noto Sans KR';font-size:12.5px;background:#FBF8F1}
+.bscore a{color:var(--ink);text-decoration:none}.bscore a:hover{text-decoration:underline}.nw{white-space:nowrap}.bscore b{color:var(--red);font-weight:700;margin:0 3px}
+
+/* 낱말 풀이 */
+.tw{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;border-bottom:2px dotted var(--red);line-height:inherit}
+.tw:hover,.tw.on{background:rgba(200,55,45,.10)}
+#tip{position:absolute;z-index:60;max-width:300px;background:var(--paper2);border:1.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:10px 12px;font-family:'Noto Sans KR';font-size:14.5px;line-height:1.6;display:none}
+#tip b{display:block;color:var(--red);font-size:13px;letter-spacing:.06em;margin-bottom:3px}
+.howto{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);margin:-6px 0 14px}
+.howto span{border-bottom:2px dotted var(--red);color:var(--ink)}
+/* 넓은 블록은 두 단을 가로질러 */
+.body .sim,.body .artimg,.body .details{column-span:all;break-inside:avoid}
+/* 시뮬레이터 */
+.sim{border:2px solid var(--ink);background:var(--paper2);margin:22px 0;padding:0 0 12px}
+.sim-head{background:var(--red);color:#fff;font-family:'Noto Sans KR';font-weight:900;font-size:14px;letter-spacing:.06em;padding:7px 12px}
+.body .sim p.sim-goal,.sim-goal{font-size:16.5px;line-height:1.7;margin:12px 14px 8px;text-align:left}
+.sim-modes{display:flex;gap:8px;margin:0 14px 6px;flex-wrap:wrap}
+.sim-modes button,.sim-ctl button{font-family:'Noto Sans KR';font-weight:700;font-size:15px;border:1.5px solid var(--ink);background:var(--paper);padding:9px 12px;cursor:pointer;color:var(--ink)}
+.sim-modes button.on{background:var(--ink);color:var(--paper)}
+.sim-how{font-family:'Noto Sans KR';font-size:14px;line-height:1.6;color:#3B3530;margin:4px 14px 8px;min-height:44px}
+.sim canvas{display:block;width:100%;max-width:480px;aspect-ratio:1/1;margin:0 auto;border:1px solid var(--line);background:#fff;touch-action:none}
+.sim-ctl{display:flex;align-items:center;gap:8px;margin:10px 14px 0;flex-wrap:wrap}
+.sim-ctl input[type=range]{flex:1;min-width:140px;accent-color:var(--red)}
+.sim-ctl #simDeg{font-family:'Noto Sans KR';font-weight:900;min-width:44px;text-align:right}
+.sim-out{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 14px 0}
+.so{border:1.5px solid var(--ink);padding:8px 10px;font-family:'Noto Sans KR'}
+.so span{display:block;font-size:12.5px;color:var(--gray)}
+.so b{font-size:22px}
+.so.cur{background:#FFF3D6}
+.body .sim p.sim-note,.sim-note{text-align:left;font-family:'Noto Sans KR';font-size:14px;line-height:1.6;margin:10px 14px 0}
+.body .sim p.sim-note.win,.sim-note.win{background:#FFF3D6;border-left:4px solid var(--red);padding:8px 10px}
+/* 작품 그림 */
+.artimg{margin:20px 0}
+.artimg img{width:100%;display:block;border:1px solid var(--ink);background:#fff}
+.artimg .cap{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);margin-top:7px;line-height:1.55}
+.artimg .cap b{color:var(--ink)}
+.artimg .zoomhint{font-family:'Noto Sans KR';font-size:12px;color:var(--red);margin-top:3px}
+.details{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:18px 0}
+.dt{border:1.5px solid var(--ink);background:var(--paper2)}
+.dt img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;border-bottom:1px solid var(--ink)}
+.dt .dl{font-family:'Noto Sans KR';font-weight:900;font-size:14px;padding:7px 10px 0}
+.dt .dl i{font-style:normal;color:#fff;background:var(--red);display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;margin-right:6px;font-size:12px}
+.dt .dn{font-size:15px;line-height:1.65;padding:4px 10px 10px}
+/* 대화(경제) */
+.body p.talk{text-align:left;padding-left:3.4em;text-indent:-3.4em}
+.body p.talk b.who{font-family:'Noto Sans KR';font-weight:900;display:inline-block;width:3.1em;text-indent:0}
+.body p.talk.dad b.who{color:var(--navy)} .body p.talk.kid b.who{color:var(--red)}
+/* 한 쪽 표지 */
+body.cover-mode #mast{display:none}
+@media(max-width:899px){body.cover-mode .ask{display:none}}
+body.cover-mode .page{padding-top:0;padding-bottom:0}
+.cover1{display:flex;flex-direction:column;height:calc(100svh - 46px);min-height:560px;padding:10px 0 12px}
+.c-top{display:flex;justify-content:space-between;gap:8px;font-family:'Noto Sans KR';font-size:11.5px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);padding:4px 0}
+.c-top b{color:var(--red)}
+.c-name{font-family:'Playfair Display','Noto Serif KR',serif;font-weight:900;font-size:clamp(64px,19vw,150px);line-height:.9;margin:6px 0 0;text-align:center;letter-spacing:-.01em}
+.c-sub{text-align:center;font-family:'Noto Sans KR';font-weight:700;font-size:12px;letter-spacing:.32em;border-bottom:4px double var(--ink);padding:4px 0 7px}
+.c-art{position:relative;flex:1 1 auto;min-height:0;margin-top:10px;border:1.5px solid var(--ink);overflow:hidden;background:var(--navy);cursor:pointer}
+.c-art svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.c-head{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(244,239,228,.0) 0%,rgba(244,239,228,.96) 22%);padding:34px 14px 12px}
+.c-head .kicker{font-size:11.5px}
+.c-head h2{font-size:clamp(22px,5.4vw,38px);font-weight:900;line-height:1.22;margin:4px 0 0;word-break:keep-all;letter-spacing:-.02em}
+.c-lines{display:grid;grid-template-columns:1fr;gap:0;margin-top:8px}
+.c-l{display:flex;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer}
+.c-l .cs{font-family:'Noto Sans KR';font-weight:900;color:var(--red);font-size:12px;min-width:3.2em}
+.c-l .ct{font-size:15px;font-weight:700;line-height:1.35;word-break:keep-all;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-l .cp{font-family:'Noto Sans KR';font-size:12px;color:var(--gray)}
+.c-foot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;gap:8px}
+.c-foot .go{margin:0}
+@media(min-width:900px){
+  .cover1{display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:auto auto auto 1fr auto;column-gap:26px}
+  .c-top,.c-name,.c-sub{grid-column:1 / -1}
+  .c-art{grid-column:1;grid-row:4 / 6;margin-top:12px}
+  .c-lines{grid-column:2;grid-row:4;align-self:start;margin-top:12px}
+  .c-foot{grid-column:2;grid-row:5}
+  .c-l .ct{white-space:normal}
+}
+.c-deck,.c-lh{display:none}
+@media(max-width:899px){.c-l:nth-child(n+7){display:none}}
+@media(max-width:899px) and (max-height:760px){.c-l:nth-child(n+6){display:none}}
+@media(min-width:900px){.c-deck{display:block;font-size:17px;line-height:1.7;color:#3B3530;border-left:3px solid var(--red);padding-left:12px;margin-bottom:16px}.c-lh{display:block;font-family:'Noto Sans KR';font-weight:900;font-size:12px;letter-spacing:.2em;border-bottom:2px solid var(--ink);padding-bottom:4px}}
+/* 차례 쪽 */
+.howread{border:1.5px solid var(--ink);background:var(--paper2);padding:10px 14px;margin:18px 0;font-family:'Noto Sans KR';font-size:14.5px;line-height:1.7}
+.howread b{color:var(--red)}
+/* 만화 콘티 */
+.comic-wait{border:2px dashed var(--ink);background:var(--paper2);padding:14px;margin:6px 0 18px;font-family:'Noto Sans KR';font-size:15px;line-height:1.7}
+.conti{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ct-p{border:1.5px solid var(--ink);background:#fff;padding:10px 12px;position:relative;min-height:120px}
+.ct-p .pn{position:absolute;top:6px;right:8px;font-family:'Noto Sans KR';font-weight:900;color:var(--red)}
+.ct-p .ln{font-size:15.5px;line-height:1.6;margin:4px 0}
+.ct-p .ln b{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);margin-right:6px}
+.ct-p .ln.nar{font-style:italic;color:#3B3530}
+.ct-p .ln.fx{font-family:'Noto Sans KR';font-weight:900;color:var(--red)}
+.comic-img img{width:100%;display:block;border:1.5px solid var(--ink)}
+/* 영상 */
+.vstat{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);margin:2px 0 6px}
+.vwhy{font-size:15.5px;line-height:1.7;margin:4px 0}
+.vtip{font-family:'Noto Sans KR';font-size:13.5px;background:#FFF3D6;padding:6px 9px;margin:6px 0}
+.strip.gpt{grid-template-columns:1fr 1fr}
+.pnl.img{line-height:normal}
+.pnl.img .bubs{position:static;padding:8px 10px;background:#fff;border-top:1.5px solid var(--ink);gap:5px}
+.pnl.img .bub{box-shadow:none;font-size:14px;max-width:100%}
+.pnl.img .pno{top:6px;bottom:auto;left:6px;right:auto;font-size:12px;padding:1px 6px}
+@media(max-width:600px){.strip.gpt{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="mast wrap" id="mast"></header>
+<nav class="tabs"><div class="wrap" id="tabs"></div></nav>
+<main class="wrap page" id="page"></main>
+<button class="ask" id="askBtn" aria-label="무엇이든 물어보세요"><span id="askIc"></span><span>무엇이든<br>물어보세요</span></button>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script src="config.js" onerror="void 0"></script>
+<script></script>
+<script>
+window.boot = function(DATA){
+"use strict";
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = "nova-1";
+const CFG = window.SEOA_CONFIG || {};
+let S = {reactions:{}, qa:[], sudoku:null};
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) S = Object.assign(S, s); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+function toast(t){ const el = $("#toast"); el.textContent = t; el.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(() => el.style.display = "none", 2000); }
+function log(kind, payload){
+  if (!CFG.gasUrl) return;
+  try { fetch(CFG.gasUrl, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body: JSON.stringify(Object.assign({kind, issue: DATA.issue.no, t: new Date().toISOString()}, payload))}).catch(() => {}); } catch(e) {}
+}
+const A = DATA.articles, F = DATA.figs || {}, SECS = DATA.sections;
+
+/* ---------- 제호와 탭 ---------- */
+$("#mast").innerHTML = `
+  <div class="dateline"><span><b>${esc(DATA.issue.label)}</b> · ${esc(DATA.issue.dateText)}</span><span>기획 서아 · 매주 금요일 밤 10시 발행</span></div>
+  <div class="nameplate"><h1>Nova</h1><div class="en">서아가 기획한 주간 과학 교양지</div><div class="motto">노바(Nova): 어느 날 갑자기 밝게 빛나는 '새 별'이라는 뜻이에요</div></div>
+  <div class="mast-tools"><button class="tbtn" id="calBtn">지난 호</button></div>`;
+$("#askIc").innerHTML = F.teacher || "";
+$("#tabs").innerHTML = SECS.map(s => `<button class="tab" data-s="${s.id}">${esc(s.name)}</button>`).join("");
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => go(b.dataset.s, true));
+
+/* ---------- 공통 조각 ---------- */
+const figHtml = (id, n) => {
+  const a = A[id]; const fg = (a && a.figs) || [];
+  return fg.map((f, i) => F[id + (i ? "_" + (i+1) : "")] ? `<figure><div class="fig wide-fig">${F[id + (i ? "_" + (i+1) : "")]}</div><div class="swipehint">그림을 옆으로 밀어 보세요 ↔</div><figcaption><b>그림 ${n}${fg.length>1?"-"+(i+1):""}</b>${esc(f.cap)}</figcaption></figure>` : "").join("");
+};
+function linkTerms(html, ctx){
+  if (!ctx || !ctx.terms) return html;
+  for (const tm of ctx.terms){
+    if (ctx.used.has(tm.k)) continue;
+    const key = esc(tm.k); const i = html.indexOf(key);
+    if (i < 0) continue;
+    // 태그 속이면 건너뜀
+    const lt = html.lastIndexOf("<", i), gt = html.lastIndexOf(">", i);
+    if (lt > gt) continue;
+    html = html.slice(0, i) + `<button class="tw" data-w="${esc(tm.w)}" data-m="${esc(tm.m)}">${key}</button>` + html.slice(i + key.length);
+    ctx.used.add(tm.k);
+  }
+  return html;
+}
+function termCtx(a){
+  const ts = ((a && a.terms) || []).map(t => ({w: t.w, m: t.m, k: String(t.w).replace(/\s*\(.*?\)\s*/g, "").trim()})).filter(t => t.k.length >= 2);
+  ts.sort((x, y) => y.k.length - x.k.length);
+  return {terms: ts, used: new Set()};
+}
+function bodyHtml(bs, ctx, id){
+  let first = true;
+  return (bs||[]).map(b => {
+    if (b.t === "p") {
+      const m = /^(아빠|서아)\s*:\s*(.*)$/.exec(b.x || "");
+      if (m) { first = false; return `<p class="talk ${m[1]==="아빠"?"dad":"kid"}"><b class="who">${esc(m[1])}</b>${linkTerms(esc(m[2]), ctx)}</p>`; }
+      const h = `<p class="${first?"first":""}">${linkTerms(esc(b.x), ctx)}</p>`; first = false; return h;
+    }
+    if (b.t === "h") return `<h4>${esc(b.x)}</h4>`;
+    if (b.t === "quote") return `<div class="pull">${esc(b.x)}</div>`;
+    if (b.t === "box") return `<div class="box"><div class="bt">${esc(b.title||"")}</div><div class="bb">${b.x?linkTerms(esc(b.x), ctx):""}${(b.items&&b.items.length)?`<ul>${b.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:""}</div></div>`;
+    if (b.t === "list") return `<ul>${b.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`;
+    if (b.t === "sim") return simHtml(b.x);
+    if (b.t === "art") return artImgHtml(id, b.i || 0);
+    if (b.t === "details") return detailsHtml(id);
+    return "";
+  }).join("");
+}
+function termsHtml(ts){ return (ts&&ts.length) ? `<div class="terms"><div class="th">용어 정리</div>${ts.map(t=>`<div class="term"><b>${esc(t.w)}</b>${esc(t.m)}</div>`).join("")}</div>` : ""; }
+function srcHtml(id, ss){
+  if (!ss || !ss.length) return "";
+  return `<div class="srcs"><div class="sh">출처</div>${ss.map((s, i) => `<div class="src">
+      <div class="st"><span class="lang">${s.lang==="en"?"영어":"한국어"}</span>${esc(s.t)}</div>
+      <div class="sm">${esc(s.pub||"")}${s.date?" · "+esc(s.date):""}</div>
+      <div class="sbtns"><a class="sbtn" href="${esc(s.u)}" target="_blank" rel="noopener">원문 보기 ↗</a>${(s.lang==="en"&&s.ko)?`<button class="sbtn kbtn" data-k="${id}-${i}">국문 요약</button>`:""}</div>
+      ${(s.lang==="en"&&s.ko)?`<div class="ko" id="ko-${id}-${i}"><div class="kh">국문 요약 · Nova 편집부가 원문을 읽고 우리말로 정리했어요</div>${esc(s.ko)}</div>`:""}
+    </div>`).join("")}</div>`;
+}
+function reactHtml(id){
+  const r = S.reactions[id];
+  return `<div class="react">이 기사 어땠나요? <button class="rb ${r==="like"?"on":""}" data-id="${id}" data-r="like">좋아요</button><button class="rb dis ${r==="dislike"?"on":""}" data-id="${id}" data-r="dislike">별로예요</button></div>`;
+}
+let figNo = 0;
+function articleHtml(id){
+  const a = A[id]; if (!a) return "";
+  figNo++;
+  const long = (a.body||[]).filter(b=>b.t==="p").map(b=>b.x).join("").length > 900;
+  return `<article class="art" id="a-${id}">
+    <div class="kicker">${esc(a.kicker||a.section)}</div>
+    <h3 class="title">${esc(a.title)}</h3>
+    <p class="deck">${esc(a.deck||"")}</p>
+    <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
+    ${figHtml(id, figNo)}
+    ${(a.terms&&a.terms.length)?`<div class="howto">밑줄 친 <span>낱말</span>을 누르면 뜻이 나와요.</div>`:""}
+    <div class="body ${long?"cols":""}">${bodyHtml(a.body, termCtx(a), id)}</div>
+    ${termsHtml(a.terms)}
+    ${srcHtml(id, a.sources)}
+    ${reactHtml(id)}
+  </article>`;
+}
+function bindArticleBits(root){
+  root.querySelectorAll(".kbtn").forEach(b => b.onclick = () => { const el = $("#ko-" + b.dataset.k); const on = !el.classList.contains("on"); el.classList.toggle("on", on); b.classList.toggle("on", on); });
+  root.querySelectorAll(".rb").forEach(b => b.onclick = () => {
+    const id = b.dataset.id, r = b.dataset.r; S.reactions[id] = S.reactions[id] === r ? null : r; save();
+    b.parentElement.querySelectorAll(".rb").forEach(x => x.classList.toggle("on", S.reactions[id] === x.dataset.r));
+    log("reaction", {target: "기사", id, r: S.reactions[id] || "취소"});
+  });
+}
+function secHead(s){
+  const idx = SECS.findIndex(x => x.id === s.id);
+  return `<div class="sec-head"><h2>${esc(s.name)}</h2><span class="en">${esc(s.en||"")}</span></div>
+    <div class="sec-sub"><span>${esc(s.desc||"")}</span><span>${s.pages?esc(s.pages)+"쪽":""}</span></div>`;
+}
+function nextHtml(id){
+  const i = SECS.findIndex(s => s.id === id);
+  const prev = SECS[i-1], next = SECS[i+1];
+  return `<div class="next">${prev?`<button class="go ghost" data-go="${prev.id}">← ${esc(prev.name)}</button>`:"<span></span>"}${next?`<button class="go" data-go="${next.id}">${esc(next.name)} →</button>`:"<span></span>"}</div>`;
+}
+
+
+/* ---------- 낱말 풀이 말풍선 ---------- */
+(function(){
+  const tip = document.createElement("div"); tip.id = "tip"; document.body.appendChild(tip);
+  let cur = null;
+  document.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest(".tw");
+    if (cur) { cur.classList.remove("on"); }
+    if (!b || b === cur) { tip.style.display = "none"; cur = null; return; }
+    cur = b; b.classList.add("on");
+    tip.innerHTML = `<b>${esc(b.dataset.w)}</b>${esc(b.dataset.m)}`;
+    tip.style.display = "block";
+    const r = b.getBoundingClientRect(), W = Math.min(300, window.innerWidth - 24);
+    tip.style.maxWidth = W + "px";
+    let left = r.left + window.scrollX; if (left + W > window.scrollX + window.innerWidth - 12) left = window.scrollX + window.innerWidth - 12 - W;
+    tip.style.left = Math.max(window.scrollX + 12, left) + "px";
+    tip.style.top = (r.bottom + window.scrollY + 8) + "px";
+  });
+})();
+
+/* ---------- 바늘(연필) 돌리기 시뮬레이터 ---------- */
+function simHtml(){
+  return `<div class="sim" id="sim">
+    <div class="sim-head">직접 돌려 보기 · 연필 반 바퀴 돌리기</div>
+    <p class="sim-goal">빨간 연필심이 지금 <b>오른쪽</b>을 보고 있어요. 연필을 반 바퀴 돌려서 연필심이 <b>왼쪽</b>을 보게 만들어요. 연필이 지나간 자리는 빨갛게 칠해져요. <b>칠하는 칸을 가장 적게</b> 하려면 어떻게 돌려야 할까요?</p>
+    <div class="sim-modes"><button class="on" data-m="c">① 가운데 잡고 돌리기</button><button data-m="d">② 밀면서 돌리기</button></div>
+    <div class="sim-how" id="simHow"></div>
+    <canvas id="simCv" width="480" height="480" aria-label="연필 돌리기 그림"></canvas>
+    <div class="sim-ctl"><button id="simPlay">▶ 돌려 보기</button><input type="range" id="simR" min="0" max="180" value="0" step="1" aria-label="돌린 각도"><span id="simDeg">0°</span><button id="simReset">처음으로</button></div>
+    <div class="sim-out"><div class="so" id="soC"><span>① 동그라미로 칠한 칸</span><b id="simC">아직</b></div><div class="so" id="soD"><span>② 세 뾰족 별로 칠한 칸</span><b id="simD">아직</b></div></div>
+    <p class="sim-note" id="simNote">모눈 한 칸이 넓이 1이에요. 연필 길이는 모눈 12칸이에요. 막대를 손으로 밀어도(드래그) 돌아가요.</p>
+  </div>`;
+}
+function bindSim(){
+  const cv = document.getElementById("simCv"); if (!cv) return;
+  const W = 480, C = W/2, L = 240, CELL = 20, R = Math.PI/180;
+  const ctx = cv.getContext("2d");
+  const tr = document.createElement("canvas"); tr.width = W; tr.height = W; const tx = tr.getContext("2d");
+  let mode = "c", deg = 0, last = 0, playing = false, raf = 0, res = {c: null, d: null};
+  const HOW = {c: "연필 한가운데를 손가락으로 꾹 누른 채 빙글 돌려요. 가운데(점)는 제자리에 있고, 연필의 두 끝이 커다란 동그라미를 그려요.",
+               d: "연필을 조금 밀고, 조금 돌리기를 되풀이해요. 연필 가운데는 작은 점선 동그라미를 따라 움직이고, 연필의 두 끝은 세 뾰족 별(델토이드)의 테두리를 따라 미끄러져요."};
+  function pose(m, dg){ // 화면 좌표: 앞(연필심), 뒤(지우개), 가운데
+    const p = dg*R, mx = m === "d" ? C + L/4*Math.cos(2*p) : C, my = m === "d" ? C + L/4*Math.sin(2*p) : C;
+    const dx = Math.cos(p), dy = -Math.sin(p);
+    return {f: [mx + dx*L/2, my + dy*L/2], b: [mx - dx*L/2, my - dy*L/2], m: [mx, my], d: [dx, dy]};
+  }
+  function paint(a, b){ // a→b 도까지 지나간 자리 칠하기
+    const step = 0.5, n = Math.max(1, Math.ceil(Math.abs(b - a)/step));
+    tx.fillStyle = "#C8372D";
+    for (let i = 0; i < n; i++){
+      const p1 = pose(mode, a + (b - a)*i/n), p2 = pose(mode, a + (b - a)*(i+1)/n);
+      tx.beginPath(); tx.moveTo(...p1.b); tx.lineTo(...p1.f); tx.lineTo(...p2.f); tx.lineTo(...p2.b); tx.closePath(); tx.fill("nonzero");
+    }
+  }
+  function cells(){
+    const d = tx.getImageData(0, 0, W, W).data; let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 127) n++;
+    return n / (CELL*CELL);
+  }
+  function guide(){
+    ctx.save(); ctx.setLineDash([6, 6]); ctx.strokeStyle = "rgba(31,58,95,.55)"; ctx.lineWidth = 1.5;
+    if (mode === "c") { ctx.beginPath(); ctx.arc(C, C, L/2, 0, 2*Math.PI); ctx.stroke(); }
+    else {
+      ctx.beginPath(); for (let i = 0; i <= 360; i++){ const t = i*R, x = (2*Math.cos(t) + Math.cos(2*t))*L/4, y = (2*Math.sin(t) - Math.sin(2*t))*L/4; i ? ctx.lineTo(C + x, C - y) : ctx.moveTo(C + x, C - y); } ctx.stroke();
+      ctx.beginPath(); ctx.arc(C, C, L/4, 0, 2*Math.PI); ctx.strokeStyle = "rgba(200,55,45,.5)"; ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function pencil(P){
+    const [fx, fy] = P.f, [bx, by] = P.b, [dx, dy] = P.d, nx = -dy, ny = dx, w = 7;
+    const e = [bx + dx*16, by + dy*16], k = [fx - dx*30, fy - dy*30], tip = [fx - dx*10, fy - dy*10];
+    const quad = (a, b, col) => { ctx.beginPath(); ctx.moveTo(a[0]+nx*w, a[1]+ny*w); ctx.lineTo(b[0]+nx*w, b[1]+ny*w); ctx.lineTo(b[0]-nx*w, b[1]-ny*w); ctx.lineTo(a[0]-nx*w, a[1]-ny*w); ctx.closePath(); ctx.fillStyle = col; ctx.fill(); ctx.stroke(); };
+    ctx.save(); ctx.lineWidth = 1.6; ctx.strokeStyle = "#1C1A17"; ctx.lineJoin = "round";
+    quad(P.b, e, "#E9A1A6"); quad(e, k, "#F2C14E");
+    ctx.beginPath(); ctx.moveTo(k[0]+nx*w, k[1]+ny*w); ctx.lineTo(P.f[0], P.f[1]); ctx.lineTo(k[0]-nx*w, k[1]-ny*w); ctx.closePath(); ctx.fillStyle = "#E8C9A0"; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(tip[0]+nx*w*.34, tip[1]+ny*w*.34); ctx.lineTo(P.f[0], P.f[1]); ctx.lineTo(tip[0]-nx*w*.34, tip[1]-ny*w*.34); ctx.closePath(); ctx.fillStyle = "#C8372D"; ctx.fill();
+    ctx.beginPath(); ctx.arc(P.m[0], P.m[1], 4.5, 0, 2*Math.PI); ctx.fillStyle = mode === "c" ? "#1F3A5F" : "#C8372D"; ctx.fill();
+    ctx.restore();
+  }
+  function draw(){
+    ctx.clearRect(0, 0, W, W); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, W);
+    ctx.strokeStyle = "#E6E0D2"; ctx.lineWidth = 1;
+    for (let i = 0; i <= W; i += CELL){ ctx.beginPath(); ctx.moveTo(i+.5, 0); ctx.lineTo(i+.5, W); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, i+.5); ctx.lineTo(W, i+.5); ctx.stroke(); }
+    ctx.save(); ctx.globalAlpha = .32; ctx.drawImage(tr, 0, 0); ctx.restore();
+    guide(); pencil(pose(mode, deg));
+    document.getElementById("simDeg").textContent = Math.round(deg) + "°";
+    document.getElementById("simR").value = deg;
+  }
+  function setTo(nd){
+    nd = Math.max(0, Math.min(180, nd));
+    if (nd > last) { paint(last, nd); last = nd; }
+    deg = nd; draw();
+    const n = cells(); document.getElementById(mode === "c" ? "simC" : "simD").textContent = "약 " + Math.round(n) + "칸";
+    if (last >= 180 && res[mode] === null){ res[mode] = n; done(); }
+  }
+  function done(){
+    const note = document.getElementById("simNote");
+    if (res.c !== null && res.d !== null){
+      note.className = "sim-note win";
+      note.innerHTML = `② 세 뾰족 별(약 ${Math.round(res.d)}칸)은 ① 동그라미(약 ${Math.round(res.c)}칸)의 <b>딱 절반</b>이에요. 같은 연필을 같은 반 바퀴만큼 돌렸는데, 돌리는 방법만 바꿔도 칠하는 자리가 절반으로 줄어요. 수학으로 정확히 계산해도 절반이에요.`;
+    } else {
+      note.className = "sim-note";
+      note.innerHTML = mode === "c" ? "동그라미를 다 칠했어요. 이제 위의 <b>② 밀면서 돌리기</b>를 눌러 비교해 보세요." : "세 뾰족 별을 다 칠했어요. 이제 위의 <b>① 가운데 잡고 돌리기</b>를 눌러 비교해 보세요.";
+    }
+  }
+  function reset(m){
+    cancelAnimationFrame(raf); playing = false; document.getElementById("simPlay").textContent = "▶ 돌려 보기";
+    if (m) mode = m;
+    tx.clearRect(0, 0, W, W); deg = 0; last = 0;
+    document.querySelectorAll(".sim-modes button").forEach(b => b.classList.toggle("on", b.dataset.m === mode));
+    document.getElementById("soC").classList.toggle("cur", mode === "c"); document.getElementById("soD").classList.toggle("cur", mode === "d");
+    document.getElementById("simHow").textContent = HOW[mode];
+    if (res[mode] === null) document.getElementById(mode === "c" ? "simC" : "simD").textContent = "아직";
+    draw();
+  }
+  function play(){
+    if (playing){ playing = false; cancelAnimationFrame(raf); document.getElementById("simPlay").textContent = "▶ 돌려 보기"; return; }
+    if (deg >= 180) reset();
+    playing = true; document.getElementById("simPlay").textContent = "❚❚ 멈추기";
+    let t0 = performance.now(), d0 = deg;
+    const tick = now => { if (!playing) return; const nd = d0 + (now - t0)/1000*30; setTo(nd); if (nd < 180) raf = requestAnimationFrame(tick); else { playing = false; document.getElementById("simPlay").textContent = "▶ 다시 돌려 보기"; } };
+    raf = requestAnimationFrame(tick);
+  }
+  document.querySelectorAll(".sim-modes button").forEach(b => b.onclick = () => reset(b.dataset.m));
+  document.getElementById("simPlay").onclick = play;
+  document.getElementById("simReset").onclick = () => reset();
+  document.getElementById("simR").oninput = e => { if (playing) play(); setTo(+e.target.value); };
+  // 캔버스를 끌어서 돌리기
+  let drag = false, dragA = 0;
+  const ang = e => { const r = cv.getBoundingClientRect(), x = (e.clientX - r.left)*W/r.width - C, y = (e.clientY - r.top)*W/r.height - C; return Math.atan2(-y, x)/R; };
+  cv.addEventListener("pointerdown", e => { drag = true; dragA = ang(e); cv.setPointerCapture(e.pointerId); if (playing) play(); });
+  cv.addEventListener("pointermove", e => { if (!drag) return; let a = ang(e), dd = a - dragA; if (dd > 180) dd -= 360; if (dd < -180) dd += 360; dragA = a; if (dd > 0) setTo(deg + dd); });
+  cv.addEventListener("pointerup", () => drag = false);
+  reset("c");
+}
+
+/* ---------- 작품 그림 ---------- */
+function artImgHtml(id, i){
+  const a = A[id], w = (a.artworks||[])[i]; if (!w) return "";
+  const src = (DATA.images||{})[id + "_" + i]; if (!src) return "";
+  return `<div class="artimg"><img src="${src}" alt="${esc(w.title)}">
+    <div class="cap"><b>${esc(w.artist)}, 「${esc(w.title)}」</b>${w.year?" · "+esc(w.year):""}${w.medium?" · "+esc(w.medium):""}${w.size?" · "+esc(w.size):""}${w.owner?" · "+esc(w.owner)+" 소장":""}<br>이미지: 위키미디어 공용(퍼블릭 도메인)</div></div>`;
+}
+function detailsHtml(id){
+  const a = A[id], ds = a.details || [];
+  return `<div class="details">${ds.map((d, k) => { const src = (DATA.images||{})[id + "_d" + k]; return src ? `<div class="dt"><img src="${src}" alt="${esc(d.label)}"><div class="dl"><i>${k+1}</i>${esc(d.label)}</div><div class="dn">${esc(d.note)}</div></div>` : ""; }).join("")}</div>`;
+}
+
+/* ---------- 쪽마다 그리기 ---------- */
+function go(id, push){
+  const s = SECS.find(x => x.id === id) || SECS[0];
+  document.body.classList.toggle("inner", s.id !== "cover");
+  document.body.classList.toggle("cover-mode", s.id === "cover");
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("on", b.dataset.s === s.id));
+  const on = $(`.tab[data-s="${s.id}"]`); if (on && on.scrollIntoView) on.scrollIntoView({block:"nearest", inline:"center"});
+  figNo = s.figStart || 0;
+  let h = "";
+  if (s.id === "cover") h = coverHtml();
+  else if (s.kind === "contents") h = contentsHtml(s);
+  else if (s.kind === "quiz") h = secHead(s) + `<div id="quizBox"></div>`;
+  else if (s.kind === "sudoku") h = secHead(s) + sudokuHtml();
+  else if (s.kind === "video") h = secHead(s) + videoHtml();
+  else if (s.kind === "chiikawa") h = secHead(s) + chiikawaHtml();
+  else h = secHead(s) + s.items.map(it => it === "psytest" ? psyHtml() : it === "comic" ? comicHtml() : it === "books" ? booksHtml() : articleHtml(it)).join("");
+  if (s.id !== "cover") h += nextHtml(s.id);
+  $("#page").innerHTML = h;
+  bindArticleBits($("#page"));
+  $("#page").querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go, true));
+  if (s.kind === "quiz") quizHome();
+  if (s.kind === "sudoku") bindSudoku();
+  if (s.items && s.items.includes("psytest")) bindPsy();
+  if (s.kind === "chiikawa") loadX();
+  bindSim();
+  if (s.id === "cover") { const sv = document.querySelector(".c-art svg"); if (sv) sv.setAttribute("preserveAspectRatio", "xMidYMid meet"); }
+  if (push) { try { history.replaceState(null, "", "#" + s.id); } catch(e) { location.hash = s.id; } window.scrollTo(0, 0); }
+}
+
+/* ---------- 표지 ---------- */
+function coverHtml(){
+  const C = DATA.cover;
+  return `<section class="cover1">
+    <div class="c-top"><span><b>${esc(DATA.issue.label)}</b></span><span>${esc(DATA.issue.dateText)}</span><span>매주 금요일 밤 10시</span></div>
+    <h1 class="c-name">Nova</h1>
+    <div class="c-sub">서아가 기획한 주간 과학 교양지</div>
+    <div class="c-art" data-go="${C.go}">${F.cover || ""}<div class="c-head"><div class="kicker">이번 호 머리기사</div><h2>${esc(C.headline)}</h2></div></div>
+    <div class="c-lines"><div class="c-deck">${esc((C.lead||[])[0]||"")}</div><div class="c-lh">이번 호에는</div>${C.lines.map(l=>`<div class="c-l" data-go="${l.go}"><span class="cs">${esc(l.sec)}</span><span class="ct">${esc(l.t)}</span></div>`).join("")}</div>
+    <div class="c-foot"><button class="go ghost" data-go="contents">차례 보기</button><button class="go" data-go="${C.go}">머리기사 읽기 →</button></div>
+  </section>`;
+}
+function contentsHtml(s){
+  return secHead(s) + `<section class="toc">${DATA.toc.map(t=>`<div class="toc-row" data-go="${t.go}"><div class="ts">${esc(t.sec)}</div><div class="tt">${esc(t.t)}</div><div class="tp">${esc(t.p)}</div></div>`).join("")}</section>
+    <div class="howread"><b>Nova 읽는 법</b><br>· 맨 위의 이름표(과학, 수학, 경제…)를 누르면 그 쪽으로 가요.<br>· 기사 속 <span style="border-bottom:2px dotted var(--red)">밑줄 친 낱말</span>을 누르면 뜻이 나와요.<br>· 영어로 된 출처에는 '국문 요약' 단추가 있어요. 누르면 우리말 요약이 나와요.<br>· 궁금한 것은 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.</div>
+    <div class="editor"><div class="m">${F.mascot || ""}</div><p>${esc(DATA.editorNote)}</p></div>`;
+}
+
+/* ---------- 책 ---------- */
+function booksHtml(){
+  const B = A.books;
+  return `<article class="art" id="a-books"><div class="kicker">${esc(B.kicker||"이번 주 책")}</div><h3 class="title">${esc(B.title)}</h3><p class="deck">${esc(B.deck||"")}</p>
+    <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
+    ${(B.intro||[]).map(x=>`<p class="bintro">${esc(x.x)}</p>`).join("")}
+    ${B.books.map(b=>`<div class="book"><div>${b.img?`<img src="${b.img}" alt="${esc(b.title)} 표지" loading="lazy">`:""}</div><div>
+      <h4>${esc(b.title)}</h4><div class="bm">${esc(b.field)} · ${esc(b.by)} · ${esc(b.pub)}</div><p>${esc(b.about)}</p><p class="why">${esc(b.why)}</p>
+      ${b.metrics?`<div class="bscore"><a href="${esc(b.metrics.aladin.url)}" target="_blank" rel="noopener">알라딘 <b>★ ${b.metrics.aladin.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.aladin.reviews.toLocaleString()}개</span> · <span class="nw">세일즈포인트 ${b.metrics.aladin.salesPoint.toLocaleString()}</span></a><a href="${esc(b.metrics.yes24.url)}" target="_blank" rel="noopener">예스24 <b>★ ${b.metrics.yes24.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.yes24.reviews.toLocaleString()}개</span> · <span class="nw">판매지수 ${b.metrics.yes24.salesIndex.toLocaleString()}</span></a></div>`:""}
+      <a class="sbtn" href="${esc(b.url)}" target="_blank" rel="noopener">책 정보 보기 ↗</a></div></div>`).join("")}
+    <div class="note">표지 이미지: 알라딘 상품 정보 · 평점과 리뷰 수는 ${esc((B.books[0].metrics||{}).checked||"")} 기준(10점 만점), 이후 달라질 수 있어요.</div>${reactHtml("books")}</article>`;
+}
+
+/* ---------- 만화 ---------- */
+function comicHtml(){
+  const M = A.comic, IM = DATA.images || {};
+  const imgs = M.panels.map((p, i) => IM["comic_" + (i+1)]).filter(Boolean);
+  const head = `<article class="art" id="a-comic"><div class="kicker">${esc(M.kicker||"만화")}</div><h3 class="title">${esc(M.title)}</h3><p class="deck">${esc(M.deck||"")}</p>`;
+  const bub = l => `<div class="bub ${l.who==="효과음"?"fx":l.who==="해설"?"nar":""}">${l.who==="효과음"||l.who==="해설"||l.who==="나"?"":`<span style="color:var(--gray);font-weight:500">${esc(l.who)}</span> `}${esc(l.say)}</div>`;
+  let mid;
+  if (IM.comic_page) mid = `<div class="comic-img"><img src="${IM.comic_page}" alt="${esc(M.title)}"></div>`;
+  else if (imgs.length === M.panels.length) mid = `<div class="strip gpt">${M.panels.map((p,i)=>`<div class="pnl img ${(M.panels.length%2===1&&i===M.panels.length-1)?"wide":""}"><img src="${IM["comic_"+(i+1)]}" alt="${i+1}번째 칸" style="width:100%;display:block"><div class="bubs">${p.lines.map(bub).join("")}</div><span class="pno">${i+1}</span></div>`).join("")}</div>`;
+  else mid = `<div class="comic-wait">이번 호 만화는 그림을 <b>GPT 이미지 모델</b>에게 맡겼어요. 그림이 도착하면 이 쪽에 실려요. 그동안 이야기(콘티)를 먼저 읽어 보세요.</div>
+    <div class="conti">${M.panels.map((p,i)=>`<div class="ct-p"><span class="pn">${i+1}</span>${p.lines.map(l=>`<div class="ln ${l.who==="해설"?"nar":l.who==="효과음"?"fx":""}">${l.who==="해설"||l.who==="효과음"?"":`<b>${esc(l.who==="나"?"마스코트":l.who)}</b>`}${esc(l.say)}</div>`).join("")}</div>`).join("")}</div>`;
+  return head + mid + `${M.after?`<div class="box"><div class="bt">만화 속 과학</div><div class="bb">${esc(M.after)}</div></div>`:""}
+    <div class="note">${(IM.comic_page||imgs.length)?"그림: GPT 이미지 모델(Nova 편집부 의뢰)":"그림 준비 중: GPT 이미지 모델에 의뢰"} · 마스코트는 서아가 그린 캐릭터예요.</div>${reactHtml("comic")}</article>`;
+}
+
+/* ---------- 심리검사 ---------- */
+let psyAns = {};
+function psyHtml(){
+  const P = A.psytest; psyAns = {};
+  return `<article class="art" id="a-psytest"><div class="kicker">${esc(P.kicker||"심리검사")}</div><h3 class="title">${esc(P.title)}</h3><p class="deck">${esc(P.deck||"")}</p>
+    <div class="byline"><span>Nova 편집부</span><span>${P.questions.length}문항</span></div>
+    <div class="body">${bodyHtml(P.intro, termCtx(P), "psytest")}</div>
+    <div class="panel">${P.questions.map((q,i)=>`<div style="margin-bottom:14px"><div class="qtext" style="font-size:18px">${i+1}. ${esc(q.q)}</div>
+      ${q.options.map((o,k)=>`<button class="opt psy" data-q="${i}" data-t="${o.type}"><b>${"ABCD"[k]}</b>${esc(o.x)}</button>`).join("")}</div>`).join("")}
+      <button class="go" id="psyDone">결과 보기</button><div id="psyRes"></div></div>
+    <div class="note">${esc(P.note||"")}</div></article>`;
+}
+function bindPsy(){
+  document.querySelectorAll(".psy").forEach(b => b.onclick = () => {
+    psyAns[b.dataset.q] = b.dataset.t;
+    document.querySelectorAll(`.psy[data-q="${b.dataset.q}"]`).forEach(x => { x.style.background = x === b ? "var(--ink)" : ""; x.style.color = x === b ? "var(--paper)" : ""; });
+  });
+  const d = $("#psyDone"); if (!d) return;
+  d.onclick = () => {
+    const P = A.psytest, n = Object.keys(psyAns).length;
+    if (n < P.questions.length) { toast(`${P.questions.length - n}문항이 남았어요`); return; }
+    const cnt = {}; Object.values(psyAns).forEach(t => cnt[t] = (cnt[t]||0) + 1);
+    const top = Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a])[0], T = P.types[top];
+    $("#psyRes").innerHTML = `<div class="result"><div class="kicker">나의 탐구 유형</div><h3>${esc(T.name)}</h3><p style="font-size:16.5px;line-height:1.75">${esc(T.desc)}</p>
+      <div class="box"><div class="bt">닮은 과학자</div><div class="bb">${esc(T.scientist)}</div></div><div class="box"><div class="bt">이번 주 해 볼 일</div><div class="bb">${esc(T.try)}</div></div></div>`;
+    log("psytest", {result: T.name});
+  };
+}
+
+/* ---------- 스도쿠 ---------- */
+function sudokuHtml(){
+  return `<article class="art"><div class="kicker">두뇌 놀이</div><h3 class="title">6×6 스도쿠</h3><p class="deck">가로 줄, 세로 줄, 굵은 선으로 나뉜 2×3 상자마다 1부터 6까지가 한 번씩만 들어가요.</p>
+    <div class="body"><p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄부터 보면 실마리가 보여요. 이 문제는 답이 하나뿐인지 컴퓨터로 확인했어요.</p></div>
+    <div class="sgrid" id="sgrid"></div><div class="spad" id="spad">${[1,2,3,4,5,6].map(n=>`<button data-n="${n}">${n}</button>`).join("")}<button data-n="0" style="font-size:14px;padding:0 10px">지우기</button></div>
+    <div style="text-align:center"><button class="go" id="sdCheck">다 채웠어요</button></div><div id="sdMsg"></div></article>`;
+}
+let sdSel = null;
+function bindSudoku(){
+  const P = DATA.sudoku, g = $("#sgrid"); if (!g) return;
+  if (!S.sudoku) S.sudoku = P.puzzle.map(r => r.slice());
+  const sd = S.sudoku;
+  const draw = () => {
+    g.innerHTML = sd.map((row,r) => row.map((v,c) => { const given = P.puzzle[r][c] !== 0;
+      return `<div class="scell ${given?"given":"user"} ${c===2?"br":""} ${(r===1||r===3)?"bb":""} ${(sdSel&&sdSel[0]===r&&sdSel[1]===c)?"sel":""}" data-r="${r}" data-c="${c}">${v||""}</div>`; }).join("")).join("");
+    g.querySelectorAll(".scell.user").forEach(el => el.onclick = () => { sdSel = [+el.dataset.r, +el.dataset.c]; draw(); });
+  };
+  draw();
+  $("#spad").querySelectorAll("button").forEach(b => b.onclick = () => { if (!sdSel) { toast("빈칸을 먼저 누르세요"); return; } sd[sdSel[0]][sdSel[1]] = +b.dataset.n; save(); draw(); });
+  $("#sdCheck").onclick = () => {
+    if (sd.flat().some(v => !v)) { $("#sdMsg").innerHTML = `<div class="fb bad"><b>아직 빈칸이 있어요</b>모든 칸을 채워 보세요.</div>`; return; }
+    const ok = sd.every((row,r) => row.every((v,c) => v === P.solution[r][c]));
+    $("#sdMsg").innerHTML = ok ? `<div class="fb good"><b>완성!</b>가로, 세로, 굵은 상자 모두 1~6이 한 번씩 들어갔어요.</div>` : `<div class="fb bad"><b>한 곳 이상 다시 보세요</b>같은 줄이나 상자에 겹치는 숫자가 있어요.</div>`;
+    if (ok) log("sudoku", {date: today()});
+  };
+}
+
+/* ---------- 퀴즈(잠금 없음) ---------- */
+function quizHome(){
+  const el = $("#quizBox");
+  el.innerHTML = `<div class="panel"><div class="qtext" style="font-size:18px">무엇을 풀까요?</div>
+    <div class="choice"><button class="cbtn" data-type="news">이번 호 기사<small>기사를 읽고 풀어요</small></button><button class="cbtn" data-type="math">수학<small>4학년 2학기 범위(임시)</small></button></div>
+    <div id="lv"></div><div class="note">${esc(DATA.quizNote)}</div></div>`;
+  el.querySelectorAll("[data-type]").forEach(b => b.onclick = () => {
+    el.querySelectorAll("[data-type]").forEach(x => x.classList.toggle("sel", x === b));
+    $("#lv").innerHTML = `<div class="qtext" style="font-size:18px;margin-top:10px">난이도</div><div class="choice" style="grid-template-columns:1fr 1fr 1fr">${["쉬움","보통","어려움"].map(l=>`<button class="cbtn" data-l="${l}">${l}</button>`).join("")}</div>`;
+    $("#lv").querySelectorAll("[data-l]").forEach(x => x.onclick = () => runQuiz(b.dataset.type, x.dataset.l));
+  });
+}
+function runQuiz(type, level){
+  const qs = (type === "math" ? DATA.mathQuiz : DATA.newsQuiz)[level]; let i = 0, score = 0; const el = $("#quizBox");
+  const show = () => {
+    const q = qs[i]; let input = "";
+    if (q.type === "ox") input = `<div class="choice"><button class="cbtn ox" data-a="O">O</button><button class="cbtn ox" data-a="X">X</button></div>`;
+    else if (q.type === "mc") input = q.options.map((o,k) => `<button class="opt" data-a="${k}"><b>${k+1}</b>${esc(o)}</button>`).join("");
+    else if (type === "math") input = `<div class="disp" id="disp"></div><div class="pad">${["7","8","9","←","4","5","6","/","1","2","3",".","0","확인"].map(k=>`<button data-k="${k}" class="${k==="확인"?"ok":""}" ${k==="확인"?'style="grid-column:span 3"':""}>${k}</button>`).join("")}</div>`;
+    else input = `<input class="tin" id="tin" placeholder="답을 쓰세요" autocomplete="off"><div style="margin-top:10px"><button class="go" id="tok">확인</button></div>`;
+    el.innerHTML = `<div class="panel"><div class="qmeta"><span>${type==="math"?"수학":"이번 호 기사"} · ${level}</span><span>${i+1} / ${qs.length} · 맞힌 수 ${score}</span></div>
+      <div class="qbar"><i style="width:${i/qs.length*100}%"></i></div><div class="qtext">${esc(q.q)}</div>${input}<div id="fb"></div></div>`;
+    const answer = a => {
+      let ok;
+      if (q.type === "mc") ok = (+a === q.answer); else if (q.type === "ox") ok = (a === q.answer);
+      else { const norm = s => String(s).replace(/\s+/g,"").replace(/°|도|개|cm|초|곳|년|명|마리|km|m$/g,""); ok = (q.accept || [q.answer]).some(x => norm(x) === norm(a)); }
+      if (ok) score++;
+      el.querySelectorAll("button").forEach(b => b.disabled = true);
+      $("#fb").innerHTML = `<div class="fb ${ok?"good":"bad"}"><b>${ok?"맞았어요":"아쉬워요"}</b>${ok?"":"정답: " + esc(q.type==="mc"?q.options[q.answer]:q.answer) + "<br>"}${esc(q.explain||"")}</div><div style="margin-top:12px"><button class="go" id="nx">${i < qs.length-1 ? "다음 문제" : "결과 보기"}</button></div>`;
+      $("#nx").disabled = false; $("#nx").onclick = () => { i++; if (i < qs.length) show(); else done(); };
+    };
+    el.querySelectorAll("[data-a]").forEach(b => b.onclick = () => answer(b.dataset.a));
+    if ($("#disp")) { let v = ""; el.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k; if (k === "확인") { if (v) answer(v); return; } v = k === "←" ? v.slice(0,-1) : v + k; $("#disp").textContent = v; }); }
+    if ($("#tin")) { $("#tok").onclick = () => { const v = $("#tin").value.trim(); if (v) answer(v); }; $("#tin").onkeydown = e => { if (e.key === "Enter") $("#tok").click(); }; }
+  };
+  const done = () => {
+    log("quiz", {date: today(), type: type==="math"?"수학":"뉴스", level, score, coins: 0, unlocked: false});
+    el.innerHTML = `<div class="panel" style="text-align:center"><div class="kicker">결과</div><div style="font-size:48px;font-weight:900;margin:6px 0">${score} / ${qs.length}</div>
+      <p style="font-size:16px">${score===qs.length?"모두 맞혔어요. 다음엔 한 단계 올려 볼까요?":"틀린 문제는 기사를 다시 읽어 보면 답이 보여요."}</p><button class="go" id="again">다른 퀴즈 풀기</button></div>`;
+    $("#again").onclick = quizHome;
+  };
+  show();
+}
+
+/* ---------- 영상 ---------- */
+function ytId(u){ const m = String(u).match(/[?&]v=([\w-]{11})/) || String(u).match(/youtu\.be\/([\w-]{11})/); return m ? m[1] : ""; }
+function videoHtml(){
+  const V = DATA.video;
+  const one = v => `<div class="vrow">${DATA.embed?`<div class="vwrap"><iframe src="https://www.youtube-nocookie.com/embed/${esc(v.id)}?rel=0" title="${esc(v.title)}" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:""}
+    <div class="kicker" style="margin-top:6px">${esc(v.topicName||"")}</div><h4>${esc(v.title)}</h4>
+    <div class="vstat">${esc(v.channel)} · ${esc(v.duration)} · 조회수 ${Number(v.views).toLocaleString()}회 · ${esc(v.published)}</div>
+    <p class="vwhy">${esc(v.why)}</p>${v.note?`<div class="vtip">${esc(v.note)}</div>`:""}
+    <div class="sbtns"><a class="sbtn" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">유튜브에서 보기 ↗</a></div>${reactHtml("yt-"+v.id)}</div>`;
+  return `<article class="art"><div class="kicker">${esc(V.kicker)}</div><h3 class="title">${esc(V.title)}</h3><p class="deck">${esc(V.deck)}</p>
+    <div class="body">${bodyHtml(V.body)}</div>${V.list.map(one).join("")}
+    <div class="note">조회수는 ${esc(V.checked||"")} 유튜브 검색 결과 기준이에요. ${DATA.embed?"":"이 미리보기 페이지에서는 영상을 유튜브로 나가서 봐요. GitHub 정식판에서는 지면 안에서 바로 재생돼요."}</div></article>`;
+}
+
+/* ---------- 먼작귀 ---------- */
+function chiikawaHtml(){
+  const C = DATA.chiikawa;
+  return `<article class="art"><div class="kicker">먼작귀 신간</div><h3 class="title">${esc(C.title)}</h3><p class="deck">${esc(C.deck)}</p>
+    <div class="body">${bodyHtml(C.body)}</div>
+    ${(C.posts&&C.posts.length)?C.posts.map(u=>`<blockquote class="twitter-tweet" data-dnt="true"><a href="${esc(u)}"></a></blockquote>`).join(""):""}
+    <div class="srcs"><div class="sh">공식 계정</div>${C.links.map(l=>`<div class="src"><div class="st">${esc(l.t)}</div><div class="sm">${esc(l.d)}</div><div class="sbtns"><a class="sbtn" href="${esc(l.u)}" target="_blank" rel="noopener">열기 ↗</a></div></div>`).join("")}</div>
+    <div class="note">${esc(C.note)}</div></article>`;
+}
+function loadX(){ const C = DATA.chiikawa; if (!(C.posts && C.posts.length && DATA.embed)) return; if (window.twttr && window.twttr.widgets) { window.twttr.widgets.load($("#page")); return; } const s = document.createElement("script"); s.async = true; s.src = "https://platform.twitter.com/widgets.js"; document.body.appendChild(s); }
+
+/* ---------- 무엇이든 물어보세요 ---------- */
+let sample = null;
+(async () => { try { if (window.claude && window.claude.use) sample = await window.claude.use("sample"); } catch(e) { sample = null; } })();
+const openModal = h => { $("#sheet").innerHTML = h; $("#modal").classList.add("on"); };
+const closeModal = () => $("#modal").classList.remove("on");
+$("#modal").onclick = e => { if (e.target.id === "modal") closeModal(); };
+$("#askBtn").onclick = () => {
+  openModal(`<div class="kicker">독자 질문</div><h3>무엇이든 물어보세요</h3><p class="note" style="margin:0 0 10px">이번 호 기사든, 평소 궁금했던 것이든 좋아요. Nova 선생님이 답해 줄게요.</p>
+    <textarea id="qIn" placeholder="예: 보이저 1호는 언제까지 신호를 보낼 수 있나요?"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="go" id="qSend">보내기</button><button class="go ghost" id="qClose">닫기</button></div><div id="qAns"></div>
+    ${S.qa.length?`<div class="note">지난 질문</div>${S.qa.slice(-3).reverse().map(x=>`<div class="ans"><b>Q.</b> ${esc(x.q)}\n<b>A.</b> ${esc(x.a)}</div>`).join("")}`:""}`);
+  $("#qClose").onclick = closeModal;
+  if (!sample && CFG.gasUrl) fetch(CFG.gasUrl + "?action=answers").then(r => r.json()).then(list => { if (!list || !list.length) return; const d = document.createElement("div"); d.innerHTML = `<div class="note">받은 답</div>` + list.slice(-5).reverse().map(x => `<div class="ans"><b>Q.</b> ${esc(x.q)}\n<b>A.</b> ${esc(x.a)}</div>`).join(""); $("#sheet").appendChild(d); }).catch(() => {});
+  $("#qSend").onclick = async () => {
+    const q = $("#qIn").value.trim(); if (!q) return; const box = $("#qAns"); $("#qSend").disabled = true;
+    if (!sample) {
+      S.qa.push({q, a: "(선생님이 답을 쓰고 있어요)", t: Date.now()}); save(); log("question", {q});
+      box.innerHTML = `<div class="ans">질문을 보냈어요. 답이 달리면 이 창의 '받은 답'에 보여요.</div>`; $("#qSend").disabled = false;
+      if (CFG.gasUrl) setTimeout(() => { fetch(CFG.gasUrl + "?action=answers").then(r => r.json()).then(list => { const hit = (list||[]).filter(x => x.q === q).pop(); if (hit) { box.innerHTML = `<div class="ans">${esc(hit.a)}</div>`; const me = S.qa.find(x => x.q === q && x.a.startsWith("(")); if (me) { me.a = hit.a; save(); } } }).catch(() => {}); }, 9000);
+      return;
+    }
+    box.innerHTML = `<div class="ans">선생님이 답을 쓰고 있어요…</div>`;
+    try {
+      const r = await sample(DATA.askPrompt + "\n\n[서아의 질문]\n" + q, {modelTier: "default", cache: false, onText: ({text}) => { box.innerHTML = `<div class="ans">${esc(text)}</div>`; }});
+      S.qa.push({q, a: r.text, t: Date.now()}); save(); log("question", {q, a: r.text}); box.innerHTML = `<div class="ans">${esc(r.text)}</div>`;
+    } catch(e) { S.qa.push({q, a: "(질문을 받아 두었어요)", t: Date.now()}); save(); box.innerHTML = `<div class="ans">지금은 바로 답하기 어려워요. 질문은 받아 두었어요.</div>`; }
+    $("#qSend").disabled = false;
+  };
+};
+
+/* ---------- 지난 호 ---------- */
+$("#calBtn").onclick = () => {
+  const list = DATA.__issues || [{date: DATA.issue.date, label: DATA.issue.label, dateText: DATA.issue.dateText}];
+  openModal(`<div class="kicker">지난 호</div><h3>Nova 모아 보기</h3>${list.map(i=>`<button class="opt" data-d="${esc(i.date)}"><b>${esc(i.label)}</b>${esc(i.dateText||i.date)}${i.date===(DATA.__current||DATA.issue.date)?" · 지금 보는 호":""}</button>`).join("")}<div style="margin-top:12px"><button class="go ghost" id="cc">닫기</button></div>`);
+  $("#cc").onclick = closeModal;
+  document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { if (!DATA.__issues || b.dataset.d === DATA.__current) { closeModal(); return; } location.search = "?d=" + b.dataset.d; });
+};
+
+const start = (location.hash || "").replace("#", "");
+go(SECS.some(s => s.id === start) ? start : "cover", false);
+};
+(async function(){
+  if (window.__INLINE__) { window.boot(window.__INLINE__); return; }
+  try {
+    const idx = await (await fetch("editions/index.json", {cache: "no-store"})).json();
+    const now = Date.now();
+    const list = idx.issues.filter(i => Date.parse(i.publishAt) <= now).sort((a,b) => a.date < b.date ? 1 : -1);
+    const want = new URLSearchParams(location.search).get("d");
+    const pick = list.find(i => i.date === want) || list[0];
+    if (!pick) { document.getElementById("page").innerHTML = "<p>첫 호를 준비하고 있어요. 금요일 밤 10시에 만나요.</p>"; return; }
+    const data = await (await fetch("editions/" + pick.file, {cache: "no-store"})).json();
+    data.__issues = list; data.__current = pick.date; window.boot(data);
+  } catch(e) { document.getElementById("page").innerHTML = "<p>신문을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>"; }
+})();
+</script>
+</body>
+</html>
