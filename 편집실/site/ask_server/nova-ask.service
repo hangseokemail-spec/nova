@@ -1,0 +1,31 @@
+[Unit]
+Description=Nova 무엇이든 물어보세요 답하는 서버 (127.0.0.1:8787)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 키와 설정은 /etc/nova-ask.env (root만 읽을 수 있게 권한 600). systemd가 root로 읽어 넘겨 줘요.
+EnvironmentFile=/etc/nova-ask.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/nova-ask/nova_ask.py
+Restart=on-failure
+RestartSec=3
+# 따로 만든 이름 없는 사용자로 실행하고, 할 수 있는 일을 좁혀요
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryMax=150M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

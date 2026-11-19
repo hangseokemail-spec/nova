@@ -1,0 +1,54 @@
+{
+ "샬롯의 거미줄": {
+  "aladin": {
+   "url": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=171639221",
+   "star": 9.8,
+   "reviews": 21,
+   "oneLine": 11,
+   "myReview": 10,
+   "salesPoint": 20136
+  },
+  "yes24": {
+   "url": "https://www.yes24.com/product/goods/176008",
+   "star": 9.6,
+   "reviews": 379,
+   "salesIndex": 28992
+  },
+  "checked": "2026-11-19",
+  "note": "알라딘은 2018년 두 번째 개정판(지금 파는 판) 기준. 기획안의 9.3 / 100자평 83 / 리뷰 109 / 세일즈포인트 39,004는 2000년 구판(ItemId 258605, 구판절판)의 값이라 쓰지 않았어요. 예스24 상품 176008은 개정판 ISBN(9788952787590)으로 바뀐 같은 상품 쪽이라 리뷰가 쌓여 있어요."
+ },
+ "서찰을 전하는 아이": {
+  "aladin": {
+   "url": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=13716985",
+   "star": 9.3,
+   "reviews": 64,
+   "oneLine": 32,
+   "myReview": 32,
+   "salesPoint": 27900
+  },
+  "yes24": {
+   "url": "https://www.yes24.com/product/goods/5883832",
+   "star": 9.6,
+   "reviews": 166,
+   "salesIndex": 31659
+  },
+  "checked": "2026-11-19"
+ },
+ "이게 정말 나일까?": {
+  "aladin": {
+   "url": "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=67632107",
+   "star": 9.7,
+   "reviews": 47,
+   "oneLine": 22,
+   "myReview": 25,
+   "salesPoint": 16086
+  },
+  "yes24": {
+   "url": "https://www.yes24.com/product/goods/21631904",
+   "star": 9.8,
+   "reviews": 366,
+   "salesIndex": 15102
+  },
+  "checked": "2026-11-19"
+ }
+}

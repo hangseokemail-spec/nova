@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>접기 시뮬레이터 시험판</title>
+<style>
+/* Nova template_v3.html의 색과 .sim 모양을 그대로 따름. 편찬 때 아래 .fold- 부분만 템플릿에 옮기면 됨 */
+:root{--paper:#F4EFE4;--paper2:#FBF8F1;--ink:#1C1A17;--red:#C8372D;--navy:#1F3A5F;--gray:#6B655C;--line:#CFC7B6}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Serif KR',serif}
+.wrap{max-width:760px;margin:0 auto;padding:12px 16px 40px}
+.sim{border:2px solid var(--ink);background:var(--paper2);margin:22px 0;padding:0 0 12px}
+.sim-head{background:var(--red);color:#fff;font-family:'Noto Sans KR',sans-serif;font-weight:900;font-size:14px;letter-spacing:.06em;padding:7px 12px}
+.sim-goal{font-size:16.5px;line-height:1.7;margin:12px 14px 8px}
+.fold-btns{display:flex;gap:8px;margin:0 14px 8px;flex-wrap:wrap}
+.fold-btns button{font-family:'Noto Sans KR',sans-serif;font-weight:700;font-size:15px;border:1.5px solid var(--ink);background:var(--paper);padding:9px 12px;cursor:pointer;color:var(--ink)}
+.fold-btns button.main{background:var(--ink);color:var(--paper)}
+.fold-btns button:disabled{opacity:.35;cursor:default}
+.fold-stat{font-family:'Noto Sans KR',sans-serif;font-weight:900;font-size:18px;margin:4px 14px 0}
+.fold-eq{font-family:'Noto Sans KR',sans-serif;font-size:14.5px;color:var(--red);font-weight:700;margin:2px 14px 8px;min-height:20px}
+.fold-views{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 14px}
+.fold-view{display:flex;flex-direction:column;align-items:center}
+.fold-view .lab{font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:700;color:var(--gray);margin-bottom:4px}
+.fold-view canvas{display:block;border:1px solid var(--line);background:#fff;max-width:100%}
+#foldPaper{width:360px;aspect-ratio:1/1}
+#foldThick{width:200px;aspect-ratio:200/360}
+.fold-size{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--gray);margin-top:4px}
+.fold-msg{font-family:'Noto Sans KR',sans-serif;font-size:14.5px;line-height:1.6;margin:10px 14px 0;background:#FFF3D6;border-left:4px solid var(--red);padding:8px 10px;min-height:24px}
+.fold-imag{margin:12px 14px 0;border:1.5px solid var(--ink);background:var(--paper);padding:8px 10px}
+.fold-imag .t{font-family:'Noto Sans KR',sans-serif;font-weight:900;font-size:14px}
+.fold-imag .row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.fold-imag input[type=range]{flex:1;accent-color:var(--red)}
+.fold-imag #foldImN{font-family:'Noto Sans KR',sans-serif;font-weight:900;min-width:44px;text-align:right}
+.fold-imag .out{font-family:'Noto Sans KR',sans-serif;font-size:14.5px;line-height:1.65;margin-top:6px}
+.fold-imag .out b{color:var(--red)}
+.fold-tw{overflow-x:auto;margin:12px 14px 0}
+.fold-tbl{width:100%;border-collapse:collapse;font-family:'Noto Sans KR',sans-serif;font-size:13.5px}
+.fold-tbl th{background:var(--ink);color:var(--paper);font-weight:700;padding:5px 6px;text-align:right;white-space:nowrap}
+.fold-tbl td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:right;white-space:nowrap}
+.fold-tbl tr.new td{background:#FFF3D6}
+.fold-tbl tr.imag td{color:var(--navy);font-style:italic}
+.fold-note{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--gray);line-height:1.6;margin:10px 14px 0}
+@media (max-width:520px){ #foldPaper{width:100%} #foldThick{width:60%} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<p style="font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#6B655C">Nova 제2호 수학 「접을 때마다 2배」 시뮬레이터 시험판(기자2). 편찬 때 template_v3.html의 simHtml/bindSim 방식으로 옮겨요.</p>
+<div id="simMount"></div>
+</div>
+<script>
+/* ---------- 종이 접기 시뮬레이터 (template_v3.html simHtml/bindSim 방식) ---------- */
+function foldSimHtml(){
+  return `<div class="sim" id="foldSim">
+    <div class="sim-head">직접 접어 보기 · 접을 때마다 2배</div>
+    <p class="sim-goal">A4 종이 한 장을 반으로 접어 봐요. 접을 때마다 <b>겹 수</b>와 <b>두께</b>가 어떻게 변하는지, 펼치면 <b>칸</b>이 몇 개 생기는지 살펴보세요.</p>
+    <div class="fold-btns">
+      <button class="main" id="foldW">가로로 접기</button>
+      <button class="main" id="foldH">세로로 접기</button>
+      <button id="foldOpen">펼쳐 보기</button>
+      <button id="foldReset">처음으로</button>
+    </div>
+    <div class="fold-stat" id="foldStat"></div>
+    <div class="fold-eq" id="foldEq"></div>
+    <div class="fold-views">
+      <div class="fold-view"><div class="lab">위에서 본 종이</div><canvas id="foldPaper" width="360" height="360" aria-label="위에서 본 종이"></canvas><div class="fold-size" id="foldSize"></div></div>
+      <div class="fold-view"><div class="lab">옆에서 본 두께(자의 눈금은 cm)</div><canvas id="foldThick" width="200" height="360" aria-label="옆에서 본 종이 두께"></canvas></div>
+    </div>
+    <div class="fold-msg" id="foldMsg"></div>
+    <div class="fold-imag">
+      <div class="t">상상 접기: 화면 밖으로 계속 접는다면?</div>
+      <div class="row"><input type="range" id="foldIm" min="11" max="51" value="11" step="1" aria-label="상상으로 접은 횟수"><span id="foldImN">11번</span></div>
+      <div class="out" id="foldImOut"></div>
+    </div>
+    <div class="fold-tw"><table class="fold-tbl"><thead><tr><th>접은 횟수</th><th>겹 수</th><th>펼친 칸 수</th><th>두께(약)</th></tr></thead><tbody id="foldRows"></tbody></table></div>
+    <p class="fold-note">두께는 '복사 종이 10장이 약 1mm'라고 가정해서 겹 수를 10으로 나눠 계산했어요. 종이마다 두께가 달라서 어림값이에요.</p>
+  </div>`;
+}
+function bindFoldSim(){
+  const root = document.getElementById("foldSim"); if (!root) return;
+  const $f = id => document.getElementById(id);
+  const cp = $f("foldPaper"), ct = $f("foldThick"), px = cp.getContext("2d"), tx = ct.getContext("2d");
+  const PW = 210, PH = 297, MAXN = 10;                // A4(mm)
+  const S = 330 / PH, OX = (360 - PW*S)/2, OY = 15;     // 종이 화면 배율과 자리
+  let h = 0, v = 0, open = false, anim = null;
+  const two = n => 2n ** BigInt(n);                       // 2를 n번 곱한 값(정확한 큰 수)
+  const comma = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  function korean(x){                                    // 만·억·조로 띄어 읽기
+    x = BigInt(x); if (x === 0n) return "0";
+    const U = [[10n**12n,"조"],[10n**8n,"억"],[10n**4n,"만"]]; const out = [];
+    for (const [u, name] of U){ const q = x / u; if (q > 0n){ out.push(comma(q) + name); x %= u; } }
+    if (x > 0n) out.push(comma(x));
+    return out.join(" ");
+  }
+  function thick(n){                                     // 두께 글: 겹 수 ÷ 10 = mm
+    const mm = Number(two(n)) / 10;
+    if (mm < 10) return (Math.round(mm*10)/10) + "mm";
+    if (mm < 1000) { const cm = mm/10; return (Math.round(mm*10)/10) + "mm(약 " + (cm < 10 ? Math.round(cm*10)/10 : Math.round(cm)) + "cm)"; }
+    if (mm < 1000000) { const m = mm/1000; return "약 " + (m < 10 ? Math.round(m*10)/10 : Math.round(m)) + "m"; }
+    const km = mm/1000000;
+    if (km < 10000) return "약 " + korean(Math.round(km)) + "km";
+    return "약 " + korean(Math.round(km/10000)*10000) + " km";
+  }
+  function compare(n){
+    const mm = Number(two(n))/10, m = mm/1000, km = mm/1e6;
+    if (m < 100) return "아직 100m 달리기 길이보다 낮아요.";
+    if (km < 384400) return "100m 달리기 길이는 넘었고, 달까지(약 38만 4,400km)는 아직이에요.";
+    if (km < 150000000) return "달까지 거리(약 38만 4,400km)를 지났어요. 태양까지(약 1억 5,000만 km)는 아직이에요.";
+    return "태양까지 거리(약 1억 5,000만 km)도 넘었어요.";
+  }
+  const SPECIAL = {
+    20: "100m 달리기 길이를 세운 것보다 높아요.",
+    42: "달까지(약 38만 4,400km)를 지나갔어요.",
+    50: "태양까지(약 1억 5,000만 km)의 4분의 3쯤이에요.",
+    51: "태양까지 거리를 넘었어요. 2배가 이렇게 빨라요."
+  };
+  const MSG = {
+    0: "A4 종이 한 장이에요. 지금은 1겹이에요. 위의 버튼으로 반으로 접어 보세요.",
+    3: "8겹이 됐어요. 2겹씩 더했다면 아직 7겹일 텐데, 곱하기라 벌써 앞질렀어요.",
+    6: "64겹이에요. 오른쪽 돋보기 속 줄을 세어 보세요. 겹을 한 줄씩 셀 수 있는 건 여기까지예요.",
+    7: () => { const [w, hh] = size(); return `128겹, 두께는 약 1.3cm인데 종이는 가로 약 ${fmt(w/10)}cm, 세로 약 ${fmt(hh/10)}cm로 작아졌어요. 진짜 종이라면 여기쯤부터 아주 힘들어요. 왜 그럴까요?`; },
+    8: "'종이는 8번 넘게 못 접는다'는 말이 오래 퍼져 있었어요. 정말일까요? 기사의 '왜 8번도 힘들까?'를 읽어 보세요.",
+    10: "1,024겹, 약 10cm예요. 화면 속 종이는 여기까지예요. 아래 '상상 접기' 밀대로 더 가 보세요."
+  };
+  const msg = k => typeof MSG[k] === "function" ? MSG[k]() : MSG[k];
+  const n = () => h + v;
+  const size = () => [PW / 2**h, PH / 2**v];
+  const fmt = x => (Math.round(x*10)/10).toString();
+
+  function drawPaper(){
+    px.clearRect(0, 0, 360, 360); px.fillStyle = "#fff"; px.fillRect(0, 0, 360, 360);
+    // 처음 A4 자리(회색 점선)
+    px.save(); px.setLineDash([5, 5]); px.strokeStyle = "#B9B1A2"; px.lineWidth = 1.2; px.strokeRect(OX, OY, PW*S, PH*S); px.restore();
+    if (open){
+      const cols = 2**h, rows = 2**v, cw = PW*S/cols, rh = PH*S/rows;
+      px.fillStyle = "#F7E9D9"; px.fillRect(OX, OY, PW*S, PH*S);
+      px.save(); px.setLineDash([4, 3]); px.strokeStyle = "#1F3A5F"; px.lineWidth = 1.3;
+      for (let i = 1; i < cols; i++){ px.beginPath(); px.moveTo(OX + i*cw, OY); px.lineTo(OX + i*cw, OY + PH*S); px.stroke(); }
+      for (let j = 1; j < rows; j++){ px.beginPath(); px.moveTo(OX, OY + j*rh); px.lineTo(OX + PW*S, OY + j*rh); px.stroke(); }
+      px.restore();
+      px.strokeStyle = "#1C1A17"; px.lineWidth = 1.6; px.strokeRect(OX, OY, PW*S, PH*S);
+      if (cols*rows <= 64){
+        const fs = Math.max(9, Math.min(22, Math.min(cw, rh)*0.42));
+        px.fillStyle = "#C8372D"; px.font = `700 ${fs}px 'Noto Sans KR', sans-serif`; px.textAlign = "center"; px.textBaseline = "middle";
+        let k = 1; for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) px.fillText(k++, OX + (i+.5)*cw, OY + (j+.5)*rh);
+      }
+      return;
+    }
+    const [w, hh] = size();
+    const x = OX + (PW - w)*S, y = OY + (PH - hh)*S;    // 접힌 종이는 오른쪽 아래로 모여요
+    if (anim){
+      const t = anim.t, k = Math.cos(Math.PI*t);         // 1 → -1 (넘어가는 반쪽)
+      if (anim.dir === "w"){                              // 왼쪽 반이 오른쪽으로 넘어감
+        const W0 = w*2*S, cx = x;                         // 접는 선 = 지금 종이의 왼쪽 끝
+        sheet(cx, y, W0/2, hh*S, "#F7E9D9");
+        const ww = W0/2*Math.abs(k), lx = k > 0 ? cx - ww : cx;
+        sheet(lx, y, ww, hh*S, k > 0 ? "#F7E9D9" : "#EBCFB0");
+      } else {                                            // 위쪽 반이 아래로 넘어감
+        const H0 = hh*2*S, cy = y;
+        sheet(x, cy, w*S, H0/2, "#F7E9D9");
+        const hh2 = H0/2*Math.abs(k), ty = k > 0 ? cy - hh2 : cy;
+        sheet(x, ty, w*S, hh2, k > 0 ? "#F7E9D9" : "#EBCFB0");
+      }
+    } else {
+      sheet(x, y, w*S, hh*S, n() ? "#EBCFB0" : "#F7E9D9");
+      if (n() >= 6){                                      // 너무 작아지면 빨간 동그라미로 짚어 줌
+        px.save(); px.strokeStyle = "#C8372D"; px.lineWidth = 2; px.beginPath();
+        px.arc(x + w*S/2, y + hh*S/2, Math.max(w, hh)*S/2 + 10, 0, 2*Math.PI); px.stroke(); px.restore();
+      }
+    }
+  }
+  function sheet(x, y, w, hh, col){ px.fillStyle = col; px.fillRect(x, y, w, hh); px.strokeStyle = "#1C1A17"; px.lineWidth = 1.6; px.strokeRect(x, y, w, hh); }
+
+  function drawThick(){
+    const H = 360, base = 340, top = 14, mmPx = (base - top)/120; // 0~12cm
+    tx.clearRect(0, 0, 200, H); tx.fillStyle = "#fff"; tx.fillRect(0, 0, 200, H);
+    // 자
+    tx.fillStyle = "#F2E6C9"; tx.fillRect(8, top - 6, 34, base - top + 12); tx.strokeStyle = "#1C1A17"; tx.lineWidth = 1; tx.strokeRect(8, top - 6, 34, base - top + 12);
+    tx.font = "700 10px 'Noto Sans KR', sans-serif"; tx.textAlign = "left"; tx.textBaseline = "middle"; tx.fillStyle = "#1C1A17";
+    for (let m = 0; m <= 120; m++){
+      const yy = base - m*mmPx, len = m % 10 === 0 ? 14 : (m % 5 === 0 ? 9 : 5);
+      tx.beginPath(); tx.moveTo(42, yy + .5); tx.lineTo(42 - len, yy + .5); tx.stroke();
+      if (m % 10 === 0) tx.fillText(String(m/10), 11, yy);
+    }
+    // 종이 더미
+    const mm = 2**n()/10, bh = Math.max(1, mm*mmPx);
+    tx.fillStyle = "#C8372D"; tx.fillRect(56, base - bh, 46, bh);
+    tx.strokeStyle = "#1C1A17"; tx.strokeRect(56, base - bh, 46, bh);
+    tx.beginPath(); tx.moveTo(48, base + .5); tx.lineTo(110, base + .5); tx.stroke();
+    // 돋보기(겹 세기)
+    const bx = 116, by = 206, bw = 78, bhh = 120;
+    tx.strokeStyle = "#1F3A5F"; tx.lineWidth = 1.5; tx.strokeRect(bx, by, bw, bhh);
+    tx.save(); tx.setLineDash([3, 3]); tx.beginPath(); tx.moveTo(102, base - bh); tx.lineTo(bx, by); tx.moveTo(102, base); tx.lineTo(bx, by + bhh); tx.stroke(); tx.restore();
+    tx.fillStyle = "#1F3A5F"; tx.font = "700 10.5px 'Noto Sans KR', sans-serif"; tx.textAlign = "center"; tx.fillText("돋보기", bx + bw/2, by - 9);
+    const L = 2**n();
+    if (L <= 64){
+      const gap = (bhh - 12)/L;
+      for (let i = 0; i < L; i++){ tx.fillStyle = i % 2 ? "#E8A39C" : "#C8372D"; tx.fillRect(bx + 8, by + 6 + i*gap, bw - 16, Math.max(1, gap - (L > 32 ? .4 : 1.5))); }
+    } else {
+      tx.fillStyle = "#1C1A17"; tx.font = "700 11px 'Noto Sans KR', sans-serif";
+      ["겹이 너무", "많아 다 그릴", "수 없어요"].forEach((s, i) => tx.fillText(s, bx + bw/2, by + 44 + i*16));
+    }
+  }
+
+  function status(){
+    const L = two(n());
+    $f("foldStat").textContent = `${n()}번 접음 · ${comma(L)}겹 · 두께 ${thick(n())}`;
+    const [w, hh] = size();
+    $f("foldSize").textContent = open ? `펼친 종이: 가로 21cm × 세로 29.7cm · 칸 ${comma(L)}개` : `지금 종이: 가로 약 ${fmt(w/10)}cm × 세로 약 ${fmt(hh/10)}cm`;
+    $f("foldW").disabled = $f("foldH").disabled = open || n() >= MAXN || !!anim;
+    $f("foldOpen").textContent = open ? "다시 접기" : "펼쳐 보기";
+    $f("foldOpen").disabled = !!anim;
+  }
+  function say(s){ $f("foldMsg").textContent = s; }
+  function addRow(){
+    const tb = $f("foldRows"); tb.querySelectorAll("tr.new").forEach(r => r.classList.remove("new"));
+    const L = two(n()), tr = document.createElement("tr"); tr.className = "new";
+    tr.innerHTML = `<td>${n()}번</td><td>${comma(L)}겹</td><td>${comma(L)}칸</td><td>${thick(n())}</td>`;
+    const im = tb.querySelector("tr.imag"); tb.insertBefore(tr, im);
+  }
+  function draw(){ drawPaper(); drawThick(); status(); }
+
+  function fold(dir){
+    if (open || anim || n() >= MAXN) return;
+    const before = two(n());
+    if (dir === "w") h++; else v++;
+    anim = {dir, t: 0}; const t0 = performance.now();
+    const tick = now => {
+      anim.t = Math.min(1, (now - t0)/400); drawPaper();
+      if (anim.t < 1) requestAnimationFrame(tick);
+      else { anim = null; draw(); addRow(); $f("foldEq").textContent = `${comma(before)} × 2 = ${comma(two(n()))}겹`; say(msg(n()) || `${n()}번 접었어요. 앞의 겹 수에 2를 곱하면 지금 겹 수가 나와요.`); }
+    };
+    status(); requestAnimationFrame(tick);
+  }
+  function toggleOpen(){
+    if (anim) return;
+    open = !open; draw();
+    if (open) say(`접힌 선으로 생긴 칸은 모두 ${comma(two(n()))}칸이에요. 겹 수와 똑같아요. 칸 하나하나가 한 겹씩 포개져 있었어요.`);
+    else say(msg(n()) || `${n()}번 접은 모습으로 돌아왔어요.`);
+  }
+  function reset(){
+    h = 0; v = 0; open = false; anim = null;
+    $f("foldRows").innerHTML = `<tr><td>0번</td><td>1겹</td><td>1칸</td><td>0.1mm</td></tr><tr class="imag" style="display:none"></tr>`;
+    $f("foldEq").textContent = ""; say(MSG[0]); draw();
+    $f("foldIm").value = 11; $f("foldImN").textContent = "11번";
+    $f("foldImOut").textContent = "밀대를 움직이면 11번부터 51번까지 겹 수와 두께를 계산해 보여 줘요.";
+  }
+  function imag(){
+    const k = +$f("foldIm").value, L = two(k);
+    $f("foldImN").textContent = k + "번";
+    $f("foldImOut").innerHTML = `${k}번 접으면 <b>${korean(L)}겹</b>이에요.<br>두께는 ${thick(k)}. ${SPECIAL[k] || compare(k)}`;
+    const im = $f("foldRows").querySelector("tr.imag");
+    if (im){ im.style.display = ""; im.innerHTML = `<td>${k}번(상상)</td><td>${comma(L)}겹</td><td>${comma(L)}칸</td><td>${thick(k)}</td>`; }
+  }
+  $f("foldW").onclick = () => fold("w");
+  $f("foldH").onclick = () => fold("h");
+  $f("foldOpen").onclick = toggleOpen;
+  $f("foldReset").onclick = reset;
+  $f("foldIm").oninput = imag;
+  reset();
+}
+document.getElementById("simMount").innerHTML = foldSimHtml();
+bindFoldSim();
+</script>
+</body>
+</html>
