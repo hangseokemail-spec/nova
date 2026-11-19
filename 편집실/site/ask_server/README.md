@@ -12,6 +12,22 @@ AWS Lightsail 우분투 서버(서울, 고정 IP `3.34.169.45`)에 한 번만 �
 
 ---
 
+## 가장 쉬운 방법: 한 줄로 설치하기
+
+1. Lightsail 콘솔 → 인스턴스 → **Networking(네트워킹)** 탭 → IPv4 방화벽에 **HTTP**, **HTTPS** 규칙 추가(아래 2단계).
+2. **Connect** 탭 → **Connect using SSH**로 검은 창을 열고, 아래 한 줄을 붙여 넣고 Enter.
+
+```bash
+curl -fsSL "https://raw.githubusercontent.com/hangseokemail-spec/nova/main/%ED%8E%B8%EC%A7%91%EC%8B%A4/site/ask_server/setup_all.sh" -o /tmp/nova_setup.sh && sudo bash /tmp/nova_setup.sh
+```
+
+3. 중간에 'y 또는 n'을 물으면 y를 누르고 API 키를 붙여 넣어요(화면에 안 보이는 게 정상). 키가 아직 없으면 n.
+4. 마지막 화면을 복사해 Claude에게 보내요.
+
+아래 1~7단계는 같은 일을 한 단계씩 하는 방법이에요.
+
+---
+
 ## 1단계. Lightsail에 접속하기
 
 Lightsail 콘솔 → 인스턴스 → **'브라우저를 사용하여 연결'(Connect using SSH)** 을 눌러 검은 창을 엽니다.
