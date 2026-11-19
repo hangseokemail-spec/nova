@@ -1,0 +1,18 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" font-family="'Noto Sans KR','Noto Sans CJK KR',sans-serif" role="img"><defs>
+<pattern id="n2-psy-s15-a-dot" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.1" fill="#1C1A17" opacity=".55"/></pattern>
+<pattern id="n2-psy-s15-a-dotR" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.3" fill="#C8372D" opacity=".75"/></pattern>
+<pattern id="n2-psy-s15-a-dotRd" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.25" fill="#C8372D" opacity=".9"/></pattern>
+<pattern id="n2-psy-s15-a-dotRs" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.2" fill="#C8372D" opacity=".7"/></pattern>
+<pattern id="n2-psy-s15-a-dotN" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.2" fill="#1F3A5F" opacity=".6"/></pattern>
+<pattern id="n2-psy-s15-a-dotP" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r=".9" fill="#FBF8F1" opacity=".35"/></pattern>
+<pattern id="n2-psy-s15-a-dotF" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.1" fill="#8E9AAA" opacity=".8"/></pattern>
+<pattern id="n2-psy-s15-a-dotG" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.2" fill="#1F3A5F" opacity=".35"/></pattern>
+<pattern id="n2-psy-s15-a-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#1C1A17" stroke-width="1.2" opacity=".5"/></pattern>
+<pattern id="n2-psy-s15-a-hatchN" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#1F3A5F" stroke-width="1.1" opacity=".45"/></pattern>
+<marker id="n2-psy-s15-a-arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#1C1A17"/></marker>
+<marker id="n2-psy-s15-a-arrR" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#C8372D"/></marker>
+<marker id="n2-psy-s15-a-arrN" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#1F3A5F"/></marker>
+<marker id="n2-psy-s15-a-arrF" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#8E9AAA"/></marker>
+<marker id="n2-psy-s15-a-arrP" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#F4EFE4"/></marker>
+<marker id="n2-psy-s15-a-tick" markerWidth="2" markerHeight="12" refX="1" refY="6" orient="auto"><rect width="2" height="12" fill="#1C1A17"/></marker>
+</defs><rect width="64" height="64" fill="none"/><g transform="translate(0,0) scale(1.000)" fill="none" stroke="#1C1A17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M40,6 L40,34 M14,34 L44,34 M17,34 L17,60 M40,34 L40,60"/><rect x="9" y="41" width="16" height="12" rx="5" fill="#F4DCD2"/><rect x="32" y="41" width="16" height="12" rx="5" fill="#F4DCD2"/><path d="M13,53 q4,-5 8,0 M36,53 q4,-5 8,0" stroke-width="1.6"/></g></svg>

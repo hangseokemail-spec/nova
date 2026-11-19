@@ -42,6 +42,7 @@ if os.path.exists(os.path.join(ID, "art_n2.py")):              # 편찬 때 만�
     import importlib.util
     sp = importlib.util.spec_from_file_location("art_n2", os.path.join(ID, "art_n2.py")); m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m)
     FIGS.update({k: v for k, v in m.ART.items() if k not in ("mascot", "teacher")})
+if "n2_cover" in FIGS: FIGS["cover"] = FIGS["n2_cover"]   # 도판 담당이 그린 표지(4:5)
 if "cover" not in FIGS:   # 임시 표지: 밤하늘에 가까이 붙은 별 둘(주제 '둘이 만나면'). 표지 그림이 오면 바뀜
     rr = random.Random(20261120)
     st = "".join(f'<circle cx="{rr.uniform(-1600,2400):.0f}" cy="{rr.uniform(-2000,2560):.0f}" r="{rr.choice([0.8,1.3,1.9])}" fill="#F4EFE4" opacity="{rr.choice([.5,.8,1])}"/>' for _ in range(520))
@@ -54,7 +55,7 @@ if "cover" not in FIGS:   # 임시 표지: 밤하늘에 가까이 붙은 별 둘
 
 # ---------------- 원고 ----------------
 IDS = ["gorilla", "merger", "folding", "snowflake", "economy", "export", "art", "art2", "purr", "psytest", "comic"]
-A, missing, MISS = {}, [], []
+A, missing, MISS, FIG_MISSING = {}, [], [], []
 for i in IDS:
     d = L(i + ".json")
     if d is None: missing.append(i); continue
@@ -78,10 +79,27 @@ for i in IDS:
                 opts = list(enumerate(q["options"])); _qr.shuffle(opts)
                 q["answer"] = [k for k, (o, _) in enumerate(opts) if o == q["answer"]][0]
                 q["options"] = [x for _, x in opts]
-    d.pop("facts", None); d.pop("gpt_prompt", None)   # 화면에 쓰지 않는 조사 기록은 싣지 않음
-    for f in d.get("figs", []): f.pop("brief", None)
+    d.pop("facts", None); d.pop("gpt_prompt", None); d.pop("image", None)   # 화면에 쓰지 않는 조사 기록은 싣지 않음
+    for p_ in d.get("panels", []) or []: p_.pop("place_note", None)
+    heads = {b.get("x") for b in d.get("body", []) or [] if b.get("t") == "h"}
+    keep = []
+    for f in d.get("figs", []) or []:
+        f.pop("brief", None)
+        if f.get("svg") and f["svg"] not in FIGS:   # 도판 파일이 아직 없으면 그 그림만 건너뜀
+            FIG_MISSING.append((i, f["svg"])); continue
+        if "at" in f and f["at"] and f["at"] not in heads and i != "psytest":
+            print("그림 자리(at) 소제목을 못 찾아 기사 끝에 둠:", i, f.get("svg") or f.get("img"), f["at"]); f["at"] = ""
+        keep.append(f)
+    if "figs" in d: d["figs"] = keep
     d = json.loads(json.dumps(d, ensure_ascii=False).replace("서아 페이퍼", "Nova"))
     A[i] = d
+
+# 만화: 7칸의 '…'와 '톡.'은 그림을 보고 정한 자리(칸 왼쪽 위에서 가로 %, 세로 %)
+COMIC_POS = {(7, "…"): (33, 70), (7, "톡."): (28, 52)}
+if "comic" in A:
+    for k, p_ in enumerate(A["comic"].get("panels", []), 1):
+        for l in p_.get("lines", []):
+            if (k, l.get("say")) in COMIC_POS: l["pos"] = list(COMIC_POS[(k, l["say"])])
 
 # 책
 books = L("books.json"); METRICS = L("books_metrics.json") or {}
@@ -129,13 +147,24 @@ for s in SECTIONS[1:]:
         toc.append({"sec": s["name"], "t": KIND_T[s["kind"]], "p": str(page), "go": s["id"]}); page += 2
     s["pages"] = f"{start}–{page-1}"
 
-# 표지(임시: 고릴라 머리기사. 편찬 때 표지 제목·그림을 정하면 바꿔요)
+# 표지: 큰 제목 「둘이 만나면 생기는 일」, 머리기사 gorilla. 편집장의 final/editor.json이 있으면 그 문구를 씀
+ED = L("editor.json") or {}
 head = A.get("gorilla", {})
-COVER = {"headline": head.get("title", ""), "lead": [head.get("deck", "")], "go": "science",
-         "caption": "고릴라 둘이 힘을 합쳐 높은 가지에 손을 뻗었어요.",
-         "lines": [{"sec": sec, "t": A[i]["title"], "go": go} for sec, i, go in
-                   [("과학", "merger", "science"), ("수학", "folding", "math"), ("수학", "snowflake", "math"), ("경제", "economy", "economy"),
-                    ("경제", "export", "economy"), ("예술", "art", "art"), ("예술", "art2", "art"), ("마음", "purr", "mind"), ("문학", "books", "lit")] if i in A]}
+SEC_OF = {i: (s["name"], s["id"]) for s in SECTIONS for i in s.get("items", [])}
+def cover_line(x):
+    if isinstance(x, str) and x in A: return {"sec": {"심리검사": "마음"}.get(SEC_OF[x][0], SEC_OF[x][0]) if x in SEC_OF else "", "t": A[x]["title"], "go": SEC_OF.get(x, ("", "contents"))[1]}
+    if isinstance(x, dict):
+        i = x.get("id")
+        if i in A: return {"sec": x.get("sec") or SEC_OF.get(i, ("",))[0], "t": x.get("t") or A[i]["title"], "go": x.get("go") or SEC_OF.get(i, ("", "contents"))[1]}
+        if x.get("t"): return {"sec": x.get("sec", ""), "t": x["t"], "go": x.get("go", "contents")}
+    return None
+LINE_IDS = ["merger", "folding", "economy", "art", "purr", "books"]   # 탭마다 한 줄씩
+COVER = {"kicker": "이번 호 주제", "headline": ED.get("coverTitle") or "둘이 만나면 생기는 일",
+         "lead": [ED.get("coverLead") or head.get("deck", "")], "go": "science",
+         "caption": ED.get("coverCaption") or "리샤가 받침이 되고 아멜리아가 손을 뻗었어요. 하늘에는 큰 별과 작은 별이 함께 있어요.",
+         "lines": [l for l in (cover_line(x) for x in (ED.get("coverLines") or LINE_IDS)) if l]}
+if "n2_cover" in FIGS: COVER["fit"] = "xMidYMax slice"   # 4:5 표지 도판은 칸을 꽉 채우고 아래(땅)를 맞춤
+if not ED: print("알림: final/editor.json이 없어 표지 문구와 편집장 글은 임시 문구예요.")
 
 # 기사 퀴즈: 난이도마다 10문제, 기사마다 고르게
 rng = random.Random(20261120); pool = {"쉬움": [], "보통": [], "어려움": []}
@@ -160,7 +189,7 @@ for v in vids: v["topicName"] = _TN.get(v.get("topic"), v.get("topic", ""))
 VIDEO = {
   "kicker": "이번 주 영상", "title": "그리고, 만들고, 실험하고, 더 알아보는 영상 네 편",
   "deck": "주제가 겹치지 않게 네 편을 골랐어요. 많은 사람이 본 영상 가운데, 방송사나 오래 활동한 어린이 채널의 영상을 먼저 봤어요.",
-  "body": [{"t": "p", "x": "영상은 유튜브 검색 결과에서 조회수(본 사람 수)와 올린 지 얼마나 됐는지, 어떤 채널이 만들었는지를 살펴 골랐어요. 오래전에 올라왔어도 지금 봐도 좋은 내용이면 골랐어요. 유튜브에는 별점이 없고, 좋아요 수와 댓글은 이번에 확인하지 못했어요."}],
+  "body": [{"t": "p", "x": "영상은 11월 19일 유튜브 검색 결과에서 조회수, 올린 때, 채널을 보고 골랐어요. 영상을 끝까지 재생해 확인하지 못했어요. 좋아요·댓글 수는 읽지 못했어요. 영상 속 광고는 Nova가 고를 수 없으니 어른과 함께 보세요."}],
   "list": vids, "checked": "2026년 11월 19일",
 }
 ASK = extra["askPrompt"].replace("어린이 신문 '서아 페이퍼'", "과학 교양지 'Nova'").replace("4학년이 이해할 수 있는 쉬운 말로, '~해요'체로 3~6문장으로 답해.", "초등학교 4학년이 이해할 수 있게 '~해요'체로 4~8문장으로 쉽고 자세하게 답해. 비유를 하나 이상 들고, 4학년이 모를 것 같은 낱말은 괄호 안에 쉬운 뜻을 붙여. 내용은 정확하게, 모르는 것은 모른다고 말해.")
@@ -234,6 +263,14 @@ if os.path.isdir(CM):
             IMAGES[n] = save_img(Image.open(os.path.join(CM, f)), PFX + n + ".jpg", 1400)
 for iid, f in COV.items():
     IMAGES["cover_" + iid] = shutil.copy(f, os.path.join(IMG_OUT, f"{PFX}cover_{iid}.jpg"))
+USED = {"cover", "mascot", "teacher"}
+for a in A.values():
+    for f in (a.get("figs") or []) if isinstance(a, dict) else []:
+        if f.get("svg"):
+            USED.add(f["svg"]); USED.add(f["svg"] + "_h")
+            if a.get("id") == "psytest" or a is A.get("psytest"): USED.update(f["svg"] + "_" + c for c in "abcd")
+FIGS = {k: v for k, v in FIGS.items() if k in USED or not k.startswith("n2_")}
+FIGS.pop("n2_cover", None)
 def _uri(p): return "data:image/jpeg;base64," + base64.b64encode(open(p, "rb").read()).decode()
 
 def data(embed):
@@ -245,7 +282,7 @@ def data(embed):
             b["img"] = src(IMAGES["cover_" + iid]) if iid else ""
     return {
       "issue": ISSUE, "sections": SECTIONS, "articles": arts, "figs": FIGS, "cover": COVER, "toc": toc,
-      "editorNote": "Nova는 초등학교 4학년 서아가 직접 기획한 과학 잡지예요. 일주일에 한 번, 금요일 밤 10시에 나와요. 이번 호의 주제는 '둘이 만나면'이에요. 고릴라 둘이 사다리가 되고, 별 둘이 하나로 합쳐지고, 종이는 접을 때마다 2배가 돼요. 기사를 끝까지 읽으면 '잘했어요' 도장이 찍혀요. 읽다가 궁금한 것이 생기면 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.",
+      "editorNote": ED.get("editorNote") or "Nova는 초등학교 4학년 서아가 직접 기획한 과학 잡지예요. 일주일에 한 번, 금요일 밤 10시에 나와요. 이번 호의 주제는 '둘이 만나면'이에요. 고릴라 둘이 사다리가 되고, 별 둘이 하나로 합쳐지고, 종이는 접을 때마다 2배가 돼요. 기사를 끝까지 읽으면 '잘했어요' 도장이 찍혀요. 읽다가 궁금한 것이 생기면 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.",
       "newsQuiz": NQ, "mathQuiz": math_q["levels"],
       "quizNote": "수학 퀴즈는 이번 호 수학 기사 두 편과 4학년 2학기 범위에서 냈어요. 아빠가 문제 파일을 주시면 거기에 맞춰요.",
       "sudoku": sud, "video": VIDEO, "askPrompt": ASK, "askExample": "예: 고릴라는 왜 손가락 마디로 땅을 짚나요?",
@@ -283,6 +320,7 @@ open(os.path.join(SITE, "config.js"), "w", encoding="utf-8").write(
     f'window.SEOA_CONFIG = {{ gasUrl: "{gas}", askUrl: "{ask}" }};\n')
 
 print("원고 출처:", FROM)
+print("도판:", len(glob.glob(os.path.join(ID, "figs", "*.svg"))), "개 파일 | 빠진 도판:", FIG_MISSING or "없음")
 print("고치기 못 찾음:", MISS or "없음")
 print("시뮬레이터:", list(SIMS), "| 그림:", sorted(IMAGES))
 print("조립 완료", len(html) // 1024, "KB | 없는 원고:", missing or "없음", "| 퀴즈:", {k: len(v) for k, v in NQ.items()})

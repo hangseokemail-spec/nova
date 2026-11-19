@@ -281,21 +281,93 @@ async def test_figimg(br):
     """figs의 img: 그림 파일을 보여 주고 '일러스트'·credit 표시, img가 없는 그림은 예전처럼(SVG 있으면 SVG)"""
     ctx, pg, errs = await new_page(br, {"width": 390, "height": 844})
     d = json.loads(json.dumps(D2)); g = d["articles"]["gorilla"]
-    g["figs"][0]["img"] = "n2_art_d0"; g["figs"][0]["credit"] = "그림: Nova 편집부 의뢰, AI 생성 일러스트"
-    d["figs"]["gorilla_2"] = '<svg viewBox="0 0 10 5" xmlns="http://www.w3.org/2000/svg"><rect width="10" height="5" fill="#1F3A5F"/></svg>'
+    g["figs"][0] = {"img": "n2_art_d0", "at": g["figs"][0]["at"], "cap": "시험용 그림 설명", "credit": "그림: Nova 편집부 의뢰, AI 생성 일러스트"}   # GPT 그림이 SVG 자리를 대신하는 경우
     d["cover"]["img"] = "n2_art_0"
     async def ed(route): await route.fulfill(status=200, content_type="application/json", body=json.dumps(d, ensure_ascii=False))
     await pg.route("**/editions/2026-11-20.json", ed)
     await pg.goto(BASE + "?d=2026-11-20#science"); await pg.wait_for_selector("#a-gorilla figure")
     await pg.wait_for_timeout(500)
-    r = await pg.evaluate("""() => { const f = document.querySelectorAll('#a-gorilla figure');
+    r = await pg.evaluate("""() => { const f = document.querySelectorAll('#a-gorilla .body figure');
       return [f.length, !!f[0].querySelector('img') && f[0].querySelector('img').naturalWidth > 0, f[0].querySelector('.illu') && f[0].querySelector('.illu').textContent, (f[0].querySelector('.credit')||{}).textContent, !!f[1].querySelector('svg')]; }""")
-    ok("[그림] figs.img → 그림 파일 + 일러스트 표시 + credit, 다음 그림은 SVG", r[0] == 2 and r[1] and r[2] == "일러스트" and "AI 생성" in (r[3] or "") and r[4], str(r))
+    ok("[그림] figs.img(at 자리) → 그림 파일 + 일러스트 표시 + credit, 다음 그림은 SVG", r[0] == 3 and r[1] and r[2] == "일러스트" and "AI 생성" in (r[3] or "") and r[4], str(r))
     await pg.evaluate("document.querySelector('#a-gorilla figure').scrollIntoView()"); await pg.screenshot(path=os.path.join(SHOT, "phone_fig_img_test.png"))
     await pg.click('.tab[data-s="cover"]'); await pg.wait_for_timeout(400)
     cimg = await pg.eval_on_selector(".c-art img.c-img", "e => e.naturalWidth > 0")
     ok("[그림] 표지 그림 파일(cover.img)", cimg)
     ok("[그림] 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+
+# 만화 칸마다 가리면 안 되는 곳(감·까마귀, 칸 안 %: 왼, 위, 오른, 아래). 그림을 직접 보고 정함
+PROTECT = {1: [(55, 3, 70, 20)], 2: [(49, 3, 64, 21), (75, 50, 98, 78)], 3: [(66, 3, 81, 20)], 4: [(59, 3, 74, 20)],
+           5: [(62, 3, 78, 20)], 6: [(59, 3, 74, 21)], 7: [(69, 6, 82, 24), (76, 3, 90, 27)]}
+
+async def test_final(br, vp, name):
+    """최종 원고 화면: 본문 안 도판, 표지, 만화 대사, 심리 동점, 경제 알림, 책 고른 방법, 스도쿠 규칙, 영상 안내"""
+    ctx, pg, errs = await new_page(br, vp)
+    await pg.goto(BASE + "?d=2026-11-20#cover"); await pg.wait_for_selector(".c-art")
+    h = await pg.inner_text(".c-head h2"); sv = await pg.query_selector(".c-art svg")
+    ok(f"[{name}] 표지: 큰 제목·표지 도판", h.strip() == "둘이 만나면 생기는 일" and bool(sv), h)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_final_cover.png"))
+    # 과학: 고릴라 도판 셋이 at 소제목 바로 뒤에
+    await pg.click('.tab[data-s="science"]'); await pg.wait_for_selector("#a-gorilla .infig")
+    r = await pg.evaluate("""() => { const a = document.querySelector('#a-gorilla');
+      const figs = Array.from(a.querySelectorAll('figure.infig')).map(f => { let p = f.previousElementSibling; while (p && p.tagName === 'FIGURE') p = p.previousElementSibling; return [f.dataset.fig, p ? p.textContent : '']; });
+      return figs; }""")
+    G = D2["articles"]["gorilla"]["figs"]
+    want = [[f["svg"], f["at"]] for f in G if f.get("svg")]
+    ok(f"[{name}] 고릴라 도판이 소제목 바로 뒤에(순서대로)", r == want, json.dumps(r, ensure_ascii=False)[:160])
+    allfig = await pg.evaluate("""() => Array.from(document.querySelectorAll('figure.infig svg')).filter(s => s.getBoundingClientRect().width > 0).map(s => Math.round(s.getBoundingClientRect().right))""")
+    ok(f"[{name}] 과학 도판이 화면 폭 안", all(x <= vp["width"] for x in allfig), f"{len(allfig)}장, 최대 오른쪽 {max(allfig) if allfig else 0}px")
+    await pg.evaluate("document.querySelector('#a-gorilla figure.infig').scrollIntoView({block:'start'}); window.scrollBy(0, -70)"); await pg.wait_for_timeout(200)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_final_gorilla_fig.png"))
+    vis = await pg.evaluate("""() => { const f = document.querySelector('figure[data-fig="n2_merger_s5"]'); if (!f) return null;
+      return [getComputedStyle(f.querySelector('.fv')).display, getComputedStyle(f.querySelector('.fh')).display]; }""")
+    want_v = ["block", "none"] if vp["width"] < 700 else ["none", "block"]
+    ok(f"[{name}] 별 연표: 휴대폰 세로판·PC 가로판", vis == want_v, str(vis))
+    # 경제 알림
+    await pg.click('.tab[data-s="economy"]'); await pg.wait_for_selector("#a-economy")
+    an = await pg.query_selector("#a-economy .anote"); nf = await pg.eval_on_selector_all("#a-economy figure.infig, #a-export figure.infig", "es => es.length")
+    ok(f"[{name}] 경제: 꾸민 대화 알림·도판", bool(an) and nf == 3, f"도판 {nf}")
+    # 책
+    await pg.click('.tab[data-s="lit"]'); await pg.wait_for_selector(".bmethod")
+    t = await pg.inner_text("#a-books")
+    ok(f"[{name}] 책: 어떻게 골랐나요·『샬롯』 덧말·리뷰+한줄평", "어떻게 골랐나요?" in t and "2000년 판" in t and "리뷰+한줄평" in t and "2026년 11월 19일 조사" in t)
+    # 만화
+    await pg.click('.tab[data-s="comic"]'); await pg.wait_for_selector(".pnl.ov img")
+    await pg.evaluate("Promise.all(Array.from(document.querySelectorAll('.pnl.ov img')).map(i => i.complete ? 1 : new Promise(r => { i.onload = i.onerror = r; })))")
+    res = await pg.evaluate("""(P) => Array.from(document.querySelectorAll('.pnl.ov')).map((pn, i) => {
+      const im = pn.querySelector('.pimg').getBoundingClientRect(); const out = [];
+      pn.querySelectorAll('.pimg .bub').forEach(b => { const r = b.getBoundingClientRect();
+        const x0 = (r.left - im.left) / im.width * 100, y0 = (r.top - im.top) / im.height * 100, x1 = (r.right - im.left) / im.width * 100, y1 = (r.bottom - im.top) / im.height * 100;
+        for (const q of (P[i+1] || [])) if (x0 < q[2] && x1 > q[0] && y0 < q[3] && y1 > q[1]) out.push([i+1, b.textContent, q]);
+        if (x1 > 100.5 || y1 > 100.5 || x0 < -0.5) out.push([i+1, b.textContent, '칸 밖']); });
+      return [pn.querySelector('img').naturalWidth > 0, out]; })""", {str(k): v for k, v in PROTECT.items()})
+    n_ok = sum(1 for x in res if x[0]); hits = [h for x in res for h in x[1]]
+    band = await pg.inner_text(".pnl.ov .capband")
+    ok(f"[{name}] 만화 7칸 그림·대사가 감과 까마귀를 가리지 않음", n_ok == 7 and not hits, json.dumps(hits, ensure_ascii=False)[:200])
+    ok(f"[{name}] 만화 1칸 해설은 아래 띠", "감나무에 감이 딱 하나" in band, band[:30])
+    await pg.evaluate("document.querySelector('.strip.ovs').scrollIntoView({block:'start'}); window.scrollBy(0, -60)"); await pg.wait_for_timeout(200)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_final_comic.png"))
+    el = await pg.query_selector(".strip.ovs"); await el.screenshot(path=os.path.join(SHOT, f"{name}_final_comic_all.png"))
+    # 심리검사 동점
+    await pg.click('.tab[data-s="mind"]'); await pg.wait_for_selector("#psyDone")
+    Q = D2["articles"]["psytest"]["questions"]
+    for i in range(len(Q)):
+        await pg.click(f'.psy[data-q="{i}"][data-t="{"A" if i < len(Q)//2 else "B"}"]')
+    await pg.click("#psyDone"); n_res = await pg.eval_on_selector_all("#psyRes .result", "es => es.length"); t = await pg.inner_text("#psyRes")
+    ico = await pg.eval_on_selector_all("#psyRes .psyico svg", "es => es.length")
+    ok(f"[{name}] 심리검사 동점이면 두 유형 다", n_res == 2 and "둘 다 읽어 보세요" in t and ico == 2, f"결과 {n_res}개, 기호 {ico}")
+    await pg.evaluate("document.querySelector('#psyRes').scrollIntoView({block:'start'}); window.scrollBy(0, -60)"); await pg.wait_for_timeout(150)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_final_psy_result.png"))
+    # 스도쿠 규칙, 영상 안내
+    await pg.click('.tab[data-s="sudoku"]'); await pg.wait_for_selector("#sgrid-0")
+    t = await pg.inner_text("article.art")
+    ok(f"[{name}] 스도쿠 intro·규칙 세 줄", "처음이라면" in t and t.count("1부터 9까지가 한 번씩") >= 3)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_final_sudoku.png"))
+    await pg.click('.tab[data-s="video"]'); await pg.wait_for_selector(".vrow")
+    t = await pg.inner_text("article.art")
+    ok(f"[{name}] 영상 안내(끝까지 재생 못 함·광고·11월 19일)", "끝까지 재생해 확인하지 못했어요" in t and "어른과 함께" in t and "11월 19일" in t)
+    ok(f"[{name}] 최종 화면 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
     await ctx.close()
 
 async def test_inline(br):
@@ -334,6 +406,7 @@ async def main():
                 if name == "phone":
                     await test_quiz(br, vp, name); await test_psy(br, vp, name)
                 await test_ask(br, vp, name)
+                await test_final(br, vp, name)
             await test_figimg(br)
             await test_inline(br)
             await br.close()

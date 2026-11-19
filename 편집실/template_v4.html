@@ -266,7 +266,7 @@ body.inner .mast-tools{margin-top:-30px}
 .artimg .zoomhint{font-family:'Noto Sans KR';font-size:12px;color:var(--red);margin-top:3px}
 .details{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:18px 0}
 .dt{border:1.5px solid var(--ink);background:var(--paper2)}
-.dt img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;border-bottom:1px solid var(--ink)}
+.dt img{width:100%;display:block;aspect-ratio:4/3;object-fit:contain;background:#E9E2D2;border-bottom:1px solid var(--ink)}
 .dt .dl{font-family:'Noto Sans KR';font-weight:900;font-size:14px;padding:7px 10px 0}
 .dt .dl i{font-style:normal;color:#fff;background:var(--red);display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;margin-right:6px;font-size:12px}
 .dt .dn{font-size:15px;line-height:1.65;padding:4px 10px 10px}
@@ -336,6 +336,32 @@ figure .fig.figimg{position:relative;line-height:0}
 figure .fig.figimg img{width:100%;height:auto;display:block}
 .illu{position:absolute;left:8px;top:8px;line-height:1.4;font-family:'Noto Sans KR';font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--paper);color:var(--ink);border:1px solid var(--ink);padding:1px 6px}
 figcaption .credit{display:block;font-size:11.5px;margin-top:2px}
+/* 본문 안 도판(제2호부터 figs.svg / figs.at) */
+.body figure,.body .infig{column-span:all;break-inside:avoid;margin:20px auto 22px}
+.fig.svgfig{line-height:0;background:var(--paper2)}
+.fig.svgfig svg{width:100%;height:auto;display:block}
+.fig .fh{display:none}
+@media(min-width:700px){.fig .fv{display:none}.fig .fh{display:block}}
+.anote{font-family:'Noto Sans KR';font-size:13px;line-height:1.6;color:#3B3530;background:var(--paper2);border:1px dashed var(--ink);padding:7px 11px;margin:-6px 0 16px}
+.anote::before{content:"알림";font-weight:900;color:var(--red);margin-right:8px;letter-spacing:.1em}
+/* 책: 고른 방법, 지표 덧말 */
+.bmnote{font-family:'Noto Sans KR';font-size:12px;color:var(--gray);line-height:1.55;margin:-6px 0 10px}
+.bmethod .bb p{margin:0 0 8px;font-size:15.5px;line-height:1.75}.bmethod .bb p:last-child{margin:0}
+/* 심리검사: 결과 기호, 네 자리 그림 */
+.psyico{display:inline-block;width:40px;height:40px;vertical-align:-8px;margin-right:8px}.psyico svg{width:100%;height:100%;display:block}
+.psyfig{max-width:420px}
+/* 만화: 그림 위에 얹는 대사 */
+.strip.ovs .pnl.img{line-height:normal}
+.pnl.ov .pimg{position:relative;line-height:0}
+.pnl.ov .obubs{position:absolute;top:5%;display:flex;flex-direction:column;gap:4px;line-height:1.35;max-width:64%;align-items:flex-start}
+.pnl.ov .obubs.tl{left:4%}
+.pnl.ov .obubs.tc{left:46%;transform:translateX(-50%);align-items:center;max-width:40%}
+.pnl.ov .bub{box-shadow:2px 2px 0 var(--ink);font-size:13.5px;max-width:100%;line-height:1.35;white-space:normal;word-break:keep-all}
+.pnl.ov .pimg>.bub{line-height:1.35}
+.pnl.ov .bub.fx{font-size:17px;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.pnl.ov .pno{top:auto;bottom:6px;right:6px;left:auto}
+.capband{background:#FFF6CC;border-top:1.5px solid var(--ink);font-family:'Noto Sans KR';font-weight:700;font-size:13.5px;line-height:1.5;padding:6px 10px}
+@media(max-width:600px){.pnl.ov .bub{font-size:12.5px;padding:3px 7px}.pnl.ov .bub.fx{font-size:15px}.pnl.ov .obubs{gap:3px}}
 /* 표지 그림 파일 */
 .c-art img.c-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 /* 9×9 스도쿠 여러 판 */
@@ -461,18 +487,31 @@ $("#tabs").innerHTML = SECS.map(s => `<button class="tab" data-s="${s.id}">${esc
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => go(b.dataset.s, true));
 
 /* ---------- 공통 조각 ---------- */
-const figHtml = (id, n) => {
+// 그림 한 장. 형식 셋: {img}(그림 파일, '일러스트' 표시) / {svg}(편집부 도판 이름, _h가 있으면 PC는 가로판) / 예전 형식(F[기사id], F[기사id_2])
+const isInline = f => !!f && (f.svg || Object.prototype.hasOwnProperty.call(f, "at"));
+function figOne(id, f, i, n, total){
+  const no = `그림 ${n}${total>1?"-"+(i+1):""}`;
+  const cap = `<figcaption><b>${no}</b>${esc(f.cap)}${f.credit?`<span class="credit">${esc(f.credit)}</span>`:""}</figcaption>`;
+  if (f.img) {   // 그림 파일(GPT 일러스트 등): assets/img/<img>.jpg
+    const src = (DATA.images||{})[f.img] || ("assets/img/" + f.img + ".jpg");
+    return `<figure class="${isInline(f)?"infig":""}"><div class="fig figimg"><img src="${esc(src)}" alt="${esc(f.cap)}" loading="lazy"><span class="illu">일러스트</span></div>${cap}</figure>`;
+  }
+  if (f.svg) {
+    const sv = F[f.svg]; if (!sv) return "";
+    const hz = F[f.svg + "_h"];
+    return `<figure class="infig" data-fig="${esc(f.svg)}"><div class="fig svgfig">${hz ? `<div class="fv">${sv}</div><div class="fh">${hz}</div>` : sv}</div>${cap}</figure>`;
+  }
+  const svg = F[id + (i ? "_" + (i+1) : "")];
+  return svg ? `<figure><div class="fig wide-fig">${svg}</div><div class="swipehint">그림을 옆으로 밀어 보세요 ↔</div>${cap}</figure>` : "";
+}
+const figHtml = (id, n) => {   // 기사 머리(제목 아래)에 놓는 그림: 예전 형식
   const a = A[id]; const fg = (a && a.figs) || [];
-  return fg.map((f, i) => {
-    const no = `그림 ${n}${fg.length>1?"-"+(i+1):""}`;
-    if (f.img) {   // 그림 파일(GPT 일러스트 등): assets/img/<img>.jpg
-      const src = (DATA.images||{})[f.img] || ("assets/img/" + f.img + ".jpg");
-      return `<figure><div class="fig figimg"><img src="${esc(src)}" alt="${esc(f.cap)}" loading="lazy"><span class="illu">일러스트</span></div><figcaption><b>${no}</b>${esc(f.cap)}${f.credit?`<span class="credit">${esc(f.credit)}</span>`:""}</figcaption></figure>`;
-    }
-    const svg = F[id + (i ? "_" + (i+1) : "")];
-    return svg ? `<figure><div class="fig wide-fig">${svg}</div><div class="swipehint">그림을 옆으로 밀어 보세요 ↔</div><figcaption><b>${no}</b>${esc(f.cap)}</figcaption></figure>` : "";
-  }).join("");
+  return fg.map((f, i) => isInline(f) ? "" : figOne(id, f, i, n, fg.length)).join("");
 };
+function figsAt(id, n, at){   // 본문 안 그림: at(소제목 글)과 같은 소제목 바로 뒤, at이 빈 값이면 기사 끝
+  const a = A[id]; const fg = (a && a.figs) || [];
+  return fg.map((f, i) => (isInline(f) && String(f.at || "") === at) ? figOne(id, f, i, n, fg.length) : "").join("");
+}
 function linkTerms(html, ctx){
   if (!ctx || !ctx.terms) return html;
   for (const tm of ctx.terms){
@@ -492,15 +531,15 @@ function termCtx(a){
   ts.sort((x, y) => y.k.length - x.k.length);
   return {terms: ts, used: new Set()};
 }
-function bodyHtml(bs, ctx, id){
+function bodyHtml(bs, ctx, id, figN){
   let first = true;
-  return (bs||[]).map(b => {
+  const out = (bs||[]).map(b => {
     if (b.t === "p") {
       const m = /^(아빠|서아)\s*:\s*(.*)$/.exec(b.x || "");
       if (m) { first = false; return `<p class="talk ${m[1]==="아빠"?"dad":"kid"}"><b class="who">${esc(m[1])}</b>${linkTerms(esc(m[2]), ctx)}</p>`; }
       const h = `<p class="${first?"first":""}">${linkTerms(esc(b.x), ctx)}</p>`; first = false; return h;
     }
-    if (b.t === "h") return `<h4>${esc(b.x)}</h4>`;
+    if (b.t === "h") return `<h4>${esc(b.x)}</h4>` + (figN ? figsAt(id, figN, b.x) : "");
     if (b.t === "quote") return `<div class="pull">${esc(b.x)}</div>`;
     if (b.t === "box") return `<div class="box"><div class="bt">${esc(b.title||"")}</div><div class="bb">${b.x?linkTerms(esc(b.x), ctx):""}${(b.items&&b.items.length)?`<ul>${b.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:""}</div></div>`;
     if (b.t === "list") return `<ul>${b.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`;
@@ -509,6 +548,7 @@ function bodyHtml(bs, ctx, id){
     if (b.t === "details") return detailsHtml(id);
     return "";
   }).join("");
+  return out + (figN ? figsAt(id, figN, "") : "");
 }
 function termsHtml(ts){ return (ts&&ts.length) ? `<div class="terms"><div class="th">용어 정리</div>${ts.map(t=>`<div class="term"><b>${esc(t.w)}</b>${esc(t.m)}</div>`).join("")}</div>` : ""; }
 function srcHtml(id, ss){
@@ -534,9 +574,10 @@ function articleHtml(id){
     ${stampHtml(id)}<h3 class="title">${esc(a.title)}</h3>
     <p class="deck">${esc(a.deck||"")}</p>
     <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
+    ${a.note?`<div class="anote">${esc(a.note)}</div>`:""}
     ${figHtml(id, figNo)}
     ${(a.terms&&a.terms.length)?`<div class="howto">밑줄 친 <span>낱말</span>을 누르면 뜻이 나와요.</div>`:""}
-    <div class="body ${long?"cols":""}">${bodyHtml(a.body, termCtx(a), id)}</div>
+    <div class="body ${long?"cols":""}">${bodyHtml(a.body, termCtx(a), id, figNo)}</div>
     ${termsHtml(a.terms)}
     ${endHtml(id)}
     ${srcHtml(id, a.sources)}
@@ -806,7 +847,7 @@ function go(id, push){
   if (s.kind === "chiikawa") loadX();
   Object.keys(SIMS).forEach(k => { try { SIMS[k][1](); } catch(e) { console.warn("시뮬레이터 오류:", k, e); } });
   readSetup();
-  if (s.id === "cover") { const sv = document.querySelector(".c-art svg"); if (sv) sv.setAttribute("preserveAspectRatio", "xMidYMid meet"); }
+  if (s.id === "cover") { const sv = document.querySelector(".c-art svg"); if (sv) sv.setAttribute("preserveAspectRatio", (DATA.cover && DATA.cover.fit) || "xMidYMid meet"); }
   if (push) { try { history.replaceState(null, "", "#" + s.id); } catch(e) { location.hash = s.id; } window.scrollTo(0, 0); }
 }
 
@@ -817,7 +858,7 @@ function coverHtml(){
     <div class="c-top"><span><b>${esc(DATA.issue.label)}</b></span><span>${esc(DATA.issue.dateText)}</span><span>매주 금요일 밤 10시</span></div>
     <h1 class="c-name">Nova</h1>
     <div class="c-sub">서아가 기획한 주간 과학 교양지</div>
-    <div class="c-art" data-go="${C.go}">${C.img ? `<img class="c-img" src="${esc((DATA.images||{})[C.img] || ("assets/img/" + C.img + ".jpg"))}" alt="${esc(C.caption||C.headline)}">` : (F.cover || "")}<div class="c-head"><div class="kicker">이번 호 머리기사</div><h2>${esc(C.headline)}</h2></div></div>
+    <div class="c-art" data-go="${C.go}">${C.img ? `<img class="c-img" src="${esc((DATA.images||{})[C.img] || ("assets/img/" + C.img + ".jpg"))}" alt="${esc(C.caption||C.headline)}">` : (F.cover || "")}<div class="c-head"><div class="kicker">${esc(C.kicker || "이번 호 머리기사")}</div><h2>${esc(C.headline)}</h2></div></div>
     <div class="c-lines"><div class="c-deck">${esc((C.lead||[])[0]||"")}</div><div class="c-lh">이번 호에는</div>${C.lines.map(l=>`<div class="c-l" data-go="${l.go}"><span class="cs">${esc(l.sec)}</span><span class="ct">${esc(l.t)}</span></div>`).join("")}</div>
     <div class="c-foot"><button class="go ghost" data-go="contents">차례 보기</button><button class="go" data-go="${C.go}">머리기사 읽기 →</button></div>
   </section>`;
@@ -843,9 +884,11 @@ function booksHtml(){
     ${(B.intro||[]).map(x=>`<p class="bintro">${esc(x.x)}</p>`).join("")}
     ${B.books.map(b=>`<div class="book"><div>${b.img?`<img src="${b.img}" alt="${esc(b.title)} 표지" loading="lazy">`:""}</div><div>
       <h4>${esc(b.title)}</h4><div class="bm">${esc(b.field)} · ${esc(b.by)} · ${esc(b.pub)}</div><p>${esc(b.about)}</p><p class="why">${esc(b.why)}</p>
-      ${b.metrics?`<div class="bscore"><a href="${esc(b.metrics.aladin.url)}" target="_blank" rel="noopener">알라딘 <b>★ ${b.metrics.aladin.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.aladin.reviews.toLocaleString()}개</span> · <span class="nw">세일즈포인트 ${b.metrics.aladin.salesPoint.toLocaleString()}</span></a><a href="${esc(b.metrics.yes24.url)}" target="_blank" rel="noopener">예스24 <b>★ ${b.metrics.yes24.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.yes24.reviews.toLocaleString()}개</span> · <span class="nw">판매지수 ${b.metrics.yes24.salesIndex.toLocaleString()}</span></a></div>`:""}
+      ${b.metrics?`<div class="bscore"><a href="${esc(b.metrics.aladin.url)}" target="_blank" rel="noopener">알라딘 <b>★ ${b.metrics.aladin.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.aladin.reviews.toLocaleString()}개</span> · <span class="nw">세일즈포인트 ${b.metrics.aladin.salesPoint.toLocaleString()}</span></a><a href="${esc(b.metrics.yes24.url)}" target="_blank" rel="noopener">예스24 <b>★ ${b.metrics.yes24.star.toFixed(1)}</b> <span class="nw">${esc(b.metrics.yes24.reviewsLabel || "리뷰")} ${b.metrics.yes24.reviews.toLocaleString()}개</span> · <span class="nw">판매지수 ${b.metrics.yes24.salesIndex.toLocaleString()}</span></a></div>`:""}
+      ${b.metricsNote?`<div class="bmnote">${esc(b.metricsNote)}</div>`:""}
       <a class="sbtn" href="${esc(b.url)}" target="_blank" rel="noopener">책 정보 보기 ↗</a></div></div>`).join("")}
-    <div class="note">표지 이미지: 알라딘 상품 정보 · 평점과 리뷰 수는 ${esc((B.books[0].metrics||{}).checked||"")} 기준(10점 만점), 이후 달라질 수 있어요.</div>${endHtml("books")}${reactHtml("books")}</article>`;
+    ${(B.method&&B.method.length)?`<div class="box bmethod"><div class="bt">어떻게 골랐나요?</div><div class="bb">${B.method.map((x,i)=>`<p>${esc(i===0?String(x.x||x).replace(/^어떻게 골랐나요\?\s*/,""):(x.x||x))}</p>`).join("")}</div></div>`:""}
+    <div class="note">표지 이미지: 알라딘 상품 정보 · 평점과 리뷰 수는 ${esc((B.books[0].metrics||{}).checkedText || ((B.books[0].metrics||{}).checked||"") + " 기준")}(10점 만점), 이후 달라질 수 있어요.</div>${endHtml("books")}${reactHtml("books")}</article>`;
 }
 
 /* ---------- 만화 ---------- */
@@ -853,9 +896,22 @@ function comicHtml(){
   const M = A.comic, IM = DATA.images || {};
   const imgs = M.panels.map((p, i) => IM["comic_" + (i+1)]).filter(Boolean);
   const head = `<article class="art" id="a-comic" ${readAttrs("comic")}><div class="kicker">${esc(M.kicker||"만화")}</div>${stampHtml("comic")}<h3 class="title">${esc(M.title)}</h3><p class="deck">${esc(M.deck||"")}</p>`;
-  const bub = l => `<div class="bub ${l.who==="효과음"?"fx":l.who==="해설"?"nar":""}">${l.who==="효과음"||l.who==="해설"||l.who==="나"?"":`<span style="color:var(--gray);font-weight:500">${esc(l.who)}</span> `}${esc(l.say)}</div>`;
+  const bub = (l, st) => `<div class="bub ${l.who==="효과음"?"fx":l.who==="해설"?"nar":""}"${st?` style="${st}"`:""}>${l.who==="효과음"||l.who==="해설"||l.who==="나"?"":`<span style="color:var(--gray);font-weight:500">${esc(l.who)}</span> `}${esc(l.say)}</div>`;
+  // 대사를 그림 위에 얹기(제2호부터 panels[].place, caption, lines[].pos): 자리 힌트가 있을 때만
+  const ovPanel = (p, i) => {
+    const capL = p.caption === "bottom" ? p.lines.filter(l => l.who === "해설") : [];
+    const posL = p.lines.filter(l => l.pos && !capL.includes(l));
+    const grp = p.lines.filter(l => !capL.includes(l) && !posL.includes(l));
+    const wide = M.panels.length % 2 === 1 && i === M.panels.length - 1;
+    return `<div class="pnl img ov ${wide?"wide":""}"><div class="pimg"><img src="${IM["comic_"+(i+1)]}" alt="${i+1}번째 칸: ${esc(p.lines.map(l => l.say).join(" "))}" style="width:100%;display:block">
+      ${grp.length?`<div class="obubs ${p.place==="top-center"?"tc":"tl"}">${grp.map(l => bub(l)).join("")}</div>`:""}
+      ${posL.map(l => bub(l, `position:absolute;left:${+l.pos[0]}%;top:${+l.pos[1]}%`)).join("")}
+      <span class="pno">${i+1}</span></div>${capL.length?`<div class="capband">${capL.map(l => esc(l.say)).join(" ")}</div>`:""}</div>`;
+  };
+  const hasPlace = M.panels.some(p => p.place || p.caption);
   let mid;
   if (IM.comic_page) mid = `<div class="comic-img"><img src="${IM.comic_page}" alt="${esc(M.title)}"></div>`;
+  else if (imgs.length === M.panels.length && hasPlace) mid = `<div class="strip gpt ovs">${M.panels.map(ovPanel).join("")}</div>`;
   else if (imgs.length === M.panels.length) mid = `<div class="strip gpt">${M.panels.map((p,i)=>`<div class="pnl img ${(M.panels.length%2===1&&i===M.panels.length-1)?"wide":""}"><img src="${IM["comic_"+(i+1)]}" alt="${i+1}번째 칸" style="width:100%;display:block"><div class="bubs">${p.lines.map(bub).join("")}</div><span class="pno">${i+1}</span></div>`).join("")}</div>`;
   else mid = `<div class="comic-wait">이번 호 만화는 그림을 <b>GPT 이미지 모델</b>에게 맡겼어요. 그림이 도착하면 이 쪽에 실려요. 그동안 이야기(콘티)를 먼저 읽어 보세요.</div>
     <div class="conti">${M.panels.map((p,i)=>`<div class="ct-p"><span class="pn">${i+1}</span>${p.lines.map(l=>`<div class="ln ${l.who==="해설"?"nar":l.who==="효과음"?"fx":""}">${l.who==="해설"||l.who==="효과음"?"":`<b>${esc(l.who==="나"?"마스코트":l.who)}</b>`}${esc(l.say)}</div>`).join("")}</div>`).join("")}</div>`;
@@ -873,6 +929,7 @@ function psyHtml(){
     <div class="panel">${P.questions.map((q,i)=>`<div style="margin-bottom:14px"><div class="qtext" style="font-size:18px">${i+1}. ${esc(q.q)}</div>
       ${q.options.map((o,k)=>`<button class="opt psy" data-q="${i}" data-t="${o.type}"><b>${"ABCD"[k]}</b>${esc(o.x)}</button>`).join("")}</div>`).join("")}
       <button class="go" id="psyDone">결과 보기</button><div id="psyRes"></div></div>
+    ${(P.figs||[]).map((f, i) => (f.svg && F[f.svg]) ? `<figure class="infig psyfig"><div class="fig svgfig">${F[f.svg]}</div><figcaption>${esc(f.cap||"")}</figcaption></figure>` : "").join("")}
     <div class="note">${esc(P.note||"")}</div></article>`;
 }
 function bindPsy(){
@@ -885,11 +942,14 @@ function bindPsy(){
     const P = A.psytest, n = Object.keys(psyAns).length;
     if (n < P.questions.length) { toast(`${P.questions.length - n}문항이 남았어요`); return; }
     const cnt = {}; Object.values(psyAns).forEach(t => cnt[t] = (cnt[t]||0) + 1);
-    const top = Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a])[0], T = P.types[top];
-    $("#psyRes").innerHTML = `<div class="result"><div class="kicker">${esc(P.resultKicker || "나의 탐구 유형")}</div><h3>${esc(T.name)}</h3><p style="font-size:16.5px;line-height:1.75">${esc(T.desc)}</p>
+    const best = Math.max(...Object.values(cnt));
+    const tops = Object.keys(cnt).filter(k => cnt[k] === best && P.types[k]).sort();   // 동점이면 모두
+    const icon = k => { const base = ((P.figs||[])[0]||{}).svg; const sv = base && F[base + "_" + k.toLowerCase()]; return sv ? `<span class="psyico">${sv}</span>` : ""; };
+    const one = k => { const T = P.types[k]; return `<div class="result"><div class="kicker">${esc(P.resultKicker || "나의 탐구 유형")}${tops.length>1?` · 동점 ${tops.indexOf(k)+1}/${tops.length}`:""}</div><h3>${icon(k)}${esc(T.name)}</h3><p style="font-size:16.5px;line-height:1.75">${esc(T.desc)}</p>
       ${T.partner?`<div class="box"><div class="bt">${esc(P.partnerLabel || "이런 짝과 만나면 좋아요")}</div><div class="bb">${esc(T.partner)}</div></div>`:""}
-      <div class="box"><div class="bt">${esc(P.scientistLabel || "닮은 과학자")}</div><div class="bb">${esc(T.scientist)}</div></div><div class="box"><div class="bt">이번 주 해 볼 일</div><div class="bb">${esc(T.try)}</div></div></div>`;
-    log("psytest", {result: T.name});
+      <div class="box"><div class="bt">${esc(P.scientistLabel || "닮은 과학자")}</div><div class="bb">${esc(T.scientist)}</div></div><div class="box"><div class="bt">이번 주 해 볼 일</div><div class="bb">${esc(T.try)}</div></div></div>`; };
+    $("#psyRes").innerHTML = (tops.length > 1 ? `<div class="fb good" style="margin-top:12px"><b>두 유형이 똑같이 나왔어요</b>${tops.length}가지 유형이 ${best}번씩 나왔어요. 둘 다 읽어 보세요.</div>` : "") + tops.map(one).join("");
+    log("psytest", {result: tops.map(k => P.types[k].name).join(", ")});
   };
 }
 
@@ -988,7 +1048,7 @@ function sudokuHtml(){
   const n0 = sdSize(SD_LIST[0]), bx0 = sdBox(SD_LIST[0]);
   const head = SD_MULTI
     ? `<div class="kicker">두뇌 놀이</div><h3 class="title">${n0}×${n0} 스도쿠 ${SD_LIST.length}판</h3><p class="deck">가로 줄, 세로 줄, 굵은 선으로 나뉜 ${bx0[0]}×${bx0[1]} 상자마다 1부터 ${n0}까지가 한 번씩만 들어가요.</p>
-       <div class="body"><p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄과 상자부터 보면 실마리가 보여요. 한 판을 다 맞히면 그 판 위에 <b>왕관</b>이 올라가요. 왕관은 이 기기에 남아요. 두 문제 모두 답이 하나뿐인지 컴퓨터로 확인했어요.</p></div>`
+       <div class="body">${SDD.intro?`<p>${esc(SDD.intro)}</p>`:""}${(SDD.rules&&SDD.rules.length)?`<div class="box"><div class="bt">규칙</div><div class="bb"><ul>${SDD.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>`:""}<p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄과 상자부터 보면 실마리가 보여요. 한 판을 다 맞히면 그 판 위에 <b>왕관</b>이 올라가요. 왕관은 이 기기에 남아요.${SDD.intro?"":" 두 문제 모두 답이 하나뿐인지 컴퓨터로 확인했어요."}</p></div>`
     : `<div class="kicker">두뇌 놀이</div><h3 class="title">6×6 스도쿠</h3><p class="deck">가로 줄, 세로 줄, 굵은 선으로 나뉜 2×3 상자마다 1부터 6까지가 한 번씩만 들어가요.</p>
        <div class="body"><p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄부터 보면 실마리가 보여요. 이 문제는 답이 하나뿐인지 컴퓨터로 확인했어요.</p></div>`;
   const board = (P, k) => {

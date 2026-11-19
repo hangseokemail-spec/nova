@@ -223,7 +223,7 @@ body.inner .nameplate h1{font-size:38px}
 body.inner .nameplate .en,body.inner .nameplate .motto{display:none}
 body.inner .mast-tools{margin-top:-30px}
 @media(max-width:600px){body.inner .nameplate{text-align:left} body.inner .mast-tools{margin-top:-32px;justify-content:flex-end}}
-.toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:'Noto Sans KR';font-weight:700;padding:9px 14px;z-index:50;display:none}
+.toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);word-break:keep-all;text-align:center;max-width:calc(100vw - 32px);background:var(--ink);color:var(--paper);font-family:'Noto Sans KR';font-weight:700;padding:9px 14px;z-index:50;display:none}
 .bintro{font-size:16px;line-height:1.75;margin:14px 0}
 .bscore{display:flex;flex-direction:column;gap:3px;margin:10px 0 12px;padding:8px 10px;border:1px solid var(--ink);font-family:'Noto Sans KR';font-size:12.5px;background:#FBF8F1}
 .bscore a{color:var(--ink);text-decoration:none}.bscore a:hover{text-decoration:underline}.nw{white-space:nowrap}.bscore b{color:var(--red);font-weight:700;margin:0 3px}
@@ -245,7 +245,9 @@ body.inner .mast-tools{margin-top:-30px}
 .sim-modes button,.sim-ctl button{font-family:'Noto Sans KR';font-weight:700;font-size:15px;border:1.5px solid var(--ink);background:var(--paper);padding:9px 12px;cursor:pointer;color:var(--ink)}
 .sim-modes button.on{background:var(--ink);color:var(--paper)}
 .sim-how{font-family:'Noto Sans KR';font-size:14px;line-height:1.6;color:#3B3530;margin:4px 14px 8px;min-height:44px}
-.sim canvas{display:block;width:100%;max-width:480px;aspect-ratio:1/1;margin:0 auto;border:1px solid var(--line);background:#fff;touch-action:none}
+#simCv{display:block;width:100%;max-width:480px;aspect-ratio:1/1;margin:0 auto;border:1px solid var(--line);background:#fff;touch-action:none}
+.sim canvas{touch-action:none}
+.body .sim p{text-align:left}
 .sim-ctl{display:flex;align-items:center;gap:8px;margin:10px 14px 0;flex-wrap:wrap}
 .sim-ctl input[type=range]{flex:1;min-width:140px;accent-color:var(--red)}
 .sim-ctl #simDeg{font-family:'Noto Sans KR';font-weight:900;min-width:44px;text-align:right}
@@ -264,7 +266,7 @@ body.inner .mast-tools{margin-top:-30px}
 .artimg .zoomhint{font-family:'Noto Sans KR';font-size:12px;color:var(--red);margin-top:3px}
 .details{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:18px 0}
 .dt{border:1.5px solid var(--ink);background:var(--paper2)}
-.dt img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;border-bottom:1px solid var(--ink)}
+.dt img{width:100%;display:block;aspect-ratio:4/3;object-fit:contain;background:#E9E2D2;border-bottom:1px solid var(--ink)}
 .dt .dl{font-family:'Noto Sans KR';font-weight:900;font-size:14px;padding:7px 10px 0}
 .dt .dl i{font-style:normal;color:#fff;background:var(--red);display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;margin-right:6px;font-size:12px}
 .dt .dn{font-size:15px;line-height:1.65;padding:4px 10px 10px}
@@ -286,8 +288,8 @@ body.cover-mode .page{padding-top:0;padding-bottom:0}
 .c-head{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(244,239,228,.0) 0%,rgba(244,239,228,.96) 22%);padding:34px 14px 12px}
 .c-head .kicker{font-size:11.5px}
 .c-head h2{font-size:clamp(22px,5.4vw,38px);font-weight:900;line-height:1.22;margin:4px 0 0;word-break:keep-all;letter-spacing:-.02em}
-.c-lines{display:grid;grid-template-columns:1fr;gap:0;margin-top:8px}
-.c-l{display:flex;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer}
+.c-lines{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin-top:8px;min-width:0}
+.c-l{display:flex;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer;min-width:0}
 .c-l .cs{font-family:'Noto Sans KR';font-weight:900;color:var(--red);font-size:12px;min-width:3.2em}
 .c-l .ct{font-size:15px;font-weight:700;line-height:1.35;word-break:keep-all;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .c-l .cp{font-family:'Noto Sans KR';font-size:12px;color:var(--gray)}
@@ -328,6 +330,107 @@ body.cover-mode .page{padding-top:0;padding-bottom:0}
 .pnl.img .bub{box-shadow:none;font-size:14px;max-width:100%}
 .pnl.img .pno{top:6px;bottom:auto;left:6px;right:auto;font-size:12px;padding:1px 6px}
 @media(max-width:600px){.strip.gpt{grid-template-columns:1fr}}
+/* ===== 제2호부터 (template_v4) ===== */
+/* 기사 그림(GPT 일러스트 등 사진 파일) */
+figure .fig.figimg{position:relative;line-height:0}
+figure .fig.figimg img{width:100%;height:auto;display:block}
+.illu{position:absolute;left:8px;top:8px;line-height:1.4;font-family:'Noto Sans KR';font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--paper);color:var(--ink);border:1px solid var(--ink);padding:1px 6px}
+figcaption .credit{display:block;font-size:11.5px;margin-top:2px}
+/* 본문 안 도판(제2호부터 figs.svg / figs.at) */
+.body figure,.body .infig{column-span:all;break-inside:avoid;margin:20px auto 22px}
+.fig.svgfig{line-height:0;background:var(--paper2)}
+.fig.svgfig svg{width:100%;height:auto;display:block}
+.fig .fh{display:none}
+@media(min-width:700px){.fig .fv{display:none}.fig .fh{display:block}}
+.anote{font-family:'Noto Sans KR';font-size:13px;line-height:1.6;color:#3B3530;background:var(--paper2);border:1px dashed var(--ink);padding:7px 11px;margin:-6px 0 16px}
+.anote::before{content:"알림";font-weight:900;color:var(--red);margin-right:8px;letter-spacing:.1em}
+/* 책: 고른 방법, 지표 덧말 */
+.bmnote{font-family:'Noto Sans KR';font-size:12px;color:var(--gray);line-height:1.55;margin:-6px 0 10px}
+.bmethod .bb p{margin:0 0 8px;font-size:15.5px;line-height:1.75}.bmethod .bb p:last-child{margin:0}
+/* 심리검사: 결과 기호, 네 자리 그림 */
+.psyico{display:inline-block;width:40px;height:40px;vertical-align:-8px;margin-right:8px}.psyico svg{width:100%;height:100%;display:block}
+.psyfig{max-width:420px}
+/* 만화: 그림 위에 얹는 대사 */
+.strip.ovs .pnl.img{line-height:normal}
+.pnl.ov .pimg{position:relative;line-height:0}
+.pnl.ov .obubs{position:absolute;top:5%;display:flex;flex-direction:column;gap:4px;line-height:1.35;max-width:64%;align-items:flex-start}
+.pnl.ov .obubs.tl{left:4%}
+.pnl.ov .obubs.tc{left:46%;transform:translateX(-50%);align-items:center;max-width:40%}
+.pnl.ov .bub{box-shadow:2px 2px 0 var(--ink);font-size:13.5px;max-width:100%;line-height:1.35;white-space:normal;word-break:keep-all}
+.pnl.ov .pimg>.bub{line-height:1.35}
+.pnl.ov .bub.fx{font-size:17px;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.pnl.ov .pno{top:auto;bottom:6px;right:6px;left:auto}
+.capband{background:#FFF6CC;border-top:1.5px solid var(--ink);font-family:'Noto Sans KR';font-weight:700;font-size:13.5px;line-height:1.5;padding:6px 10px}
+@media(max-width:600px){.pnl.ov .bub{font-size:12.5px;padding:3px 7px}.pnl.ov .bub.fx{font-size:15px}.pnl.ov .obubs{gap:3px}}
+/* 표지 그림 파일 */
+.c-art img.c-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* 9×9 스도쿠 여러 판 */
+.sdb{border-top:2px solid var(--ink);padding-top:12px;margin-top:22px}
+.sdb-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.sdb-head h4{font-size:21px;font-weight:900;margin:0}
+.sdb-head .sdb-meta{font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray)}
+.sdb-head .sdb-meta b{color:var(--red)}
+.sgrid-wrap{position:relative;max-width:360px;margin:16px auto 10px}
+.sgrid-wrap.n9{max-width:450px;margin-top:70px}
+.sgrid-wrap .sgrid{margin:0 auto}
+.sgrid.n9{grid-template-columns:repeat(9,1fr);max-width:100%;width:100%}
+.sgrid.n9 .scell{font-size:clamp(17px,4.6vw,23px);min-width:0}
+.scell.peer{background:#F6F0E2}.scell.given.peer{background:#E6DDC8}
+.scell.same{color:var(--navy);background:#E3EAF3}
+.scell.wrong{background:#F6D5D0}
+.spad.n9{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:360px;margin:10px auto}
+.spad.n9 button{min-width:0;width:100%;height:48px;padding:0}
+.spad.n9 button[data-n="0"]{font-size:13px!important;padding:0!important;white-space:nowrap;letter-spacing:-.04em}
+@media(min-width:601px){.spad.n9{grid-template-columns:repeat(10,1fr);max-width:560px}}
+.sdb-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.sdb-btns .go{font-size:14px}
+.crown{position:absolute;left:50%;top:-68px;width:88px;transform:translateX(-50%) rotate(-7deg);z-index:2;filter:drop-shadow(2px 3px 0 rgba(28,26,23,.25));pointer-events:none}
+.crown svg{display:block;width:100%;height:auto}
+.crown.ghost{filter:grayscale(1);opacity:.16}
+.crown.drop{animation:crownDrop .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes crownDrop{0%{transform:translate(-50%,-120px) rotate(-30deg) scale(.6);opacity:0}60%{opacity:1}100%{transform:translateX(-50%) rotate(-7deg) scale(1);opacity:1}}
+.crown-tag{display:inline-block;font-family:'Noto Sans KR';font-weight:900;font-size:12px;color:#fff;background:var(--red);padding:2px 8px;letter-spacing:.06em;margin-left:6px;vertical-align:2px}
+/* 축하 효과(색종이·완성 도장) */
+.fxcv{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:70}
+.cele{position:fixed;left:50%;top:42%;z-index:71;pointer-events:none;transform:translate(-50%,-50%);text-align:center;background:var(--paper);border:4px double var(--ink);box-shadow:6px 6px 0 var(--ink);padding:14px 26px 16px;min-width:230px;animation:celePop 2.6s ease both}
+.cele .cc{width:86px;margin:-58px auto 4px}
+.cele .ck{font-family:'Noto Sans KR';font-weight:900;font-size:12px;letter-spacing:.32em;color:var(--red)}
+.cele .ct{font-size:clamp(26px,7vw,34px);font-weight:900;line-height:1.2;margin:2px 0 4px;letter-spacing:-.02em;white-space:nowrap}
+.cele .cs{font-family:'Noto Sans KR';font-size:13px;color:var(--gray)}
+@keyframes celePop{0%{transform:translate(-50%,-50%) scale(.4) rotate(-8deg);opacity:0}12%{transform:translate(-50%,-50%) scale(1.08) rotate(2deg);opacity:1}20%{transform:translate(-50%,-50%) scale(1) rotate(0)}85%{opacity:1}100%{transform:translate(-50%,-56%) scale(.98);opacity:0}}
+/* 다 읽음 도장 */
+article.art{position:relative}
+.rstamp{float:right;width:78px;height:78px;margin:2px 0 6px 10px;border-radius:50%;border:3px solid var(--red);box-shadow:inset 0 0 0 2px var(--paper2),inset 0 0 0 4px var(--red);color:var(--red);display:none;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);font-family:'Noto Sans KR';line-height:1.1;text-align:center;background:rgba(251,248,241,.6);mix-blend-mode:multiply;opacity:.92}
+.rstamp.on{display:flex}
+.rstamp b{font-size:14px;font-weight:900;letter-spacing:-.05em}
+.rstamp small{font-size:9.5px;font-weight:700;letter-spacing:.12em;margin-top:2px}
+.rstamp i{font-style:normal;font-size:9px;font-weight:700;margin-top:2px;border-top:1px solid var(--red);padding-top:1px}
+.rstamp.press{animation:stampIn .6s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes stampIn{0%{transform:scale(2.2) rotate(-30deg);opacity:0}55%{transform:scale(.92) rotate(-10deg);opacity:1}100%{transform:scale(1) rotate(-12deg);opacity:.92}}
+.endmark{display:flex;align-items:center;gap:12px;margin:22px 0 4px;min-height:40px;font-family:'Noto Sans KR';font-size:13px;color:var(--gray)}
+.endmark::before,.endmark::after{content:"";flex:1;border-top:1px solid var(--ink)}
+.endmark .em{display:flex;align-items:center;gap:8px;word-break:keep-all;max-width:80%}
+.endmark .em i{font-style:normal;display:inline-block;width:10px;height:10px;background:var(--ink)}
+.endmark .rstamp{float:none;width:64px;height:64px;margin:0}
+.endmark .rstamp b{font-size:12px}
+.endmark .rstamp small{font-size:8px}
+.endmark .emt{display:none;font-weight:700;color:var(--red)}
+.endmark.done .emt{display:inline}
+.endmark.done .emw{display:none}
+@media(max-width:600px){.rstamp{width:66px;height:66px}.rstamp b{font-size:12.5px}.rstamp small{font-size:8px}}
+.tread{display:inline-block;font-family:'Noto Sans KR';font-weight:900;font-size:10.5px;color:var(--red);border:1.5px solid var(--red);border-radius:50%;width:30px;height:30px;line-height:27px;text-align:center;transform:rotate(-12deg);margin-left:6px;vertical-align:middle;letter-spacing:-.04em;background:rgba(251,248,241,.6)}
+.readbar{display:flex;align-items:center;gap:10px;border:1.5px solid var(--ink);background:var(--paper2);padding:8px 12px;margin:14px 0 6px;font-family:'Noto Sans KR';font-size:13.5px}
+.readbar .rb-bar{flex:1;height:8px;background:var(--line);position:relative;min-width:60px}
+.readbar .rb-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--red)}
+.readbar b{color:var(--red)}
+.tab.done::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-left:4px;vertical-align:3px}
+/* 질문 기다림 */
+.ans.wait{color:var(--gray)}
+.ans.wait .dots i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-left:4px;animation:dotB 1s infinite ease-in-out}
+.ans.wait .dots i:nth-child(2){animation-delay:.15s}.ans.wait .dots i:nth-child(3){animation-delay:.3s}
+@keyframes dotB{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.ans.err{border-color:var(--red)}
+@media (prefers-reduced-motion: reduce){.crown.drop,.rstamp.press,.cele{animation-duration:.01s}.cele{animation:none;opacity:1}}
 </style>
 </head>
 <body>
@@ -356,6 +459,23 @@ function log(kind, payload){
   try { fetch(CFG.gasUrl, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body: JSON.stringify(Object.assign({kind, issue: DATA.issue.no, t: new Date().toISOString()}, payload))}).catch(() => {}); } catch(e) {}
 }
 const A = DATA.articles, F = DATA.figs || {}, SECS = DATA.sections;
+const IKEY = String(DATA.issue.date || DATA.issue.no);   // 호마다 따로 기억하는 열쇠
+if (!S.read || typeof S.read !== "object") S.read = {};   // 다 읽은 기사: "날짜:기사id" → 시각
+if (!S.sd || typeof S.sd !== "object") S.sd = {};         // 여러 판 스도쿠: 날짜 → [판마다 칸]
+if (!S.crown || typeof S.crown !== "object") S.crown = {}; // 왕관: "날짜:판번호" → 시각
+
+/* ---------- 호마다 실려 오는 시뮬레이터(editions JSON의 sims) ---------- */
+const SIMS = {kakeya: [() => simHtml(), () => bindSim()]};
+Object.keys(DATA.sims || {}).forEach(id => {
+  const sm = DATA.sims[id];
+  try {
+    if (sm.css) { const st = document.createElement("style"); st.textContent = sm.css; document.head.appendChild(st); }
+    // 한 파일 미리보기(아티팩트)는 조립 때 넣은 <script>의 함수를 쓰고, 사이트는 JSON에 실린 코드를 함수로 만들어요
+    const pre = (window.__NOVA_SIMS__ || {})[id];
+    const f = pre || new Function(sm.js + "\nreturn {html: " + sm.html + ", bind: " + sm.bind + "};")();
+    SIMS[id] = [f.html, f.bind];
+  } catch(e) { console.warn("시뮬레이터를 불러오지 못했어요:", id, e); }
+});
 
 /* ---------- 제호와 탭 ---------- */
 $("#mast").innerHTML = `
@@ -367,10 +487,31 @@ $("#tabs").innerHTML = SECS.map(s => `<button class="tab" data-s="${s.id}">${esc
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => go(b.dataset.s, true));
 
 /* ---------- 공통 조각 ---------- */
-const figHtml = (id, n) => {
+// 그림 한 장. 형식 셋: {img}(그림 파일, '일러스트' 표시) / {svg}(편집부 도판 이름, _h가 있으면 PC는 가로판) / 예전 형식(F[기사id], F[기사id_2])
+const isInline = f => !!f && (f.svg || Object.prototype.hasOwnProperty.call(f, "at"));
+function figOne(id, f, i, n, total){
+  const no = `그림 ${n}${total>1?"-"+(i+1):""}`;
+  const cap = `<figcaption><b>${no}</b>${esc(f.cap)}${f.credit?`<span class="credit">${esc(f.credit)}</span>`:""}</figcaption>`;
+  if (f.img) {   // 그림 파일(GPT 일러스트 등): assets/img/<img>.jpg
+    const src = (DATA.images||{})[f.img] || ("assets/img/" + f.img + ".jpg");
+    return `<figure class="${isInline(f)?"infig":""}"><div class="fig figimg"><img src="${esc(src)}" alt="${esc(f.cap)}" loading="lazy"><span class="illu">일러스트</span></div>${cap}</figure>`;
+  }
+  if (f.svg) {
+    const sv = F[f.svg]; if (!sv) return "";
+    const hz = F[f.svg + "_h"];
+    return `<figure class="infig" data-fig="${esc(f.svg)}"><div class="fig svgfig">${hz ? `<div class="fv">${sv}</div><div class="fh">${hz}</div>` : sv}</div>${cap}</figure>`;
+  }
+  const svg = F[id + (i ? "_" + (i+1) : "")];
+  return svg ? `<figure><div class="fig wide-fig">${svg}</div><div class="swipehint">그림을 옆으로 밀어 보세요 ↔</div>${cap}</figure>` : "";
+}
+const figHtml = (id, n) => {   // 기사 머리(제목 아래)에 놓는 그림: 예전 형식
   const a = A[id]; const fg = (a && a.figs) || [];
-  return fg.map((f, i) => F[id + (i ? "_" + (i+1) : "")] ? `<figure><div class="fig wide-fig">${F[id + (i ? "_" + (i+1) : "")]}</div><div class="swipehint">그림을 옆으로 밀어 보세요 ↔</div><figcaption><b>그림 ${n}${fg.length>1?"-"+(i+1):""}</b>${esc(f.cap)}</figcaption></figure>` : "").join("");
+  return fg.map((f, i) => isInline(f) ? "" : figOne(id, f, i, n, fg.length)).join("");
 };
+function figsAt(id, n, at){   // 본문 안 그림: at(소제목 글)과 같은 소제목 바로 뒤, at이 빈 값이면 기사 끝
+  const a = A[id]; const fg = (a && a.figs) || [];
+  return fg.map((f, i) => (isInline(f) && String(f.at || "") === at) ? figOne(id, f, i, n, fg.length) : "").join("");
+}
 function linkTerms(html, ctx){
   if (!ctx || !ctx.terms) return html;
   for (const tm of ctx.terms){
@@ -390,23 +531,24 @@ function termCtx(a){
   ts.sort((x, y) => y.k.length - x.k.length);
   return {terms: ts, used: new Set()};
 }
-function bodyHtml(bs, ctx, id){
+function bodyHtml(bs, ctx, id, figN){
   let first = true;
-  return (bs||[]).map(b => {
+  const out = (bs||[]).map(b => {
     if (b.t === "p") {
       const m = /^(아빠|서아)\s*:\s*(.*)$/.exec(b.x || "");
       if (m) { first = false; return `<p class="talk ${m[1]==="아빠"?"dad":"kid"}"><b class="who">${esc(m[1])}</b>${linkTerms(esc(m[2]), ctx)}</p>`; }
       const h = `<p class="${first?"first":""}">${linkTerms(esc(b.x), ctx)}</p>`; first = false; return h;
     }
-    if (b.t === "h") return `<h4>${esc(b.x)}</h4>`;
+    if (b.t === "h") return `<h4>${esc(b.x)}</h4>` + (figN ? figsAt(id, figN, b.x) : "");
     if (b.t === "quote") return `<div class="pull">${esc(b.x)}</div>`;
     if (b.t === "box") return `<div class="box"><div class="bt">${esc(b.title||"")}</div><div class="bb">${b.x?linkTerms(esc(b.x), ctx):""}${(b.items&&b.items.length)?`<ul>${b.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:""}</div></div>`;
     if (b.t === "list") return `<ul>${b.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`;
-    if (b.t === "sim") return simHtml(b.x);
+    if (b.t === "sim") { const sm = SIMS[b.x || "kakeya"]; try { return sm ? sm[0]() : ""; } catch(e) { console.warn(e); return ""; } }
     if (b.t === "art") return artImgHtml(id, b.i || 0);
     if (b.t === "details") return detailsHtml(id);
     return "";
   }).join("");
+  return out + (figN ? figsAt(id, figN, "") : "");
 }
 function termsHtml(ts){ return (ts&&ts.length) ? `<div class="terms"><div class="th">용어 정리</div>${ts.map(t=>`<div class="term"><b>${esc(t.w)}</b>${esc(t.m)}</div>`).join("")}</div>` : ""; }
 function srcHtml(id, ss){
@@ -427,18 +569,90 @@ function articleHtml(id){
   const a = A[id]; if (!a) return "";
   figNo++;
   const long = (a.body||[]).filter(b=>b.t==="p").map(b=>b.x).join("").length > 900;
-  return `<article class="art" id="a-${id}">
+  return `<article class="art" id="a-${id}" ${readAttrs(id)}>
     <div class="kicker">${esc(a.kicker||a.section)}</div>
-    <h3 class="title">${esc(a.title)}</h3>
+    ${stampHtml(id)}<h3 class="title">${esc(a.title)}</h3>
     <p class="deck">${esc(a.deck||"")}</p>
     <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
+    ${a.note?`<div class="anote">${esc(a.note)}</div>`:""}
     ${figHtml(id, figNo)}
     ${(a.terms&&a.terms.length)?`<div class="howto">밑줄 친 <span>낱말</span>을 누르면 뜻이 나와요.</div>`:""}
-    <div class="body ${long?"cols":""}">${bodyHtml(a.body, termCtx(a), id)}</div>
+    <div class="body ${long?"cols":""}">${bodyHtml(a.body, termCtx(a), id, figNo)}</div>
     ${termsHtml(a.terms)}
+    ${endHtml(id)}
     ${srcHtml(id, a.sources)}
     ${reactHtml(id)}
   </article>`;
+}
+
+/* ---------- 다 읽음 도장 ---------- */
+// 기사를 연 뒤 '그 기사가 화면에 보인 시간'이 글 길이에 맞는 최소 시간을 넘고, 끝부분(끝 표시)이 화면에 들어오면 도장을 찍어요.
+const READABLE = id => !!A[id] && id !== "psytest";
+const rkey = id => IKEY + ":" + id;
+const isRead = id => !!S.read[rkey(id)];
+function textLen(id){
+  const a = A[id] || {}; let n = 0;
+  const add = s => { n += String(s || "").length; };
+  add(a.title); add(a.deck);
+  (a.body || []).forEach(b => { add(b.x); (b.items || []).forEach(add); });
+  (a.panels || []).forEach(p => (p.lines || []).forEach(l => add(l.say))); add(a.after);
+  (a.intro || []).forEach(b => add(b.x)); (a.books || []).forEach(b => { add(b.about); add(b.why); });
+  return n;
+}
+function readNeed(id){   // 초: 40자에 1초, 15초~60초
+  const fast = Number(DATA.readFastSec || 0); if (fast > 0) return fast;
+  return Math.max(15, Math.min(60, Math.round(textLen(id) / 40)));
+}
+function readAttrs(id){ return READABLE(id) ? `data-rid="${esc(id)}" data-need="${readNeed(id)}"` : ""; }
+function mdText(t){ const d = new Date(t); return (d.getMonth()+1) + "." + d.getDate(); }
+function stampHtml(id){
+  if (!READABLE(id)) return "";
+  const t = S.read[rkey(id)];
+  return `<div class="rstamp ${t?"on":""}" data-stamp="${esc(id)}" aria-label="다 읽은 기사" title="끝까지 읽었어요"><b>잘했어요</b><small>다 읽음</small><i>${t?mdText(t):""}</i></div>`;
+}
+function endHtml(id){
+  if (!READABLE(id)) return "";
+  const t = S.read[rkey(id)];
+  return `<div class="endmark ${t?"done":""}" data-end="${esc(id)}"><span class="em"><i></i><span class="emw">끝 · 끝까지 읽으면 도장을 찍어 줘요</span><span class="emt">끝까지 읽었어요. 잘했어요!</span></span></div>`;
+}
+const READ = {obs: null, timer: 0, st: {}};
+function readSetup(){
+  if (READ.obs) READ.obs.disconnect(); clearInterval(READ.timer); READ.st = {};
+  const arts = Array.from(document.querySelectorAll("article.art[data-rid]"));
+  if (!arts.length || !("IntersectionObserver" in window)) return;
+  const now0 = performance.now();
+  arts.forEach(el => { const id = el.dataset.rid; if (isRead(id)) return; READ.st[id] = {el, vis: false, endVis: false, acc: 0, last: now0, need: (+el.dataset.need || 20) * 1000}; });
+  READ.obs = new IntersectionObserver(es => es.forEach(e => {
+    const el = e.target, id = el.dataset.rid || el.dataset.end, st = READ.st[id]; if (!st) return;
+    if (el.dataset.end) st.endVis = e.isIntersecting; else st.vis = e.isIntersecting;
+  }), {threshold: 0});
+  Object.values(READ.st).forEach(st => { READ.obs.observe(st.el); const em = st.el.querySelector(".endmark"); if (em) READ.obs.observe(em); });
+  READ.timer = setInterval(() => {
+    const now = performance.now();
+    for (const id in READ.st){
+      const st = READ.st[id]; if (st.done) continue;
+      if (st.vis && !document.hidden) st.acc += now - st.last;
+      st.last = now;
+      if (st.endVis && st.acc >= st.need) { st.done = true; stampNow(id); }
+    }
+  }, 400);
+}
+function stampNow(id){
+  const t = Date.now(); S.read[rkey(id)] = t; save();
+  document.querySelectorAll(`[data-stamp="${id}"]`).forEach(s => { s.querySelector("i").textContent = mdText(t); s.classList.add("on"); });
+  const em = document.querySelector(`.endmark[data-end="${id}"]`);
+  if (em) {
+    em.classList.add("done");
+    const st = document.createElement("div"); st.className = "rstamp on press"; st.innerHTML = `<b>잘했어요</b><small>다 읽음</small><i>${mdText(t)}</i>`;
+    em.querySelector(".em").prepend(st);
+    const r = st.getBoundingClientRect(); FX.burst(r.left + r.width/2, r.top + r.height/2, "mini");
+  }
+  toast("끝까지 읽었어요! 읽음 도장 쾅");
+  markTabs();
+}
+function sectionIds(s){ return (s.items || []).filter(READABLE); }
+function markTabs(){
+  SECS.forEach(s => { const ids = sectionIds(s); const b = $(`.tab[data-s="${s.id}"]`); if (b) b.classList.toggle("done", ids.length > 0 && ids.every(isRead)); });
 }
 function bindArticleBits(root){
   root.querySelectorAll(".kbtn").forEach(b => b.onclick = () => { const el = $("#ko-" + b.dataset.k); const on = !el.classList.contains("on"); el.classList.toggle("on", on); b.classList.toggle("on", on); });
@@ -631,8 +845,9 @@ function go(id, push){
   if (s.kind === "sudoku") bindSudoku();
   if (s.items && s.items.includes("psytest")) bindPsy();
   if (s.kind === "chiikawa") loadX();
-  bindSim();
-  if (s.id === "cover") { const sv = document.querySelector(".c-art svg"); if (sv) sv.setAttribute("preserveAspectRatio", "xMidYMid meet"); }
+  Object.keys(SIMS).forEach(k => { try { SIMS[k][1](); } catch(e) { console.warn("시뮬레이터 오류:", k, e); } });
+  readSetup();
+  if (s.id === "cover") { const sv = document.querySelector(".c-art svg"); if (sv) sv.setAttribute("preserveAspectRatio", (DATA.cover && DATA.cover.fit) || "xMidYMid meet"); }
   if (push) { try { history.replaceState(null, "", "#" + s.id); } catch(e) { location.hash = s.id; } window.scrollTo(0, 0); }
 }
 
@@ -643,43 +858,65 @@ function coverHtml(){
     <div class="c-top"><span><b>${esc(DATA.issue.label)}</b></span><span>${esc(DATA.issue.dateText)}</span><span>매주 금요일 밤 10시</span></div>
     <h1 class="c-name">Nova</h1>
     <div class="c-sub">서아가 기획한 주간 과학 교양지</div>
-    <div class="c-art" data-go="${C.go}">${F.cover || ""}<div class="c-head"><div class="kicker">이번 호 머리기사</div><h2>${esc(C.headline)}</h2></div></div>
+    <div class="c-art" data-go="${C.go}">${C.img ? `<img class="c-img" src="${esc((DATA.images||{})[C.img] || ("assets/img/" + C.img + ".jpg"))}" alt="${esc(C.caption||C.headline)}">` : (F.cover || "")}<div class="c-head"><div class="kicker">${esc(C.kicker || "이번 호 머리기사")}</div><h2>${esc(C.headline)}</h2></div></div>
     <div class="c-lines"><div class="c-deck">${esc((C.lead||[])[0]||"")}</div><div class="c-lh">이번 호에는</div>${C.lines.map(l=>`<div class="c-l" data-go="${l.go}"><span class="cs">${esc(l.sec)}</span><span class="ct">${esc(l.t)}</span></div>`).join("")}</div>
     <div class="c-foot"><button class="go ghost" data-go="contents">차례 보기</button><button class="go" data-go="${C.go}">머리기사 읽기 →</button></div>
   </section>`;
 }
+function tocId(t){   // 차례 줄의 기사 id(제1호처럼 id가 없으면 제목으로 찾음)
+  if (t.id) return t.id;
+  return Object.keys(A).find(k => A[k] && A[k].title === t.t) || "";
+}
 function contentsHtml(s){
-  return secHead(s) + `<section class="toc">${DATA.toc.map(t=>`<div class="toc-row" data-go="${t.go}"><div class="ts">${esc(t.sec)}</div><div class="tt">${esc(t.t)}</div><div class="tp">${esc(t.p)}</div></div>`).join("")}</section>
-    <div class="howread"><b>Nova 읽는 법</b><br>· 맨 위의 이름표(과학, 수학, 경제…)를 누르면 그 쪽으로 가요.<br>· 기사 속 <span style="border-bottom:2px dotted var(--red)">밑줄 친 낱말</span>을 누르면 뜻이 나와요.<br>· 영어로 된 출처에는 '국문 요약' 단추가 있어요. 누르면 우리말 요약이 나와요.<br>· 궁금한 것은 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.</div>
+  const all = []; SECS.forEach(x => sectionIds(x).forEach(i => all.push(i)));
+  const done = all.filter(isRead).length;
+  const bar = all.length ? `<div class="readbar"><span>읽음 도장</span><span class="rb-bar"><i style="width:${Math.round(done/all.length*100)}%"></i></span><span><b>${done}</b> / ${all.length}</span></div>` : "";
+  return secHead(s) + bar + `<section class="toc">${DATA.toc.map(t=>{ const id = tocId(t); return `<div class="toc-row" data-go="${t.go}"><div class="ts">${esc(t.sec)}</div><div class="tt">${esc(t.t)}${(id && READABLE(id) && isRead(id))?`<span class="tread" title="다 읽었어요">읽음</span>`:""}</div><div class="tp">${esc(t.p)}</div></div>`; }).join("")}</section>
+    <div class="howread"><b>Nova 읽는 법</b><br>· 맨 위의 이름표(과학, 수학, 경제…)를 누르면 그 쪽으로 가요.<br>· 기사 속 <span style="border-bottom:2px dotted var(--red)">밑줄 친 낱말</span>을 누르면 뜻이 나와요.<br>· 영어로 된 출처에는 '국문 요약' 단추가 있어요. 누르면 우리말 요약이 나와요.<br>· 기사를 끝까지 읽으면 제목 옆에 <b>'잘했어요' 도장</b>이 찍히고, 이 차례에도 '읽음'이 표시돼요.<br>· 궁금한 것은 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.</div>
     <div class="editor"><div class="m">${F.mascot || ""}</div><p>${esc(DATA.editorNote)}</p></div>`;
 }
 
 /* ---------- 책 ---------- */
 function booksHtml(){
   const B = A.books;
-  return `<article class="art" id="a-books"><div class="kicker">${esc(B.kicker||"이번 주 책")}</div><h3 class="title">${esc(B.title)}</h3><p class="deck">${esc(B.deck||"")}</p>
+  return `<article class="art" id="a-books" ${readAttrs("books")}><div class="kicker">${esc(B.kicker||"이번 주 책")}</div>${stampHtml("books")}<h3 class="title">${esc(B.title)}</h3><p class="deck">${esc(B.deck||"")}</p>
     <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
     ${(B.intro||[]).map(x=>`<p class="bintro">${esc(x.x)}</p>`).join("")}
     ${B.books.map(b=>`<div class="book"><div>${b.img?`<img src="${b.img}" alt="${esc(b.title)} 표지" loading="lazy">`:""}</div><div>
       <h4>${esc(b.title)}</h4><div class="bm">${esc(b.field)} · ${esc(b.by)} · ${esc(b.pub)}</div><p>${esc(b.about)}</p><p class="why">${esc(b.why)}</p>
-      ${b.metrics?`<div class="bscore"><a href="${esc(b.metrics.aladin.url)}" target="_blank" rel="noopener">알라딘 <b>★ ${b.metrics.aladin.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.aladin.reviews.toLocaleString()}개</span> · <span class="nw">세일즈포인트 ${b.metrics.aladin.salesPoint.toLocaleString()}</span></a><a href="${esc(b.metrics.yes24.url)}" target="_blank" rel="noopener">예스24 <b>★ ${b.metrics.yes24.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.yes24.reviews.toLocaleString()}개</span> · <span class="nw">판매지수 ${b.metrics.yes24.salesIndex.toLocaleString()}</span></a></div>`:""}
+      ${b.metrics?`<div class="bscore"><a href="${esc(b.metrics.aladin.url)}" target="_blank" rel="noopener">알라딘 <b>★ ${b.metrics.aladin.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.aladin.reviews.toLocaleString()}개</span> · <span class="nw">세일즈포인트 ${b.metrics.aladin.salesPoint.toLocaleString()}</span></a><a href="${esc(b.metrics.yes24.url)}" target="_blank" rel="noopener">예스24 <b>★ ${b.metrics.yes24.star.toFixed(1)}</b> <span class="nw">${esc(b.metrics.yes24.reviewsLabel || "리뷰")} ${b.metrics.yes24.reviews.toLocaleString()}개</span> · <span class="nw">판매지수 ${b.metrics.yes24.salesIndex.toLocaleString()}</span></a></div>`:""}
+      ${b.metricsNote?`<div class="bmnote">${esc(b.metricsNote)}</div>`:""}
       <a class="sbtn" href="${esc(b.url)}" target="_blank" rel="noopener">책 정보 보기 ↗</a></div></div>`).join("")}
-    <div class="note">표지 이미지: 알라딘 상품 정보 · 평점과 리뷰 수는 ${esc((B.books[0].metrics||{}).checked||"")} 기준(10점 만점), 이후 달라질 수 있어요.</div>${reactHtml("books")}</article>`;
+    ${(B.method&&B.method.length)?`<div class="box bmethod"><div class="bt">어떻게 골랐나요?</div><div class="bb">${B.method.map((x,i)=>`<p>${esc(i===0?String(x.x||x).replace(/^어떻게 골랐나요\?\s*/,""):(x.x||x))}</p>`).join("")}</div></div>`:""}
+    <div class="note">표지 이미지: 알라딘 상품 정보 · 평점과 리뷰 수는 ${esc((B.books[0].metrics||{}).checkedText || ((B.books[0].metrics||{}).checked||"") + " 기준")}(10점 만점), 이후 달라질 수 있어요.</div>${endHtml("books")}${reactHtml("books")}</article>`;
 }
 
 /* ---------- 만화 ---------- */
 function comicHtml(){
   const M = A.comic, IM = DATA.images || {};
   const imgs = M.panels.map((p, i) => IM["comic_" + (i+1)]).filter(Boolean);
-  const head = `<article class="art" id="a-comic"><div class="kicker">${esc(M.kicker||"만화")}</div><h3 class="title">${esc(M.title)}</h3><p class="deck">${esc(M.deck||"")}</p>`;
-  const bub = l => `<div class="bub ${l.who==="효과음"?"fx":l.who==="해설"?"nar":""}">${l.who==="효과음"||l.who==="해설"||l.who==="나"?"":`<span style="color:var(--gray);font-weight:500">${esc(l.who)}</span> `}${esc(l.say)}</div>`;
+  const head = `<article class="art" id="a-comic" ${readAttrs("comic")}><div class="kicker">${esc(M.kicker||"만화")}</div>${stampHtml("comic")}<h3 class="title">${esc(M.title)}</h3><p class="deck">${esc(M.deck||"")}</p>`;
+  const bub = (l, st) => `<div class="bub ${l.who==="효과음"?"fx":l.who==="해설"?"nar":""}"${st?` style="${st}"`:""}>${l.who==="효과음"||l.who==="해설"||l.who==="나"?"":`<span style="color:var(--gray);font-weight:500">${esc(l.who)}</span> `}${esc(l.say)}</div>`;
+  // 대사를 그림 위에 얹기(제2호부터 panels[].place, caption, lines[].pos): 자리 힌트가 있을 때만
+  const ovPanel = (p, i) => {
+    const capL = p.caption === "bottom" ? p.lines.filter(l => l.who === "해설") : [];
+    const posL = p.lines.filter(l => l.pos && !capL.includes(l));
+    const grp = p.lines.filter(l => !capL.includes(l) && !posL.includes(l));
+    const wide = M.panels.length % 2 === 1 && i === M.panels.length - 1;
+    return `<div class="pnl img ov ${wide?"wide":""}"><div class="pimg"><img src="${IM["comic_"+(i+1)]}" alt="${i+1}번째 칸: ${esc(p.lines.map(l => l.say).join(" "))}" style="width:100%;display:block">
+      ${grp.length?`<div class="obubs ${p.place==="top-center"?"tc":"tl"}">${grp.map(l => bub(l)).join("")}</div>`:""}
+      ${posL.map(l => bub(l, `position:absolute;left:${+l.pos[0]}%;top:${+l.pos[1]}%`)).join("")}
+      <span class="pno">${i+1}</span></div>${capL.length?`<div class="capband">${capL.map(l => esc(l.say)).join(" ")}</div>`:""}</div>`;
+  };
+  const hasPlace = M.panels.some(p => p.place || p.caption);
   let mid;
   if (IM.comic_page) mid = `<div class="comic-img"><img src="${IM.comic_page}" alt="${esc(M.title)}"></div>`;
+  else if (imgs.length === M.panels.length && hasPlace) mid = `<div class="strip gpt ovs">${M.panels.map(ovPanel).join("")}</div>`;
   else if (imgs.length === M.panels.length) mid = `<div class="strip gpt">${M.panels.map((p,i)=>`<div class="pnl img ${(M.panels.length%2===1&&i===M.panels.length-1)?"wide":""}"><img src="${IM["comic_"+(i+1)]}" alt="${i+1}번째 칸" style="width:100%;display:block"><div class="bubs">${p.lines.map(bub).join("")}</div><span class="pno">${i+1}</span></div>`).join("")}</div>`;
   else mid = `<div class="comic-wait">이번 호 만화는 그림을 <b>GPT 이미지 모델</b>에게 맡겼어요. 그림이 도착하면 이 쪽에 실려요. 그동안 이야기(콘티)를 먼저 읽어 보세요.</div>
     <div class="conti">${M.panels.map((p,i)=>`<div class="ct-p"><span class="pn">${i+1}</span>${p.lines.map(l=>`<div class="ln ${l.who==="해설"?"nar":l.who==="효과음"?"fx":""}">${l.who==="해설"||l.who==="효과음"?"":`<b>${esc(l.who==="나"?"마스코트":l.who)}</b>`}${esc(l.say)}</div>`).join("")}</div>`).join("")}</div>`;
   return head + mid + `${M.after?`<div class="box"><div class="bt">만화 속 과학</div><div class="bb">${esc(M.after)}</div></div>`:""}
-    <div class="note">${(IM.comic_page||imgs.length)?"그림: GPT 이미지 모델(Nova 편집부 의뢰)":"그림 준비 중: GPT 이미지 모델에 의뢰"} · 마스코트는 서아가 그린 캐릭터예요.</div>${reactHtml("comic")}</article>`;
+    <div class="note">${(IM.comic_page||imgs.length)?"그림: GPT 이미지 모델(Nova 편집부 의뢰)":"그림 준비 중: GPT 이미지 모델에 의뢰"} · 마스코트는 서아가 그린 캐릭터예요.</div>${endHtml("comic")}${reactHtml("comic")}</article>`;
 }
 
 /* ---------- 심리검사 ---------- */
@@ -692,6 +929,7 @@ function psyHtml(){
     <div class="panel">${P.questions.map((q,i)=>`<div style="margin-bottom:14px"><div class="qtext" style="font-size:18px">${i+1}. ${esc(q.q)}</div>
       ${q.options.map((o,k)=>`<button class="opt psy" data-q="${i}" data-t="${o.type}"><b>${"ABCD"[k]}</b>${esc(o.x)}</button>`).join("")}</div>`).join("")}
       <button class="go" id="psyDone">결과 보기</button><div id="psyRes"></div></div>
+    ${(P.figs||[]).map((f, i) => (f.svg && F[f.svg]) ? `<figure class="infig psyfig"><div class="fig svgfig">${F[f.svg]}</div><figcaption>${esc(f.cap||"")}</figcaption></figure>` : "").join("")}
     <div class="note">${esc(P.note||"")}</div></article>`;
 }
 function bindPsy(){
@@ -704,39 +942,198 @@ function bindPsy(){
     const P = A.psytest, n = Object.keys(psyAns).length;
     if (n < P.questions.length) { toast(`${P.questions.length - n}문항이 남았어요`); return; }
     const cnt = {}; Object.values(psyAns).forEach(t => cnt[t] = (cnt[t]||0) + 1);
-    const top = Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a])[0], T = P.types[top];
-    $("#psyRes").innerHTML = `<div class="result"><div class="kicker">나의 탐구 유형</div><h3>${esc(T.name)}</h3><p style="font-size:16.5px;line-height:1.75">${esc(T.desc)}</p>
-      <div class="box"><div class="bt">닮은 과학자</div><div class="bb">${esc(T.scientist)}</div></div><div class="box"><div class="bt">이번 주 해 볼 일</div><div class="bb">${esc(T.try)}</div></div></div>`;
-    log("psytest", {result: T.name});
+    const best = Math.max(...Object.values(cnt));
+    const tops = Object.keys(cnt).filter(k => cnt[k] === best && P.types[k]).sort();   // 동점이면 모두
+    const icon = k => { const base = ((P.figs||[])[0]||{}).svg; const sv = base && F[base + "_" + k.toLowerCase()]; return sv ? `<span class="psyico">${sv}</span>` : ""; };
+    const one = k => { const T = P.types[k]; return `<div class="result"><div class="kicker">${esc(P.resultKicker || "나의 탐구 유형")}${tops.length>1?` · 동점 ${tops.indexOf(k)+1}/${tops.length}`:""}</div><h3>${icon(k)}${esc(T.name)}</h3><p style="font-size:16.5px;line-height:1.75">${esc(T.desc)}</p>
+      ${T.partner?`<div class="box"><div class="bt">${esc(P.partnerLabel || "이런 짝과 만나면 좋아요")}</div><div class="bb">${esc(T.partner)}</div></div>`:""}
+      <div class="box"><div class="bt">${esc(P.scientistLabel || "닮은 과학자")}</div><div class="bb">${esc(T.scientist)}</div></div><div class="box"><div class="bt">이번 주 해 볼 일</div><div class="bb">${esc(T.try)}</div></div></div>`; };
+    $("#psyRes").innerHTML = (tops.length > 1 ? `<div class="fb good" style="margin-top:12px"><b>두 유형이 똑같이 나왔어요</b>${tops.length}가지 유형이 ${best}번씩 나왔어요. 둘 다 읽어 보세요.</div>` : "") + tops.map(one).join("");
+    log("psytest", {result: tops.map(k => P.types[k].name).join(", ")});
   };
 }
 
-/* ---------- 스도쿠 ---------- */
+/* ---------- 축하 효과: 색종이(canvas)와 팡파레(Web Audio) ---------- */
+const FX = (() => {
+  let cv = null, cx = null, parts = [], raf = 0, ac = null;
+  const reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const COLS = ["#C8372D", "#1F3A5F", "#1C1A17", "#E3B448", "#F4EFE4", "#8FA9C6", "#C8372D"];
+  function size(){ const d = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * d; cv.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0); }
+  function ensure(){
+    if (cv) return true;
+    try { cv = document.createElement("canvas"); cv.className = "fxcv"; cv.setAttribute("aria-hidden", "true"); document.body.appendChild(cv); cx = cv.getContext("2d"); size(); addEventListener("resize", size); return !!cx; }
+    catch(e) { cv = null; return false; }
+  }
+  function add(x, y, n, ang, spread, pow){
+    for (let i = 0; i < n; i++){
+      const a = ang + (Math.random() - .5) * spread, v = pow * (.55 + Math.random() * .6);
+      parts.push({x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, w: 5 + Math.random() * 7, h: 3 + Math.random() * 5, r: Math.random() * 6.3, vr: (Math.random() - .5) * .4,
+        c: COLS[(Math.random() * COLS.length) | 0], s: Math.random() < .18 ? 1 : 0, life: 0, max: 150 + Math.random() * 90});
+    }
+  }
+  function step(){
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.life < p.max && p.y < innerHeight + 30);
+    for (const p of parts){
+      p.life++; p.vy += .16; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      const fade = p.life > p.max - 30 ? (p.max - p.life) / 30 : 1;
+      cx.save(); cx.globalAlpha = fade; cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
+      if (p.s) { cx.beginPath(); cx.arc(0, 0, p.h * .7, 0, 6.283); cx.fill(); }
+      else { cx.scale(1, Math.cos(p.life * .18 + p.r)); cx.fillRect(-p.w/2, -p.h/2, p.w, p.h); if (p.c === "#F4EFE4") { cx.strokeStyle = "#1C1A17"; cx.lineWidth = .8; cx.strokeRect(-p.w/2, -p.h/2, p.w, p.h); } }
+      cx.restore();
+    }
+    if (parts.length) raf = requestAnimationFrame(step); else { raf = 0; cx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+  function run(){ if (!raf) raf = requestAnimationFrame(step); }
+  function burst(x, y, kind){
+    if (!ensure()) return;
+    if (kind === "mini") add(x, y, reduce ? 10 : 34, -Math.PI/2, Math.PI * 1.6, 7);
+    else {   // 양쪽 아래에서 쏘아 올리는 축포 + 가운데 한 번 더
+      const n = reduce ? 18 : 90;
+      add(-10, innerHeight * .78, n, -Math.PI/3.2, .9, 17);
+      add(innerWidth + 10, innerHeight * .78, n, -Math.PI + Math.PI/3.2, .9, 17);
+      if (!reduce) setTimeout(() => { add(innerWidth/2, innerHeight * .38, 70, -Math.PI/2, Math.PI * 2, 9); run(); }, 380);
+    }
+    run();
+  }
+  // 짧은 팡파레(약 1.3초): 사용자가 단추를 누른 바로 그때에만 부르기
+  function fanfare(){
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      ac = ac || new AC(); if (ac.state === "suspended") ac.resume();
+      const t0 = ac.currentTime + .03, out = ac.createGain(); out.gain.value = .16; out.connect(ac.destination);
+      const note = (f, at, dur, type, vol) => {
+        const o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.value = f;
+        g.gain.setValueAtTime(0, t0 + at); g.gain.linearRampToValueAtTime(vol, t0 + at + .02); g.gain.setValueAtTime(vol, t0 + at + dur * .6); g.gain.exponentialRampToValueAtTime(.0008, t0 + at + dur);
+        o.connect(g); g.connect(out); o.start(t0 + at); o.stop(t0 + at + dur + .05);
+      };
+      // 솔-솔-솔-도(높은)… 그리고 도·미·솔 화음
+      [[392, 0, .13], [392, .14, .13], [392, .28, .13], [523.25, .42, .32], [392, .78, .12], [523.25, .92, .5]].forEach(([f, at, d]) => { note(f, at, d, "square", .25); note(f * 2, at, d, "triangle", .12); });
+      [523.25, 659.25, 783.99].forEach(f => note(f, .92, .55, "triangle", .3));
+    } catch(e) {}
+  }
+  function banner(title, sub){
+    const el = document.createElement("div"); el.className = "cele"; el.setAttribute("role", "status");
+    el.innerHTML = `<div class="cc">${crownSvg()}</div><div class="ck">PERFECT</div><div class="ct">${esc(title)}</div><div class="cs">${esc(sub || "")}</div>`;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 2700);
+  }
+  return {burst, fanfare, banner};
+})();
+let crownN = 0;
+const crownSvg = () => { const id = "crdot" + (++crownN); return `<svg viewBox="0 0 120 86" aria-hidden="true"><defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#1C1A17" opacity=".16"/></pattern></defs>
+  <path d="M12 70 L8 24 L36 46 L60 8 L84 46 L112 24 L108 70 Z" fill="#E3B448" stroke="#1C1A17" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M12 70 L8 24 L36 46 L60 8 L84 46 L112 24 L108 70 Z" fill="url(#${id})"/>
+  <rect x="10" y="66" width="100" height="14" fill="#C8372D" stroke="#1C1A17" stroke-width="4"/>
+  <circle cx="8" cy="22" r="6" fill="#C8372D" stroke="#1C1A17" stroke-width="3"/><circle cx="60" cy="7" r="6.5" fill="#C8372D" stroke="#1C1A17" stroke-width="3"/><circle cx="112" cy="22" r="6" fill="#C8372D" stroke="#1C1A17" stroke-width="3"/>
+  <circle cx="35" cy="73" r="3.6" fill="#F4EFE4" stroke="#1C1A17" stroke-width="2"/><circle cx="60" cy="73" r="3.6" fill="#1F3A5F" stroke="#1C1A17" stroke-width="2"/><circle cx="85" cy="73" r="3.6" fill="#F4EFE4" stroke="#1C1A17" stroke-width="2"/></svg>`; };
+
+/* ---------- 스도쿠(제1호: 6×6 한 판 / 제2호부터: {puzzles:[...]} 여러 판, 다 맞히면 축하와 왕관) ---------- */
+const SDD = DATA.sudoku || {};
+const SD_MULTI = Array.isArray(SDD.puzzles);
+const SD_LIST = SD_MULTI ? SDD.puzzles : (SDD.puzzle ? [SDD] : []);
+const ORD = ["첫째", "둘째", "셋째", "넷째", "다섯째"];
+const sdSize = P => P.size || P.puzzle.length;
+const sdBox = P => (P.box && P.box.length === 2) ? P.box : (sdSize(P) === 9 ? [3, 3] : [2, 3]);   // [상자 세로 칸, 상자 가로 칸]
+const sameShape = (g, P) => Array.isArray(g) && g.length === P.puzzle.length && g.every((r, i) => Array.isArray(r) && r.length === P.puzzle[i].length);
+function sdGrid(k){
+  const P = SD_LIST[k];
+  if (!SD_MULTI) { if (!sameShape(S.sudoku, P)) S.sudoku = P.puzzle.map(r => r.slice()); return S.sudoku; }
+  if (!Array.isArray(S.sd[IKEY])) S.sd[IKEY] = [];
+  if (!sameShape(S.sd[IKEY][k], P)) S.sd[IKEY][k] = P.puzzle.map(r => r.slice());
+  return S.sd[IKEY][k];
+}
+const ckey = k => IKEY + ":" + k;
 function sudokuHtml(){
-  return `<article class="art"><div class="kicker">두뇌 놀이</div><h3 class="title">6×6 스도쿠</h3><p class="deck">가로 줄, 세로 줄, 굵은 선으로 나뉜 2×3 상자마다 1부터 6까지가 한 번씩만 들어가요.</p>
-    <div class="body"><p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄부터 보면 실마리가 보여요. 이 문제는 답이 하나뿐인지 컴퓨터로 확인했어요.</p></div>
-    <div class="sgrid" id="sgrid"></div><div class="spad" id="spad">${[1,2,3,4,5,6].map(n=>`<button data-n="${n}">${n}</button>`).join("")}<button data-n="0" style="font-size:14px;padding:0 10px">지우기</button></div>
-    <div style="text-align:center"><button class="go" id="sdCheck">다 채웠어요</button></div><div id="sdMsg"></div></article>`;
+  if (!SD_LIST.length) return "";
+  const n0 = sdSize(SD_LIST[0]), bx0 = sdBox(SD_LIST[0]);
+  const head = SD_MULTI
+    ? `<div class="kicker">두뇌 놀이</div><h3 class="title">${n0}×${n0} 스도쿠 ${SD_LIST.length}판</h3><p class="deck">가로 줄, 세로 줄, 굵은 선으로 나뉜 ${bx0[0]}×${bx0[1]} 상자마다 1부터 ${n0}까지가 한 번씩만 들어가요.</p>
+       <div class="body">${SDD.intro?`<p>${esc(SDD.intro)}</p>`:""}${(SDD.rules&&SDD.rules.length)?`<div class="box"><div class="bt">규칙</div><div class="bb"><ul>${SDD.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>`:""}<p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄과 상자부터 보면 실마리가 보여요. 한 판을 다 맞히면 그 판 위에 <b>왕관</b>이 올라가요. 왕관은 이 기기에 남아요.${SDD.intro?"":" 두 문제 모두 답이 하나뿐인지 컴퓨터로 확인했어요."}</p></div>`
+    : `<div class="kicker">두뇌 놀이</div><h3 class="title">6×6 스도쿠</h3><p class="deck">가로 줄, 세로 줄, 굵은 선으로 나뉜 2×3 상자마다 1부터 6까지가 한 번씩만 들어가요.</p>
+       <div class="body"><p>빈칸을 누른 뒤 아래 숫자를 누르세요. 숫자가 많이 채워진 줄부터 보면 실마리가 보여요. 이 문제는 답이 하나뿐인지 컴퓨터로 확인했어요.</p></div>`;
+  const board = (P, k) => {
+    const n = sdSize(P), cr = S.crown[ckey(k)], blanks = P.puzzle.flat().filter(v => !v).length;
+    return `<section class="sdb" data-k="${k}">
+      ${SD_MULTI ? `<div class="sdb-head"><h4>${ORD[k] || (k+1) + "번째"} 판${P.level ? " · " + esc(P.level) : ""}<span class="crown-tag" id="ctag-${k}" style="${cr ? "" : "display:none"}">왕관</span></h4><span class="sdb-meta">빈칸 <b>${blanks}</b>개</span></div>` : ""}
+      <div class="sgrid-wrap ${n === 9 ? "n9" : ""}"><div class="crown ${cr ? "" : "ghost"}" id="crown-${k}" title="${cr ? "다 맞혀서 받은 왕관" : "다 맞히면 여기에 왕관이 올라가요"}">${crownSvg()}</div><div class="sgrid ${n === 9 ? "n9" : ""}" id="sgrid-${k}" role="grid" aria-label="${ORD[k] || ""} 스도쿠 판"></div></div>
+      <div class="spad ${n === 9 ? "n9" : ""}" id="spad-${k}">${Array.from({length: n}, (_, i) => `<button data-n="${i+1}">${i+1}</button>`).join("")}<button data-n="0" style="font-size:14px;padding:0 10px">지우기</button></div>
+      <div class="sdb-btns"><button class="go" data-sdcheck="${k}">다 채웠어요</button>${SD_MULTI ? `<button class="go ghost" data-sdreset="${k}">처음부터</button>` : ""}</div><div id="sdMsg-${k}"></div>
+    </section>`;
+  };
+  return `<article class="art">${head}${SD_LIST.map(board).join("")}</article>`;
 }
-let sdSel = null;
+let sdSel = null;   // {k, r, c}
 function bindSudoku(){
-  const P = DATA.sudoku, g = $("#sgrid"); if (!g) return;
-  if (!S.sudoku) S.sudoku = P.puzzle.map(r => r.slice());
-  const sd = S.sudoku;
-  const draw = () => {
-    g.innerHTML = sd.map((row,r) => row.map((v,c) => { const given = P.puzzle[r][c] !== 0;
-      return `<div class="scell ${given?"given":"user"} ${c===2?"br":""} ${(r===1||r===3)?"bb":""} ${(sdSel&&sdSel[0]===r&&sdSel[1]===c)?"sel":""}" data-r="${r}" data-c="${c}">${v||""}</div>`; }).join("")).join("");
-    g.querySelectorAll(".scell.user").forEach(el => el.onclick = () => { sdSel = [+el.dataset.r, +el.dataset.c]; draw(); });
-  };
-  draw();
-  $("#spad").querySelectorAll("button").forEach(b => b.onclick = () => { if (!sdSel) { toast("빈칸을 먼저 누르세요"); return; } sd[sdSel[0]][sdSel[1]] = +b.dataset.n; save(); draw(); });
-  $("#sdCheck").onclick = () => {
-    if (sd.flat().some(v => !v)) { $("#sdMsg").innerHTML = `<div class="fb bad"><b>아직 빈칸이 있어요</b>모든 칸을 채워 보세요.</div>`; return; }
-    const ok = sd.every((row,r) => row.every((v,c) => v === P.solution[r][c]));
-    $("#sdMsg").innerHTML = ok ? `<div class="fb good"><b>완성!</b>가로, 세로, 굵은 상자 모두 1~6이 한 번씩 들어갔어요.</div>` : `<div class="fb bad"><b>한 곳 이상 다시 보세요</b>같은 줄이나 상자에 겹치는 숫자가 있어요.</div>`;
-    if (ok) log("sudoku", {date: today()});
-  };
+  SD_LIST.forEach((P, k) => {
+    const g = $("#sgrid-" + k); if (!g) return;
+    const n = sdSize(P), bx = sdBox(P), sd = sdGrid(k);
+    const draw = (wrong) => {
+      const sel = sdSel && sdSel.k === k ? sdSel : null, selV = sel ? sd[sel.r][sel.c] : 0;
+      g.innerHTML = sd.map((row, r) => row.map((v, c) => {
+        const given = P.puzzle[r][c] !== 0;
+        const isSel = sel && sel.r === r && sel.c === c;
+        const peer = sel && !isSel && (sel.r === r || sel.c === c || (Math.floor(sel.r / bx[0]) === Math.floor(r / bx[0]) && Math.floor(sel.c / bx[1]) === Math.floor(c / bx[1])));
+        const same = n === 9 && selV && v === selV && !isSel;
+        const cls = ["scell", given ? "given" : "user", ((c + 1) % bx[1] === 0 && c < n - 1) ? "br" : "", ((r + 1) % bx[0] === 0 && r < n - 1) ? "bb" : "", isSel ? "sel" : "", peer ? "peer" : "", same ? "same" : "", (wrong && wrong[r][c]) ? "wrong" : ""].filter(Boolean).join(" ");
+        return `<div class="${cls}" data-r="${r}" data-c="${c}" role="gridcell" aria-label="${r+1}줄 ${c+1}칸 ${v || "빈칸"}">${v || ""}</div>`;
+      }).join("")).join("");
+      g.querySelectorAll(".scell").forEach(el => el.onclick = () => {
+        if (el.classList.contains("given")) { sdSel = {k, r: +el.dataset.r, c: +el.dataset.c, given: true}; drawAll(); return; }
+        sdSel = {k, r: +el.dataset.r, c: +el.dataset.c}; drawAll();
+      });
+    };
+    g._draw = draw; draw();
+    const put = v => {
+      if (!sdSel || sdSel.k !== k || sdSel.given) { toast("빈칸을 먼저 누르세요"); return; }
+      sd[sdSel.r][sdSel.c] = v; save(); draw();
+      if (v && sd.flat().every(x => x)) check(true);   // 마지막 칸을 채우면 바로 채점
+    };
+    g._put = put;
+    $("#spad-" + k).querySelectorAll("button").forEach(b => b.onclick = () => put(+b.dataset.n));
+    const msg = $("#sdMsg-" + k);
+    const check = (auto) => {
+      if (sd.flat().some(v => !v)) { msg.innerHTML = `<div class="fb bad"><b>아직 빈칸이 있어요</b>모든 칸을 채워 보세요.</div>`; return; }
+      const ok = sd.every((row, r) => row.every((v, c) => v === P.solution[r][c]));
+      if (!ok) {
+        const wrong = sd.map((row, r) => row.map((v, c) => P.puzzle[r][c] === 0 && v !== P.solution[r][c]));
+        msg.innerHTML = `<div class="fb bad"><b>한 곳 이상 다시 보세요</b>같은 줄이나 상자에 겹치는 숫자가 있어요.${auto ? "" : " 연한 빨강 칸을 다시 살펴보세요."}</div>`;
+        if (!auto) draw(wrong);
+        return;
+      }
+      msg.innerHTML = `<div class="fb good"><b>완성!</b>가로, 세로, 굵은 상자 모두 1~${n}이 한 번씩 들어갔어요.${SD_MULTI ? " 판 위에 왕관이 올라갔어요." : ""}</div>`;
+      celebrateSudoku(k, n);
+      log("sudoku", {date: today()});
+    };
+    $(`[data-sdcheck="${k}"]`).onclick = () => check(false);
+    const rs = $(`[data-sdreset="${k}"]`);
+    if (rs) rs.onclick = () => {   // 실수로 지우지 않게 두 번 눌러야 지워요(왕관은 남아요)
+      if (!rs.dataset.arm) { rs.dataset.arm = "1"; rs.textContent = "한 번 더 누르면 지워져요"; setTimeout(() => { delete rs.dataset.arm; rs.textContent = "처음부터"; }, 3000); return; }
+      delete rs.dataset.arm; rs.textContent = "처음부터";
+      const fresh = P.puzzle.map(r => r.slice()); sd.splice(0, sd.length, ...fresh); save(); msg.innerHTML = ""; sdSel = null; draw();
+    };
+  });
 }
+function drawAll(){ SD_LIST.forEach((_, k) => { const g = $("#sgrid-" + k); if (g && g._draw) g._draw(); }); }
+function celebrateSudoku(k, n){
+  FX.fanfare();   // 사용자가 숫자나 '다 채웠어요'를 누른 바로 그때 불림
+  FX.burst(0, 0, "big");
+  FX.banner(SD_MULTI ? `${ORD[k] || ""} 판 완성!` : "스도쿠 완성!", SD_MULTI ? "판 위에 왕관을 올려 드려요" : `1부터 ${n}까지 모두 맞혔어요`);
+  if (!SD_MULTI) return;
+  const first = !S.crown[ckey(k)];
+  if (first) { S.crown[ckey(k)] = Date.now(); save(); }
+  const cr = $("#crown-" + k), tag = $("#ctag-" + k);
+  if (cr) { cr.classList.remove("ghost", "drop"); cr.title = "다 맞혀서 받은 왕관"; void cr.offsetWidth; cr.classList.add("drop"); }
+  if (tag) tag.style.display = "";
+}
+/* 키보드로도 입력(PC): 칸을 누른 뒤 숫자, 지우기는 Backspace, 화살표로 옮기기 */
+document.addEventListener("keydown", e => {
+  if (!sdSel || !$("#sgrid-" + sdSel.k) || e.target.closest("textarea,input")) return;
+  const P = SD_LIST[sdSel.k], n = sdSize(P), g = $("#sgrid-" + sdSel.k);
+  const mv = {ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1]}[e.key];
+  if (mv) { e.preventDefault(); const r = Math.max(0, Math.min(n - 1, sdSel.r + mv[0])), c = Math.max(0, Math.min(n - 1, sdSel.c + mv[1])); sdSel = {k: sdSel.k, r, c, given: P.puzzle[r][c] !== 0}; drawAll(); return; }
+  if (/^[1-9]$/.test(e.key) && +e.key <= n) { e.preventDefault(); g._put(+e.key); }
+  else if (e.key === "Backspace" || e.key === "Delete" || e.key === "0") { e.preventDefault(); g._put(0); }
+});
 
 /* ---------- 퀴즈(잠금 없음) ---------- */
 function quizHome(){
@@ -807,32 +1204,64 @@ function chiikawaHtml(){
 }
 function loadX(){ const C = DATA.chiikawa; if (!(C.posts && C.posts.length && DATA.embed)) return; if (window.twttr && window.twttr.widgets) { window.twttr.widgets.load($("#page")); return; } const s = document.createElement("script"); s.async = true; s.src = "https://platform.twitter.com/widgets.js"; document.body.appendChild(s); }
 
-/* ---------- 무엇이든 물어보세요 ---------- */
+/* ---------- 무엇이든 물어보세요 ----------
+   (1) Claude 아티팩트 안: window.claude로 바로 답
+   (2) 아니면 config.js의 askUrl(답하는 서버)이 있으면 POST로 보내 답을 바로 보여 줌
+   (3) 둘 다 없으면 '아직 답하는 서버가 연결되지 않았어요' 안내(gasUrl이 있으면 질문은 기록) */
 let sample = null;
 (async () => { try { if (window.claude && window.claude.use) sample = await window.claude.use("sample"); } catch(e) { sample = null; } })();
 const openModal = h => { $("#sheet").innerHTML = h; $("#modal").classList.add("on"); };
 const closeModal = () => $("#modal").classList.remove("on");
 $("#modal").onclick = e => { if (e.target.id === "modal") closeModal(); };
+const ASK_MAX = 300;
+const WAIT_HTML = `<div class="ans wait">선생님이 생각 중이에요<span class="dots"><i></i><i></i><i></i></span></div>`;
+async function askServer(q){
+  const titles = []; SECS.forEach(s => (s.items || []).forEach(id => { if (A[id] && A[id].title) titles.push(String(A[id].title).slice(0, 80)); }));
+  const ctl = ("AbortController" in window) ? new AbortController() : null;
+  const tm = setTimeout(() => { if (ctl) ctl.abort(); }, 45000);
+  try {
+    const r = await fetch(CFG.askUrl, {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify({q, issue: DATA.issue.no, date: DATA.issue.date, titles: titles.slice(0, 20)}), signal: ctl ? ctl.signal : undefined});
+    let j = null; try { j = await r.json(); } catch(e) {}
+    if (r.ok && j && j.a) return {a: String(j.a)};
+    return {err: (j && j.error) ? String(j.error) : (r.status === 429 ? "질문이 많이 몰렸어요. 조금 뒤에 다시 물어봐 주세요." : "지금은 답하는 서버가 대답하지 않아요. 조금 뒤에 다시 물어봐 주세요.")};
+  } catch(e) {
+    return {err: (e && e.name === "AbortError") ? "답이 너무 오래 걸려서 멈췄어요. 질문을 조금 짧게 바꿔 다시 물어봐 주세요." : "인터넷 연결이나 답하는 서버에 문제가 있어 답을 받지 못했어요. 잠시 뒤 다시 물어봐 주세요."};
+  } finally { clearTimeout(tm); }
+}
 $("#askBtn").onclick = () => {
   openModal(`<div class="kicker">독자 질문</div><h3>무엇이든 물어보세요</h3><p class="note" style="margin:0 0 10px">이번 호 기사든, 평소 궁금했던 것이든 좋아요. Nova 선생님이 답해 줄게요.</p>
-    <textarea id="qIn" placeholder="예: 보이저 1호는 언제까지 신호를 보낼 수 있나요?"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px"><button class="go" id="qSend">보내기</button><button class="go ghost" id="qClose">닫기</button></div><div id="qAns"></div>
+    <textarea id="qIn" maxlength="${ASK_MAX}" placeholder="${esc(DATA.askExample || "예: 별은 왜 반짝반짝 빛나 보여요?")}"></textarea>
+    <div class="note" id="qCnt" style="margin-top:4px;text-align:right">0 / ${ASK_MAX}자</div>
+    <div style="display:flex;gap:8px;margin-top:6px"><button class="go" id="qSend">보내기</button><button class="go ghost" id="qClose">닫기</button></div><div id="qAns"></div>
     ${S.qa.length?`<div class="note">지난 질문</div>${S.qa.slice(-3).reverse().map(x=>`<div class="ans"><b>Q.</b> ${esc(x.q)}\n<b>A.</b> ${esc(x.a)}</div>`).join("")}`:""}`);
   $("#qClose").onclick = closeModal;
-  if (!sample && CFG.gasUrl) fetch(CFG.gasUrl + "?action=answers").then(r => r.json()).then(list => { if (!list || !list.length) return; const d = document.createElement("div"); d.innerHTML = `<div class="note">받은 답</div>` + list.slice(-5).reverse().map(x => `<div class="ans"><b>Q.</b> ${esc(x.q)}\n<b>A.</b> ${esc(x.a)}</div>`).join(""); $("#sheet").appendChild(d); }).catch(() => {});
+  $("#qIn").oninput = () => { $("#qCnt").textContent = $("#qIn").value.length + " / " + ASK_MAX + "자"; };
+  if (!sample && !CFG.askUrl && CFG.gasUrl) fetch(CFG.gasUrl + "?action=answers").then(r => r.json()).then(list => { if (!list || !list.length) return; const d = document.createElement("div"); d.innerHTML = `<div class="note">받은 답</div>` + list.slice(-5).reverse().map(x => `<div class="ans"><b>Q.</b> ${esc(x.q)}\n<b>A.</b> ${esc(x.a)}</div>`).join(""); $("#sheet").appendChild(d); }).catch(() => {});
   $("#qSend").onclick = async () => {
-    const q = $("#qIn").value.trim(); if (!q) return; const box = $("#qAns"); $("#qSend").disabled = true;
-    if (!sample) {
-      S.qa.push({q, a: "(선생님이 답을 쓰고 있어요)", t: Date.now()}); save(); log("question", {q});
-      box.innerHTML = `<div class="ans">질문을 보냈어요. 답이 달리면 이 창의 '받은 답'에 보여요.</div>`; $("#qSend").disabled = false;
-      if (CFG.gasUrl) setTimeout(() => { fetch(CFG.gasUrl + "?action=answers").then(r => r.json()).then(list => { const hit = (list||[]).filter(x => x.q === q).pop(); if (hit) { box.innerHTML = `<div class="ans">${esc(hit.a)}</div>`; const me = S.qa.find(x => x.q === q && x.a.startsWith("(")); if (me) { me.a = hit.a; save(); } } }).catch(() => {}); }, 9000);
-      return;
+    const q = $("#qIn").value.trim().slice(0, ASK_MAX); if (!q) return; const box = $("#qAns"); $("#qSend").disabled = true;
+    if (sample) {   // (1) Claude 아티팩트 안
+      box.innerHTML = WAIT_HTML;
+      try {
+        const r = await sample(DATA.askPrompt + "\n\n[서아의 질문]\n" + q, {modelTier: "default", cache: false, onText: ({text}) => { box.innerHTML = `<div class="ans">${esc(text)}</div>`; }});
+        S.qa.push({q, a: r.text, t: Date.now()}); save(); log("question", {q, a: r.text}); box.innerHTML = `<div class="ans">${esc(r.text)}</div>`;
+      } catch(e) { S.qa.push({q, a: "(질문을 받아 두었어요)", t: Date.now()}); save(); box.innerHTML = `<div class="ans err">지금은 바로 답하기 어려워요. 질문은 받아 두었어요.</div>`; }
+      $("#qSend").disabled = false; return;
     }
-    box.innerHTML = `<div class="ans">선생님이 답을 쓰고 있어요…</div>`;
-    try {
-      const r = await sample(DATA.askPrompt + "\n\n[서아의 질문]\n" + q, {modelTier: "default", cache: false, onText: ({text}) => { box.innerHTML = `<div class="ans">${esc(text)}</div>`; }});
-      S.qa.push({q, a: r.text, t: Date.now()}); save(); log("question", {q, a: r.text}); box.innerHTML = `<div class="ans">${esc(r.text)}</div>`;
-    } catch(e) { S.qa.push({q, a: "(질문을 받아 두었어요)", t: Date.now()}); save(); box.innerHTML = `<div class="ans">지금은 바로 답하기 어려워요. 질문은 받아 두었어요.</div>`; }
+    if (CFG.askUrl) {   // (2) 답하는 서버
+      box.innerHTML = WAIT_HTML;
+      const res = await askServer(q);
+      if (res.a) { S.qa.push({q, a: res.a, t: Date.now()}); save(); log("question", {q, a: res.a}); box.innerHTML = `<div class="ans">${esc(res.a)}</div>`; }
+      else { log("question", {q}); box.innerHTML = `<div class="ans err">${esc(res.err)}</div>`; }
+      $("#qSend").disabled = false; return;
+    }
+    // (3) 답하는 곳이 없음
+    if (CFG.gasUrl) {
+      S.qa.push({q, a: "(선생님이 답을 쓰고 있어요)", t: Date.now()}); save(); log("question", {q});
+      box.innerHTML = `<div class="ans">아직 바로 답하는 서버가 연결되지 않았어요. 질문은 편집부에 보냈어요. 답이 달리면 이 창의 '받은 답'에 보여요.</div>`;
+      setTimeout(() => { fetch(CFG.gasUrl + "?action=answers").then(r => r.json()).then(list => { const hit = (list||[]).filter(x => x.q === q).pop(); if (hit) { box.innerHTML = `<div class="ans">${esc(hit.a)}</div>`; const me = S.qa.find(x => x.q === q && x.a.startsWith("(")); if (me) { me.a = hit.a; save(); } } }).catch(() => {}); }, 9000);
+    } else {
+      box.innerHTML = `<div class="ans">아직 답하는 서버가 연결되지 않았어요. 궁금한 것은 공책에 적어 두었다가 아빠나 선생님께 물어보세요. 서버가 연결되면 여기에서 바로 답해 줄게요.</div>`;
+    }
     $("#qSend").disabled = false;
   };
 };
@@ -845,6 +1274,7 @@ $("#calBtn").onclick = () => {
   document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { if (!DATA.__issues || b.dataset.d === DATA.__current) { closeModal(); return; } location.search = "?d=" + b.dataset.d; });
 };
 
+markTabs();
 const start = (location.hash || "").replace("#", "");
 go(SECS.some(s => s.id === start) ? start : "cover", false);
 };
