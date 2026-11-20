@@ -31,7 +31,7 @@ D1 = json.load(open(os.path.join(SITE, "editions", "2026-11-17.json"), encoding=
 IDX = json.load(open(os.path.join(SITE, "editions", "index.json"), encoding="utf-8"))
 for x in IDX["issues"]: x["publishAt"] = "2026-11-01T00:00:00+09:00"   # 시험용: 두 호 모두 공개된 것처럼
 
-async def new_page(br, vp, ask_url=None, clock=False):
+async def new_page(br, vp, ask_url=None, clock=False, idx=None):
     ctx = await br.new_context(viewport=vp, device_scale_factor=2 if vp["width"] < 500 else 1)
     pg = await ctx.new_page()
     errs = []
@@ -42,7 +42,7 @@ async def new_page(br, vp, ask_url=None, clock=False):
             if "Failed to load resource" in m.text and "127.0.0.1" not in u: return
             errs.append(m.text)
     pg.on("console", on_console); pg.on("pageerror", lambda e: errs.append("pageerror: " + str(e)))
-    async def idx_route(route): await route.fulfill(status=200, content_type="application/json", body=json.dumps(IDX, ensure_ascii=False))
+    async def idx_route(route): await route.fulfill(status=200, content_type="application/json", body=json.dumps(idx or IDX, ensure_ascii=False))
     await pg.route("**/editions/index.json", idx_route)
     if ask_url is not None:
         async def cfg_route(route): await route.fulfill(status=200, content_type="application/javascript", body=f'window.SEOA_CONFIG = {{ gasUrl: "", askUrl: "{ask_url}" }};')
@@ -241,8 +241,8 @@ async def test_psy(br, vp, name):
     await ctx.close()
 
 async def test_ask(br, vp, name):
-    # (가) askUrl 없음
-    ctx, pg, errs = await new_page(br, vp)
+    # (가) askUrl 없음(저장소 config.js에는 주소가 있으니 시험에서만 빈 값으로)
+    ctx, pg, errs = await new_page(br, vp, ask_url="")
     await pg.goto(BASE + "?d=2026-11-20#science"); await pg.wait_for_selector("#askBtn")
     await pg.click("#askBtn"); await pg.fill("#qIn", "고릴라는 왜 손가락 마디로 걸어요?"); await pg.click("#qSend")
     t = await pg.inner_text("#qAns")
@@ -370,6 +370,66 @@ async def test_final(br, vp, name):
     ok(f"[{name}] 최종 화면 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
     await ctx.close()
 
+async def visible(pg, sel):
+    return await pg.evaluate("""(s) => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(), cs = getComputedStyle(e);
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 0 && r.height > 0 && r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight; }""", sel)
+
+async def test_past(br, vp, name):
+    """지난 호 보기: 표지·차례·제호 단추, 호 목록(표지 제목·지금 보는 호), 지난 호 띠, 최신 호로 돌아가기, 호마다 따로 기억, 공개 전 호 숨김"""
+    ctx, pg, errs = await new_page(br, vp)
+    await pg.goto(BASE); await pg.wait_for_selector(".c-foot")
+    a = await visible(pg, ".c-foot [data-past]"); b = await visible(pg, ".c-top .c-past"); bar = await pg.query_selector("#pastBar")
+    ok(f"[{name}] 표지에 '지난 호 보기' 단추 둘(위·아래)·최신 호라 띠 없음", a and b and not bar, f"아래 {a}, 위 {b}")
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_past_cover.png"))
+    await pg.click(".c-foot [data-past]"); await pg.wait_for_selector("#modal.on .past-row")
+    rows = await pg.eval_on_selector_all("#modal .past-row", "es => es.map(e => [e.dataset.d, e.querySelector('.pr-t').textContent, e.classList.contains('cur')])")
+    want = sorted([[x["date"], x["title"], x["date"] == "2026-11-20"] for x in IDX["issues"]], reverse=True)
+    ok(f"[{name}] 지난 호 창: 호마다 한 줄(표지 제목, 지금 보는 호 표시)", rows == want, json.dumps(rows, ensure_ascii=False)[:120])
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_past_modal.png"))
+    await pg.click("#cc")
+    await pg.click('.tab[data-s="science"]'); await pg.wait_for_timeout(200); await pg.evaluate("window.scrollTo(0,0)")
+    ok(f"[{name}] 안쪽 쪽에서도 제호 '지난 호 보기' 단추가 보임", await visible(pg, "#calBtn"), await pg.inner_text("#calBtn"))
+    await pg.click('.tab[data-s="contents"]'); await pg.wait_for_selector("#pastBox .past-row")
+    n = await pg.eval_on_selector_all("#pastBox .past-row", "es => es.length"); cur = await pg.eval_on_selector("#pastBox .past-row.cur", "e => e.dataset.d + ' ' + e.textContent")
+    ok(f"[{name}] 차례에 '지난 호 보기' 칸", n == 2 and cur.startswith("2026-11-20") and "지금 보는 호" in cur, cur[:60])
+    await pg.evaluate("document.querySelector('#pastBox').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(150)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_past_contents.png"))
+    await pg.click('#pastBox .past-row[data-d="2026-11-17"]'); await pg.wait_for_selector("#pastBar")
+    t = await pg.inner_text("#pastBar"); lab = await pg.inner_text(".c-top b")
+    ok(f"[{name}] 지난 호로 가면 띠: '지금 제1호(2026년 11월 17일)를 보고 있어요 · 최신 호 보기'", "?d=2026-11-17" in pg.url and "지금 제1호(2026년 11월 17일)를 보고 있어요" in t and "최신 호 보기" in t and "제1호" in lab, t.replace("\n", " "))
+    ov = await overflow(pg); ok(f"[{name}] 띠가 있어도 가로 넘침 없음", ov <= 1, f"{ov}px")
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_past_banner_issue1.png"))
+    await pg.click("#latestLink"); await pg.wait_for_selector(".c-foot")
+    bar = await pg.query_selector("#pastBar"); lab = await pg.inner_text(".c-top b")
+    ok(f"[{name}] '최신 호 보기' → ?d 없는 처음 주소, 띠 없음", "?d=" not in pg.url and not bar and "제2호" in lab, pg.url)
+    # 호마다 따로 기억(같은 기사 id 'economy'가 두 호에 있음)
+    await pg.evaluate("""() => { const S = JSON.parse(localStorage.getItem('nova-1') || '{}'); S.read = Object.assign(S.read || {}, {'2026-11-20:economy': Date.now()});
+      S.crown = Object.assign(S.crown || {}, {'2026-11-20:0': Date.now()}); localStorage.setItem('nova-1', JSON.stringify(S)); }""")
+    await pg.goto(BASE + "?d=2026-11-17#economy"); await pg.wait_for_selector("#a-economy")
+    on1 = await pg.eval_on_selector("#a-economy .rstamp", "e => e.classList.contains('on')")
+    await pg.click('.tab[data-s="sudoku"]'); await pg.wait_for_selector("#sgrid-0"); cr1 = await pg.eval_on_selector_all(".crown:not(.ghost)", "es => es.length")
+    await pg.goto(BASE + "#economy"); await pg.wait_for_selector("#a-economy")
+    on2 = await pg.eval_on_selector("#a-economy .rstamp", "e => e.classList.contains('on')")
+    await pg.click('.tab[data-s="sudoku"]'); await pg.wait_for_selector("#sgrid-0"); cr2 = await pg.eval_on_selector("#crown-0", "e => !e.classList.contains('ghost')")
+    ok(f"[{name}] 도장·왕관은 호마다 따로(제2호 기록이 제1호에 안 보임)", (not on1) and cr1 == 0 and on2 and cr2, f"제1호 도장 {on1}, 왕관 {cr1} / 제2호 도장 {on2}, 왕관 {cr2}")
+    ok(f"[{name}] 지난 호 시험 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+    # 공개 전 호는 목록에 없음 + title이 없는 호도 깨지지 않음
+    fut = json.loads(json.dumps(IDX))
+    for x in fut["issues"]:
+        if x["date"] == "2026-11-20": x["publishAt"] = "2099-01-01T22:00:00+09:00"
+        x.pop("title", None)
+    ctx, pg, errs = await new_page(br, vp, idx=fut)
+    await pg.goto(BASE + "#contents"); await pg.wait_for_selector("#pastBox")
+    rows = await pg.eval_on_selector_all("#pastBox .past-row", "es => es.map(e => e.dataset.d + '|' + e.querySelector('.pr-t').textContent)")
+    bar = await pg.query_selector("#pastBar"); lab = await pg.inner_text(".dateline b")
+    ok(f"[{name}] 공개 시각 전 호는 목록에 없음·title 없어도 그 호 표지 제목", rows == ["2026-11-17|" + D1["cover"]["headline"]] and not bar and "제1호" in lab, json.dumps(rows, ensure_ascii=False)[:100])
+    await pg.goto(BASE + "?d=2026-11-20"); await pg.wait_for_selector(".tab")
+    lab = await pg.inner_text(".dateline b")
+    ok(f"[{name}] 공개 전 호는 ?d로도 열리지 않음(최신 공개 호로)", "제1호" in lab, lab)
+    ok(f"[{name}] 공개 전 시험 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+
 async def test_inline(br):
     ctx = await br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2); pg = await ctx.new_page()
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -407,6 +467,7 @@ async def main():
                     await test_quiz(br, vp, name); await test_psy(br, vp, name)
                 await test_ask(br, vp, name)
                 await test_final(br, vp, name)
+                await test_past(br, vp, name)
             await test_figimg(br)
             await test_inline(br)
             await br.close()

@@ -336,6 +336,30 @@ figure .fig.figimg{position:relative;line-height:0}
 figure .fig.figimg img{width:100%;height:auto;display:block}
 .illu{position:absolute;left:8px;top:8px;line-height:1.4;font-family:'Noto Sans KR';font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--paper);color:var(--ink);border:1px solid var(--ink);padding:1px 6px}
 figcaption .credit{display:block;font-size:11.5px;margin-top:2px}
+/* 지난 호 보기 */
+.tbtn.past{border:1.5px solid var(--red);color:var(--red);background:var(--paper2);font-size:12.5px;padding:5px 10px}
+.tbtn.past:hover{background:var(--red);color:#fff}
+.c-top{align-items:center}
+.c-top .c-past{padding:2px 8px;font-size:11.5px}
+@media(max-width:600px){.c-top .c-every{display:none}}
+.c-foot{flex-wrap:wrap}
+.c-foot .past-go{margin-right:auto}
+@media(max-width:420px){.c-foot .go{padding:7px 9px;font-size:12.5px}}
+body.has-pastbar .cover1{height:calc(100svh - 80px)}
+.pastbar{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;background:var(--navy);color:var(--paper);font-family:'Noto Sans KR';font-size:13px;padding:6px 12px;text-align:center;word-break:keep-all}
+.pastbar b{color:#fff}
+.pastbar a{color:#F2C14E;font-weight:900;text-decoration:none;border-bottom:1px solid #F2C14E;white-space:nowrap}
+.pastbox{margin-top:22px}
+.past-h{font-size:22px;font-weight:900;margin:0 0 6px;border-bottom:3px solid var(--ink);padding-bottom:4px}
+.past-list{border-top:1px solid var(--ink)}
+.past-row{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"l d m" "t t t";gap:2px 10px;width:100%;text-align:left;background:none;border:0;border-bottom:1px dotted var(--ink);padding:10px 2px;cursor:pointer;color:var(--ink);font:inherit}
+.past-row:hover{background:var(--paper2)}
+.past-row .pr-l{grid-area:l;font-family:'Noto Sans KR';font-weight:900;font-size:13px;color:var(--red)}
+.past-row .pr-d{grid-area:d;font-family:'Noto Sans KR';font-size:12.5px;color:var(--gray);align-self:center}
+.past-row .pr-m{grid-area:m;font-family:'Noto Sans KR';font-weight:700;font-size:12px;white-space:nowrap}
+.past-row .pr-t{grid-area:t;font-size:16.5px;font-weight:700;line-height:1.45;word-break:keep-all}
+.past-row.cur{background:#FFF3D6}
+.past-row.cur .pr-m{color:var(--red)}
 /* 본문 안 도판(제2호부터 figs.svg / figs.at) */
 .body figure,.body .infig{column-span:all;break-inside:avoid;margin:20px auto 22px}
 .fig.svgfig{line-height:0;background:var(--paper2)}
@@ -481,7 +505,7 @@ Object.keys(DATA.sims || {}).forEach(id => {
 $("#mast").innerHTML = `
   <div class="dateline"><span><b>${esc(DATA.issue.label)}</b> · ${esc(DATA.issue.dateText)}</span><span>기획 서아 · 매주 금요일 밤 10시 발행</span></div>
   <div class="nameplate"><h1>Nova</h1><div class="en">서아가 기획한 주간 과학 교양지</div><div class="motto">노바(Nova): 어느 날 갑자기 밝게 빛나는 '새 별'이라는 뜻이에요</div></div>
-  <div class="mast-tools"><button class="tbtn" id="calBtn">지난 호</button></div>`;
+  <div class="mast-tools"><button class="tbtn past" id="calBtn" data-past="1">지난 호 보기</button></div>`;
 $("#askIc").innerHTML = F.teacher || "";
 $("#tabs").innerHTML = SECS.map(s => `<button class="tab" data-s="${s.id}">${esc(s.name)}</button>`).join("");
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => go(b.dataset.s, true));
@@ -855,12 +879,12 @@ function go(id, push){
 function coverHtml(){
   const C = DATA.cover;
   return `<section class="cover1">
-    <div class="c-top"><span><b>${esc(DATA.issue.label)}</b></span><span>${esc(DATA.issue.dateText)}</span><span>매주 금요일 밤 10시</span></div>
+    <div class="c-top"><span><b>${esc(DATA.issue.label)}</b></span><span>${esc(DATA.issue.dateText)}</span><span class="c-every">매주 금요일 밤 10시</span><button class="tbtn past c-past" data-past="1">지난 호 보기</button></div>
     <h1 class="c-name">Nova</h1>
     <div class="c-sub">서아가 기획한 주간 과학 교양지</div>
     <div class="c-art" data-go="${C.go}">${C.img ? `<img class="c-img" src="${esc((DATA.images||{})[C.img] || ("assets/img/" + C.img + ".jpg"))}" alt="${esc(C.caption||C.headline)}">` : (F.cover || "")}<div class="c-head"><div class="kicker">${esc(C.kicker || "이번 호 머리기사")}</div><h2>${esc(C.headline)}</h2></div></div>
     <div class="c-lines"><div class="c-deck">${esc((C.lead||[])[0]||"")}</div><div class="c-lh">이번 호에는</div>${C.lines.map(l=>`<div class="c-l" data-go="${l.go}"><span class="cs">${esc(l.sec)}</span><span class="ct">${esc(l.t)}</span></div>`).join("")}</div>
-    <div class="c-foot"><button class="go ghost" data-go="contents">차례 보기</button><button class="go" data-go="${C.go}">머리기사 읽기 →</button></div>
+    <div class="c-foot"><button class="go ghost" data-go="contents">차례 보기</button><button class="go ghost past-go" data-past="1">지난 호 보기</button><button class="go" data-go="${C.go}">머리기사 읽기 →</button></div>
   </section>`;
 }
 function tocId(t){   // 차례 줄의 기사 id(제1호처럼 id가 없으면 제목으로 찾음)
@@ -873,7 +897,8 @@ function contentsHtml(s){
   const bar = all.length ? `<div class="readbar"><span>읽음 도장</span><span class="rb-bar"><i style="width:${Math.round(done/all.length*100)}%"></i></span><span><b>${done}</b> / ${all.length}</span></div>` : "";
   return secHead(s) + bar + `<section class="toc">${DATA.toc.map(t=>{ const id = tocId(t); return `<div class="toc-row" data-go="${t.go}"><div class="ts">${esc(t.sec)}</div><div class="tt">${esc(t.t)}${(id && READABLE(id) && isRead(id))?`<span class="tread" title="다 읽었어요">읽음</span>`:""}</div><div class="tp">${esc(t.p)}</div></div>`; }).join("")}</section>
     <div class="howread"><b>Nova 읽는 법</b><br>· 맨 위의 이름표(과학, 수학, 경제…)를 누르면 그 쪽으로 가요.<br>· 기사 속 <span style="border-bottom:2px dotted var(--red)">밑줄 친 낱말</span>을 누르면 뜻이 나와요.<br>· 영어로 된 출처에는 '국문 요약' 단추가 있어요. 누르면 우리말 요약이 나와요.<br>· 기사를 끝까지 읽으면 제목 옆에 <b>'잘했어요' 도장</b>이 찍히고, 이 차례에도 '읽음'이 표시돼요.<br>· 궁금한 것은 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.</div>
-    <div class="editor"><div class="m">${F.mascot || ""}</div><p>${esc(DATA.editorNote)}</p></div>`;
+    <div class="editor"><div class="m">${F.mascot || ""}</div><p>${esc(DATA.editorNote)}</p></div>
+    ${pastListHtml(true)}`;
 }
 
 /* ---------- 책 ---------- */
@@ -1266,13 +1291,48 @@ $("#askBtn").onclick = () => {
   };
 };
 
-/* ---------- 지난 호 ---------- */
-$("#calBtn").onclick = () => {
-  const list = DATA.__issues || [{date: DATA.issue.date, label: DATA.issue.label, dateText: DATA.issue.dateText}];
-  openModal(`<div class="kicker">지난 호</div><h3>Nova 모아 보기</h3>${list.map(i=>`<button class="opt" data-d="${esc(i.date)}"><b>${esc(i.label)}</b>${esc(i.dateText||i.date)}${i.date===(DATA.__current||DATA.issue.date)?" · 지금 보는 호":""}</button>`).join("")}<div style="margin-top:12px"><button class="go ghost" id="cc">닫기</button></div>`);
+/* ---------- 지난 호 보기 ----------
+   목록: 사이트는 editions/index.json에서 공개 시각(publishAt)이 지난 호만(__issues), 한 파일 미리보기는 조립 때 넣은 issuesIndex(공개된 호만 걸러 씀).
+   지난 호를 보는 중이면 맨 위에 얇은 띠로 알려 줘요. */
+const CUR = DATA.__current || DATA.issue.date;
+function issueList(){
+  if (DATA.__issues) return DATA.__issues;
+  const now = Date.now();
+  const L = (DATA.issuesIndex || []).filter(i => !i.publishAt || Date.parse(i.publishAt) <= now || i.date === DATA.issue.date).sort((a, b) => a.date < b.date ? 1 : -1);
+  return L.length ? L : [{date: DATA.issue.date, no: DATA.issue.no, label: DATA.issue.label, dateText: DATA.issue.dateText, title: (DATA.cover || {}).headline}];
+}
+const shortDate = i => String(i.dateText || i.date || "").replace(/\s*[월화수목금토일]요일$/, "");
+function issueTitle(i){ return i.title || (i.date === DATA.issue.date ? (DATA.cover || {}).headline : "") || ""; }
+function pastListHtml(inContents){
+  const L = issueList();
+  const rows = L.map(i => `<button class="past-row ${i.date === CUR ? "cur" : ""}" data-d="${esc(i.date)}"><span class="pr-l">${esc(i.label || ("제" + i.no + "호"))}</span><span class="pr-d">${esc(shortDate(i))}</span><span class="pr-t">${esc(issueTitle(i))}</span><span class="pr-m">${i.date === CUR ? "지금 보는 호" : "이 호 보기 →"}</span></button>`).join("");
+  const note = (!DATA.__issues && L.length > 1) ? `<div class="note">이 미리보기에서는 다른 호를 정식 사이트에서 새 창으로 열어요.</div>` : (L.length === 1 ? `<div class="note">아직 나온 호가 이 호 하나예요.</div>` : "");
+  return `<section class="pastbox" ${inContents ? 'id="pastBox"' : ""}>${inContents ? `<h3 class="past-h">지난 호 보기</h3>` : ""}<div class="past-list">${rows}</div>${note}</section>`;
+}
+function gotoIssue(d){
+  const L = issueList();
+  if (d === CUR) { closeModal(); return; }
+  if (!DATA.__issues) { if (DATA.siteUrl) window.open(DATA.siteUrl + (L[0] && d === L[0].date ? "" : "?d=" + encodeURIComponent(d)), "_blank", "noopener"); return; }
+  if (L[0] && d === L[0].date) { location.href = location.pathname; return; }   // 최신 호는 ?d 없이
+  location.href = location.pathname + "?d=" + encodeURIComponent(d);   // 그 호의 표지부터
+}
+function openPast(){
+  openModal(`<div class="kicker">지난 호 보기</div><h3>Nova 모아 보기</h3>${pastListHtml(false)}<div style="margin-top:12px"><button class="go ghost" id="cc">닫기</button></div>`);
   $("#cc").onclick = closeModal;
-  document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { if (!DATA.__issues || b.dataset.d === DATA.__current) { closeModal(); return; } location.search = "?d=" + b.dataset.d; });
-};
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-past], .past-row");
+  if (!b) return;
+  if (b.classList.contains("past-row")) gotoIssue(b.dataset.d); else openPast();
+});
+(function(){   // 지난 호를 보는 중이면 맨 위 띠
+  const L = issueList();
+  if (!DATA.__issues || !L.length || CUR === L[0].date) return;
+  const me = L.find(i => i.date === CUR) || DATA.issue;
+  const bar = document.createElement("div"); bar.className = "pastbar"; bar.id = "pastBar";
+  bar.innerHTML = `<span>지금 <b>제${esc(me.no || DATA.issue.no)}호(${esc(shortDate(me))})</b>를 보고 있어요</span><a href="${esc(location.pathname)}" id="latestLink">최신 호 보기 →</a>`;
+  document.body.prepend(bar); document.body.classList.add("has-pastbar");
+})();
 
 markTabs();
 const start = (location.hash || "").replace("#", "");

@@ -287,8 +287,19 @@ def data(embed):
       "quizNote": "수학 퀴즈는 이번 호 수학 기사 두 편과 4학년 2학기 범위에서 냈어요. 아빠가 문제 파일을 주시면 거기에 맞춰요.",
       "sudoku": sud, "video": VIDEO, "askPrompt": ASK, "askExample": "예: 고릴라는 왜 손가락 마디로 땅을 짚나요?",
       "sims": SIMS, "embed": embed,
+      **({} if embed else {"issuesIndex": [{k: v for k, v in x.items() if k != "file"} for x in idx["issues"]], "siteUrl": SITE_URL}),
       "images": {k: src(p) for k, p in IMAGES.items() if not k.startswith("cover_")},
     }
+
+# 호 목록(editions/index.json): 지난 호를 지우지 않고 이번 호를 덧붙여요. 각 호에 표지 큰 제목(title)을 넣어 '지난 호 보기' 목록에 보여 줘요
+idx = json.load(open(os.path.join(ROOT, "editions", "index.json"), encoding="utf-8"))
+idx["issues"] = [x for x in idx["issues"] if x.get("date") != DATE] + [{k: ISSUE[k] for k in ("no", "date", "label", "dateText", "publishAt")} | {"title": COVER["headline"], "file": f"{DATE}.json"}]
+for x in idx["issues"]:
+    if not x.get("title"):   # title이 없는 지난 호는 그 호 파일의 표지 큰 제목으로 채움
+        try: x["title"] = json.load(open(os.path.join(ROOT, "editions", x["file"]), encoding="utf-8"))["cover"]["headline"]
+        except Exception as e: print("지난 호 제목을 못 읽음:", x.get("file"), e)
+idx["issues"] = [{k: x[k] for k in ("no", "date", "label", "dateText", "publishAt", "title", "file") if k in x} for x in idx["issues"]]
+SITE_URL = "https://hangseokemail-spec.github.io/nova/"
 
 tpl = open(os.path.join(B, "template_v4.html"), encoding="utf-8").read()
 assert "/*__BOOT__*/" in tpl and '<script src="config.js" onerror="void 0"></script>\n' in tpl
@@ -304,8 +315,6 @@ json.dump(inline, open(os.path.join(OUT, "data.json"), "w", encoding="utf-8"), e
 ed = os.path.join(SITE, "editions"); os.makedirs(ed, exist_ok=True)
 open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(tpl.replace("/*__BOOT__*/", ""))
 json.dump(data(True), open(os.path.join(ed, f"{DATE}.json"), "w", encoding="utf-8"), ensure_ascii=False)
-idx = json.load(open(os.path.join(ROOT, "editions", "index.json"), encoding="utf-8"))   # 지난 호를 지우지 않고 덧붙임
-idx["issues"] = [x for x in idx["issues"] if x.get("date") != DATE] + [{k: ISSUE[k] for k in ("no", "date", "label", "dateText", "publishAt")} | {"file": f"{DATE}.json"}]
 json.dump(idx, open(os.path.join(ed, "index.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 for x in idx["issues"]:   # 함께 시험하려고 지난 호 파일도 옆에 둠(저장소에 이미 있는 그대로)
     p = os.path.join(ROOT, "editions", x["file"])

@@ -1,0 +1,1170 @@
+{
+ "note": "Nova에 실린 주제·책·영상·작품 목록. topic_db.py build 로 다시 만들어요. status '보류'는 아직 안 실린 원고예요.",
+ "entries": [
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "voyager",
+   "title": "보이저 1호, 18일 저녁 '1광일'에 닿는다… 빛도 꼬박 하루 걸리는 거리",
+   "deck": "1977년 지구를 떠난 탐사선 보이저 1호가 18일 오후 7시 16분(한국 시각), 빛이 하루 동안 가는 거리인 약 259억 km 지점에 이르러요.",
+   "keywords": [
+    "18일",
+    "1광일",
+    "1호",
+    "NASA(미국 항공우주국)",
+    "거리",
+    "걸리",
+    "관측",
+    "꼬박",
+    "닿는다",
+    "모스 부호",
+    "보이저",
+    "빛의 속도",
+    "성간 공간",
+    "저녁",
+    "전파",
+    "천문학자",
+    "탐사선",
+    "태양권",
+    "하루",
+    "호출부호"
+   ],
+   "urls": [
+    "https://www.dongascience.com/ko/news/80914",
+    "https://science.nasa.gov/?p=338314",
+    "https://earthsky.org/space/voyager-1-1-light-day-from-earth-november-17-18-2026/",
+    "https://science.nasa.gov/mission/voyager/voyager-1s-pale-blue-dot/",
+    "https://www.kasi.re.kr/file/1764661238731_1.pdf"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "leonid",
+   "title": "사자자리 유성우 18일 극대… 동트기 전 새벽, 맨눈으로 하늘을 넓게",
+   "deck": "혜성이 남긴 부스러기가 초속 71km로 날아드는 사자자리 유성우가 18일 오전 8시 45분 극대를 맞지만, 그때는 해가 뜬 뒤라 18일 동트기 전 어두운 곳에서 보는 것이 좋아요.",
+   "keywords": [
+    "18일",
+    "ZHR",
+    "극대",
+    "넓게",
+    "대기",
+    "동트기",
+    "맨눈",
+    "복사점",
+    "사자자리",
+    "새벽",
+    "유성",
+    "유성 폭풍",
+    "유성우",
+    "천정",
+    "하늘",
+    "한국천문연구원",
+    "혜성"
+   ],
+   "urls": [
+    "https://www.dongascience.com/ko/news/80916",
+    "https://www.kasi.re.kr/file/1764661238731_1.pdf",
+    "https://www.space.com/leonid-meteor-shower"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "crow",
+   "title": "까마귀, 눈 깜빡할 사이에 '판단'… 사람·원숭이보다 두 배 빨랐다",
+   "deck": "독일 튀빙겐대학교 연구팀이 까마귀가 화면 속 점들의 방향을 눈 깜빡할 만큼의 시간에 판단하고, 뇌는 그보다 먼저 답 쪽으로 기운다는 것을 밝혀 《사이언스》에 발표했어요.",
+   "keywords": [
+    "NCL(니도팔리움 카우도라테랄레)",
+    "과제",
+    "까마귀",
+    "깜빡할",
+    "대뇌 피질",
+    "밀리초",
+    "빨랐다",
+    "사이",
+    "신경세포(뉴런)",
+    "역치(문턱값)",
+    "원숭이",
+    "전전두엽",
+    "진화",
+    "터치스크린",
+    "판단",
+    "평균",
+    "포유류",
+    "학술지"
+   ],
+   "urls": [
+    "https://www.sciencedaily.com/releases/2026/11/261111005850.htm",
+    "https://uni-tuebingen.de/en/university/news-and-publications/press-release/crows-make-decisions-twice-as-fast-as-humans-and-monkeys/",
+    "https://bionumbers.hms.harvard.edu/bionumber.aspx?id=100706",
+    "https://faculty.washington.edu/chudler/chreflex.html"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "dino",
+   "title": "1억 1500만 년 된 공룡 뼈 속에서 '피의 흔적' 헴 찾았다",
+   "deck": "커틴대학교가 이끈 국제 연구팀이 브라질에서 나온 육식 공룡 아라타사우루스의 팔다리뼈에서 광물로 바뀐 적혈구를 찾고, 그 속에 남은 헴 분자를 화학 분석으로 확인했어요.",
+   "keywords": [
+    "1500",
+    "1억",
+    "공룡",
+    "광물",
+    "단백질",
+    "분자",
+    "세포",
+    "아미노산",
+    "적혈구",
+    "찾았다",
+    "퇴적물",
+    "하우스만나이트",
+    "헤모글로빈",
+    "헴",
+    "혈관 통로",
+    "화석",
+    "화학 분석",
+    "흔적"
+   ],
+   "urls": [
+    "https://www.sciencedaily.com/releases/2026/11/261105224542.htm",
+    "https://pdb101.rcsb.org/motm/41",
+    "https://medlineplus.gov/lab-tests/hemoglobin-test/"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "kelp",
+   "title": "14살 린든, 잠수정 몰고 켈프 숲 '회복의 열쇠' 찾아 나섰다",
+   "deck": "미국 캘리포니아의 14살 린든 헌터-핀스키가 위성 자료로 고른 켈프 숲 여섯 곳을 원격 조종 잠수정으로 찍어, 성게는 일부 숲만 회복되는 까닭이 아닐 수 있다는 단서를 얻었어요.",
+   "keywords": [
+    "14살",
+    "가설",
+    "갈조류",
+    "결선",
+    "나섰다",
+    "린든",
+    "몰고",
+    "비영리 단체",
+    "빗물 유출",
+    "성게",
+    "열쇠",
+    "열파",
+    "원격 조종 잠수정(ROV)",
+    "위성 자료",
+    "잠수정",
+    "찾아",
+    "켈프",
+    "탄소",
+    "화학 물질",
+    "회복"
+   ],
+   "urls": [
+    "https://www.snexplores.org/article/underwater-robot-kelp-forests-jic",
+    "https://www.sciencetimes.co.kr/news/%ED%83%84%EC%86%8C-%EC%A4%91%EB%A6%BD%EC%9D%80-%EA%B0%80%EB%8A%A5%ED%95%A0%EA%B9%8C-6/?cat=30"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "icecube",
+   "title": "남극 얼음으로 우주 '유령 입자' 잡았다… 2026 노벨 물리학상에 핼젠",
+   "deck": "남극 얼음 1세제곱킬로미터를 통째로 검출기로 쓰는 아이스큐브 관측소를 이끈 프랜시스 핼젠이, 우주에서 날아온 고에너지 중성미자를 찾아낸 공로로 노벨 물리학상을 받아요.",
+   "keywords": [
+    "2026",
+    "검출기",
+    "남극",
+    "노벨",
+    "논문",
+    "물리학상",
+    "빙하",
+    "세제곱킬로미터",
+    "센서",
+    "얼음",
+    "에너지",
+    "우리은하",
+    "우주",
+    "우주 입자 가속기",
+    "원자핵",
+    "유령",
+    "입자",
+    "잡았다",
+    "중성미자",
+    "체렌코프 복사",
+    "핼젠"
+   ],
+   "urls": [
+    "https://www.nobelprize.org/prizes/physics/2026/press-release/",
+    "https://physicstoday.aip.org/news/francis-halzen-to-receive-2026-nobel-prize-in-physics-for-cosmic-neutrino-detection",
+    "https://www.dongascience.com/ko/news/80214",
+    "https://www.dongascience.com/ko/news/80213"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "수학",
+   "id": "kakeya",
+   "title": "연필 돌리기에서 시작된 100년 수수께끼… 3차원 '카케야 문제' 증명한 홍 왕, 필즈상",
+   "deck": "1917년 일본 수학자 카케야 소이치가 던진 바늘 돌리기 질문은 100년 넘게 이어졌고, 홍 왕은 동료와 함께 그 3차원 판을 증명해 2026년 필즈상을 받았어요.",
+   "keywords": [
+    "100년",
+    "3차원",
+    "넓이",
+    "논문",
+    "델토이드",
+    "돌리기",
+    "문제",
+    "수수께끼",
+    "시작된",
+    "아카이브(arXiv)",
+    "연필",
+    "증명",
+    "증명한",
+    "차원",
+    "추측",
+    "카케야",
+    "카케야 집합",
+    "푸리에 해석",
+    "필즈상"
+   ],
+   "urls": [
+    "https://www.simonsfoundation.org/2026/07/23/2026-fields-medals-awarded-to-four-of-worlds-top-mathematicians/",
+    "https://plus.maths.org/icm-2026-fm-2",
+    "https://www.quantamagazine.org/living-fully-in-the-math-world-means-threading-the-needle-20260723/",
+    "https://www.quantamagazine.org/once-in-a-century-proof-settles-maths-kakeya-conjecture-20250314/",
+    "https://arxiv.org/abs/2502.17655",
+    "https://en.wikipedia.org/wiki/Kakeya_set",
+    "https://en.wikipedia.org/wiki/Deltoid_curve"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "경제",
+   "id": "economy",
+   "title": "한국은행은 왜 금리 손잡이를 두 번 올렸을까",
+   "deck": "저금통에서 출발해 이자, 금리, 은행, 한국은행까지 한 계단씩 올라가며, 올해 기준금리가 두 번 오른 까닭과 우리 생활에 생기는 일을 아빠와 서아가 함께 짚어 봐요.",
+   "keywords": [
+    "%(퍼센트)",
+    "경제",
+    "금리",
+    "기준금리",
+    "내수",
+    "대출",
+    "물가",
+    "손잡이",
+    "수출",
+    "예금",
+    "올렸을까",
+    "이자",
+    "중앙은행",
+    "투자",
+    "한국은행"
+   ],
+   "urls": [
+    "https://www.bok.or.kr/portal/singl/baseRate/list.do?dataSeCd=01&menuNo=200643",
+    "https://www.bok.or.kr/portal/cmmn/file/fileDown.do?menuNo=200755&atchFileId=17f5a7b898ce4a92b3715cb6a3bd7051&fileSn=2",
+    "https://www.bok.or.kr/portal/cmmn/file/fileDown.do?menuNo=200755&atchFileId=57a2f420e26141f39682fdb4696208b2&fileSn=2",
+    "https://www.bok.or.kr/portal/cmmn/file/fileDown.do?menuNo=200755&atchFileId=a371bacfa6d14a20948d8d1c8629a246&fileSn=2",
+    "https://www.bok.or.kr/portal/main/contents.do?menuNo=200291",
+    "https://www.bok.or.kr/portal/main/contents.do?menuNo=200289",
+    "https://www.bok.or.kr/portal/submain/submain/bokIntrcn.do?menuNo=201650",
+    "https://www.bok.or.kr/portal/singl/baseRate/progress.do?dataSeCd=01&menuNo=200656",
+    "https://economist.co.kr/article/view/ecn202509020027",
+    "https://www.nobelprize.org/prizes/economic-sciences/2026/press-release/"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "예술",
+   "id": "art",
+   "title": "모두 씨름판을 볼 때 한 사람만 딴 데를 본다… 김홍도 「씨름」 천천히 읽기",
+   "deck": "A4 종이만 한 화면에 스무 명 넘는 사람을 둥글게 앉힌 김홍도의 「씨름」을 처음 3초와 천천히 보는 시간으로 나눠, 어디를 보고 왜 명작이라 하는지 읽어 봐요.",
+   "keywords": [
+    "구도",
+    "김홍",
+    "먹",
+    "보물",
+    "본다",
+    "세기",
+    "소장",
+    "수묵담채",
+    "씨름",
+    "씨름판",
+    "여백",
+    "읽기",
+    "조선 후기",
+    "천천히",
+    "풍속화",
+    "화원",
+    "화첩"
+   ],
+   "urls": [
+    "https://www.museum.go.kr/MUSEUM/contents/M0502000000.do?schM=view&searchId=search&relicId=551",
+    "https://www.museum.go.kr/MUSEUM/contents/M0501000000.do?schM=view&relicRecommendId=16847",
+    "https://encykorea.aks.ac.kr/Article/E0013639",
+    "https://encykorea.aks.ac.kr/Article/E0011079",
+    "https://www.mcst.go.kr/site/s_culture/culture/cultureView.jsp?pSeq=71132",
+    "https://twig24.com/news/2026/05/04/20260504500181",
+    "https://www.newsis.com/view/NISX20260225_0003525866",
+    "https://kbmaeil.com/article/20260909500069",
+    "https://www.seoul.co.kr/news/2008/09/01/20080901026001",
+    "https://commons.wikimedia.org/wiki/File:Danwon_Ssireum.jpg"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "art",
+   "section": "예술",
+   "id": "art",
+   "title": "씨름 (《단원 풍속도첩》 중)",
+   "artwork": "씨름 (《단원 풍속도첩》 중)",
+   "artist": "김홍도(1745~1806년 무렵)",
+   "keywords": [
+    "씨름",
+    "단원",
+    "풍속도첩",
+    "김홍",
+    "1745",
+    "1806년",
+    "무렵"
+   ],
+   "urls": [
+    "https://commons.wikimedia.org/wiki/File:Danwon_Ssireum.jpg"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "article",
+   "section": "심리검사",
+   "id": "cute",
+   "title": "큰 머리, 아래쪽의 큰 눈… 귀여움 뒤에 숨은 '아기 도식'",
+   "deck": "1943년 로렌츠가 이름 붙인 '아기 도식'은 실험에서 귀여움 점수를 높였고 3~6살 어린이의 눈길도 끌었지만, 귀여움이 돌봄만으로 다 설명되지는 않을 수 있어요.",
+   "keywords": [
+    "감정",
+    "귀여움",
+    "대조군",
+    "도식",
+    "동물행동학자",
+    "머리",
+    "변인 통제",
+    "시선 추적",
+    "아기",
+    "아기 도식",
+    "아래쪽",
+    "한계"
+   ],
+   "urls": [
+    "https://www.nationalgeographic.com/animals/article/baby-animal-cute-evolution-brain",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC3260535",
+    "https://www.sciencedaily.com/releases/2014/07/140721100119.htm"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "psytest",
+   "section": "심리검사",
+   "id": "psytest",
+   "title": "나는 어떤 탐구자일까?",
+   "deck": "여덟 가지 생활 장면에서 고른 답으로 나의 탐구 방식을 알아보는, 재미로 하는 검사예요.",
+   "keywords": [
+    "탐구자일까"
+   ],
+   "urls": []
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "comic",
+   "section": "만화",
+   "id": "comic",
+   "title": "답장은 이틀 뒤에",
+   "deck": "보이저 1호에게 친구 신청을 보냈다. 이틀은 생각보다 길었다.",
+   "keywords": [
+    "답장",
+    "이틀"
+   ],
+   "urls": []
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "book",
+   "section": "문학",
+   "id": "book",
+   "title": "긴긴밤",
+   "keywords": [
+    "긴긴밤",
+    "문학"
+   ],
+   "urls": [
+    "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=263027170"
+   ],
+   "book_title": "긴긴밤",
+   "by": "글 루리"
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "book",
+   "section": "문학",
+   "id": "book",
+   "title": "과자 사면 과학 드립니다",
+   "keywords": [
+    "과자",
+    "사면",
+    "과학",
+    "드립니다",
+    "과학"
+   ],
+   "urls": [
+    "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=362545754"
+   ],
+   "book_title": "과자 사면 과학 드립니다",
+   "by": "글 정윤선 · 그림 시미씨"
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "book",
+   "section": "문학",
+   "id": "book",
+   "title": "세금 내는 아이들",
+   "keywords": [
+    "세금",
+    "아이들",
+    "경제"
+   ],
+   "urls": [
+    "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=273246838"
+   ],
+   "book_title": "세금 내는 아이들",
+   "by": "글 옥효진 · 그림 김미연"
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "시나모롤 쉽게 그리기! 🐶✏️ 귀염뽀짝 캐릭터 따라 그려봐요",
+   "video_id": "BUAfCkKkJCI",
+   "channel": "오마이비키",
+   "keywords": [
+    "시나모롤",
+    "그리기",
+    "귀염뽀짝",
+    "캐릭터",
+    "따라",
+    "그려봐요",
+    "그림"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=BUAfCkKkJCI"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "sub) 휴지심 뽑기기계 박스장난감 만들기 / diy boxtoy",
+   "video_id": "wc45lUzZWnU",
+   "channel": "BOXMOMMY 박스마미 만들기",
+   "keywords": [
+    "sub",
+    "휴지심",
+    "뽑기기계",
+    "박스장난감",
+    "만들기",
+    "diy",
+    "boxtoy",
+    "만들기"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=wc45lUzZWnU"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "키가 큰~ 기린도 물에 뜰 수 있을까?ㅣ물에 달걀 띄우기ㅣ어린이 과학 실험ㅣ팡팡 과학 마법사ㅣKBS 220808 방송",
+   "video_id": "5B7uqQ80qWM",
+   "channel": "KBSKids",
+   "keywords": [
+    "기린",
+    "있을까",
+    "달걀",
+    "띄우기",
+    "어린",
+    "과학",
+    "실험",
+    "팡팡",
+    "과학",
+    "마법사",
+    "kbs",
+    "220808",
+    "방송",
+    "과학"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=5B7uqQ80qWM"
+   ]
+  },
+  {
+   "issue": 1,
+   "date": "2026-11-17",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "최고다! 호기심딱지 시즌4- 공룡은 왜 사라졌을까",
+   "video_id": "InfsfbO2Gkg",
+   "channel": "EBS 키즈",
+   "keywords": [
+    "최고다",
+    "호기심딱지",
+    "시즌4",
+    "공룡",
+    "사라졌을까",
+    "기사연결"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=InfsfbO2Gkg"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "gorilla",
+   "title": "등을 내준 리샤, 올라선 아멜리아… 고릴라 자매의 '살아 있는 사다리'",
+   "deck": "이스라엘 라마트간 사파리에서 고릴라 한 마리가 등을 내주고, 다른 한 마리가 높은 가지를 꺾었어요. 이런 모습이 세 번 기록됐고, 연구진은 둘이 힘을 합친 '협력'으로 해석했어요.",
+   "keywords": [
+    "고릴라",
+    "관찰",
+    "내준",
+    "논문",
+    "리샤",
+    "사다리",
+    "살아",
+    "서부로랜드고릴라",
+    "서열",
+    "아멜리아",
+    "올라선",
+    "유인원",
+    "자매",
+    "전기 울타리",
+    "학술지",
+    "해석",
+    "협력"
+   ],
+   "urls": [
+    "https://www.sci.news/biology/gorilla-cooperation-15201.html",
+    "https://pubmed.ncbi.nlm.nih.gov/42925444/",
+    "https://nationalzoo.si.edu/animals/western-lowland-gorilla",
+    "https://ko.wikipedia.org/wiki/농구"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "과학",
+   "id": "merger",
+   "title": "안드로메다은하의 두 별, 일곱 바퀴 만에 하나로?… 웹 망원경이 지켜본 '별의 합체'",
+   "deck": "이웃 은하인 안드로메다은하에서 태양보다 조금 가벼운 별이 아주 큰 별 속으로 빙글빙글 끌려 들어갔어요. 여러 망원경의 관측으로 보면, 두 별은 하나로 합쳐진 것으로 보여요.",
+   "keywords": [
+    "공동 외피",
+    "관측",
+    "광년",
+    "궤도",
+    "망원경",
+    "모형",
+    "바퀴",
+    "안드로메다은하",
+    "은하",
+    "일곱",
+    "적외선",
+    "중심핵",
+    "지켜본",
+    "질량",
+    "학술지",
+    "합체"
+   ],
+   "urls": [
+    "https://science.nasa.gov/missions/webb/nasa-data-clinches-first-of-its-kind-stellar-merger/",
+    "https://www.sci.news/astronomy/webb-star-merger-andromeda-galaxy-15207.html",
+    "https://www.nature.com/articles/s41586-026-11221-z",
+    "https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-31/",
+    "https://ko.wikipedia.org/wiki/농구"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "수학",
+   "id": "folding",
+   "title": "접을 때마다 2배… 종이 한 장, 42번 접으면 달까지 간다는 계산의 비밀",
+   "deck": "접을 때마다 2배가 되는 종이는 계산으로는 42번 만에 달까지 닿지만, 진짜로 접기는 무척 어려워서 한 고등학생이 계산 끝에 12번을 해냈어요.",
+   "keywords": [
+    "2배",
+    "42번",
+    "가정",
+    "간다",
+    "겹",
+    "계산",
+    "기네스 세계 기록",
+    "때마다",
+    "미국 항공우주국",
+    "비밀",
+    "속설",
+    "어림",
+    "접으면",
+    "조"
+   ],
+   "urls": [
+    "https://www.guinnessworldrecords.com/news/2025/10/how-many-times-can-you-actually-fold-a-piece-of-paper-student-busts-myth",
+    "https://en.wikipedia.org/wiki/Mathematics_of_paper_folding",
+    "https://science.nasa.gov/moon/facts/",
+    "https://science.nasa.gov/sun/facts/",
+    "https://en.wikipedia.org/wiki/Paper_size"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "수학",
+   "id": "snowflake",
+   "title": "60°만 돌려도 그대로… 눈송이 속에 숨은 '뒤집기'와 '돌리기'",
+   "deck": "4학년 수학의 밀기·뒤집기·돌리기로 눈송이를 보면, 여섯 가지가 60°마다 같은 모양으로 놓인 까닭과 뒤집기 둘이 돌리기 하나가 되는 비밀이 보여요.",
+   "keywords": [
+    "60",
+    "그대",
+    "눈 결정",
+    "눈송",
+    "대칭",
+    "돌려",
+    "돌리기",
+    "뒤집기",
+    "분자",
+    "수증기",
+    "육각형"
+   ],
+   "urls": [
+    "http://www.snowcrystals.com/science/science.html",
+    "http://www.snowcrystals.com/history/history.html",
+    "http://www.snowcrystals.com/paper/paper.html"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "경제",
+   "id": "economy",
+   "title": "기름값이 오르면 붕어빵값도 오를까?",
+   "deck": "붕어빵 한 봉지에서 출발해 물가, 상승률, 기여까지 한 계단씩 올라가요. 10월 물가가 왜 올랐는지, 기름값이 다른 값으로 어떻게 번질 수 있는지 아빠와 서아가 함께 짚어 봐요.",
+   "keywords": [
+    "기름값",
+    "기여도",
+    "물가",
+    "붕어빵값",
+    "상승률",
+    "석유류",
+    "소비자물가",
+    "오르면",
+    "오를까",
+    "정유사",
+    "중동",
+    "최고가격제"
+   ],
+   "urls": [
+    "https://www.koreatimes.co.kr/economy/20261113/korean-economy-continues-to-grow-at-solid-pace-finance-ministry",
+    "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156789113",
+    "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787662",
+    "https://n.news.naver.com/mnews/article/001/0016417775?sid=101",
+    "https://n.news.naver.com/mnews/article/005/0001884967?sid=101",
+    "https://n.news.naver.com/mnews/article/001/0016442083?sid=101"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "경제",
+   "id": "export",
+   "title": "1억 달러에서 1조 달러로… 우리나라 수출, 62년 만에 1만 배",
+   "deck": "11월 19일 우리나라의 올해 수출이 1조 달러를 넘었어요. 휴대폰 속 작은 칩에서 출발해 수출, 1조의 크기, 반도체, '값×양'까지 짚어 봐요.",
+   "keywords": [
+    "1억",
+    "1조",
+    "62년",
+    "그린북",
+    "단가",
+    "달러",
+    "데이터센터",
+    "반도체",
+    "보호무역주의",
+    "수입",
+    "수출",
+    "우리나라",
+    "인공지능(AI)"
+   ],
+   "urls": [
+    "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156789969",
+    "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787411",
+    "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156789113"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "예술",
+   "id": "art",
+   "title": "언덕 위에서 겨울 마을을 내려다보다… 브뤼헐 「눈 속의 사냥꾼」 천천히 읽기",
+   "deck": "461년 전 그려진 겨울 풍경 한 점을 언덕 위 사냥꾼의 자리에서 아래 마을과 먼 산까지 따라가요. 무엇을 보고 왜 아름답다고 하는지 읽어 봐요.",
+   "keywords": [
+    "겨울",
+    "구도",
+    "내려다",
+    "마을",
+    "물레방아",
+    "발코니 구도",
+    "브뤼헐",
+    "사냥꾼",
+    "소장",
+    "실루엣",
+    "언덕",
+    "연작",
+    "유화",
+    "읽기",
+    "천천히",
+    "풍경화"
+   ],
+   "urls": [
+    "https://www.khm.at/objektdb/detail/327/",
+    "https://artsandculture.google.com/asset/WgFmzFNNN74nUg",
+    "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "art",
+   "section": "예술",
+   "id": "art",
+   "title": "눈 속의 사냥꾼 (겨울)",
+   "artwork": "눈 속의 사냥꾼 (겨울)",
+   "artist": "피터르 브뤼헐(아버지 쪽, 1525~1530년 무렵~1569년)",
+   "keywords": [
+    "사냥꾼",
+    "겨울",
+    "피터르",
+    "브뤼헐",
+    "아버지",
+    "1525",
+    "1530년",
+    "무렵",
+    "1569년"
+   ],
+   "urls": [
+    "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "예술",
+   "id": "art2",
+   "title": "눈밭 위 까치 한 마리… 모네 「까치」, 같은 겨울 다른 눈빛",
+   "deck": "브뤼헐이 사냥꾼과 마을 이야기로 겨울을 채웠어요. 약 300년 뒤 모네는 까치 한 마리와 햇빛, 그림자로 겨울을 그렸어요. 두 그림을 견주며 무엇을 보고 왜 새롭다고 했는지 읽어 봐요.",
+   "keywords": [
+    "겨울",
+    "까치",
+    "눈밭",
+    "눈빛",
+    "다른",
+    "모네",
+    "비평가",
+    "살롱",
+    "소장",
+    "유화",
+    "인상주의",
+    "캔버스",
+    "쿠르베"
+   ],
+   "urls": [
+    "https://artsandculture.google.com/asset/the-magpie/rQGnadHwK8lSmg",
+    "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_The_Magpie_-_Google_Art_Project.jpg"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "art",
+   "section": "예술",
+   "id": "art2",
+   "title": "까치 (La Pie)",
+   "artwork": "까치 (La Pie)",
+   "artist": "클로드 모네(1840~1926년)",
+   "keywords": [
+    "까치",
+    "la",
+    "pie",
+    "클로드",
+    "모네",
+    "1840",
+    "1926년"
+   ],
+   "urls": [
+    "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_The_Magpie_-_Google_Art_Project.jpg"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "article",
+   "section": "심리검사",
+   "id": "purr",
+   "title": "야옹보다 가르랑… 컴퓨터는 가르랑 소리로 고양이를 더 잘 가려냈다",
+   "deck": "독일과 이탈리아 연구팀이 고양이 소리를 컴퓨터로 분석했어요. 컴퓨터는 가르랑 소리로 어느 고양이인지 더 잘 가려냈고, 야옹 소리는 상황에 따라 크게 달라졌어요.",
+   "keywords": [
+    "가려냈다",
+    "가르랑",
+    "가르랑 소리",
+    "가축화",
+    "고양이",
+    "고양잇과",
+    "논문",
+    "분석",
+    "소리",
+    "야옹",
+    "컴퓨터",
+    "학술지"
+   ],
+   "urls": [
+    "https://www.sciencedaily.com/releases/2026/02/260210040619.htm",
+    "https://www.nature.com/articles/s41598-025-31536-7"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "psytest",
+   "section": "심리검사",
+   "id": "psytest",
+   "title": "나는 어떤 짝꿍일까?",
+   "deck": "여덟 가지 생활 장면으로, 친구들과 함께할 때 내가 잘 맡는 자리를 알아보는 재미로 하는 검사예요.",
+   "keywords": [
+    "짝꿍일까"
+   ],
+   "urls": []
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "comic",
+   "section": "만화",
+   "id": "comic",
+   "title": "꼭대기 감 하나",
+   "deck": "고릴라 자매처럼 '살아 있는 사다리'를 만들어 보기로 했다. 그런데 한 명은 날개가 있었다.",
+   "keywords": [
+    "꼭대기"
+   ],
+   "urls": []
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "book",
+   "section": "문학",
+   "id": "book",
+   "title": "샬롯의 거미줄",
+   "keywords": [
+    "샬롯",
+    "거미줄",
+    "문학"
+   ],
+   "urls": [
+    "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=171639221"
+   ],
+   "book_title": "샬롯의 거미줄",
+   "by": "글 엘윈 브룩스 화이트 · 그림 가스 윌리엄즈 · 옮김 김화곤"
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "book",
+   "section": "문학",
+   "id": "book",
+   "title": "서찰을 전하는 아이",
+   "keywords": [
+    "서찰",
+    "역사",
+    "동화"
+   ],
+   "urls": [
+    "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=13716985"
+   ],
+   "book_title": "서찰을 전하는 아이",
+   "by": "글 한윤섭 · 그림 백대승"
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "book",
+   "section": "문학",
+   "id": "book",
+   "title": "이게 정말 나일까?",
+   "keywords": [
+    "이게",
+    "나일까",
+    "생각",
+    "그림책"
+   ],
+   "urls": [
+    "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=67632107"
+   ],
+   "book_title": "이게 정말 나일까?",
+   "by": "글·그림 요시타케 신스케 · 옮김 김소연"
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "판다 그리기 | 진짜 진짜 쉬운 그림 그리기 | 동물 그리기 | How to draw a panda",
+   "video_id": "vMHMpMe63Pw",
+   "channel": "길벗스쿨 놀이터",
+   "keywords": [
+    "판다",
+    "그리기",
+    "진짜",
+    "진짜",
+    "그림",
+    "그리기",
+    "동물",
+    "그리기",
+    "how",
+    "to",
+    "draw",
+    "panda",
+    "그림"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=vMHMpMe63Pw"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "움직이는 장난감-집게 접기, 쉬운 종이접기/paper toy -tongs",
+   "video_id": "63RIMmTBNX8",
+   "channel": "색종이 연구소 origami",
+   "keywords": [
+    "움직이",
+    "장난감",
+    "집게",
+    "접기",
+    "종이접기",
+    "paper",
+    "toy",
+    "tongs",
+    "만들기"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=63RIMmTBNX8"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "탱글 탱글! 터지지 않는 물주머니를 만들어요!ㅣ알긴산 물주머니ㅣ어린이 과학 실험ㅣ팡팡 과학 마법사ㅣKBS 221107 방송",
+   "video_id": "C5BCRzzHNSY",
+   "channel": "KBSKids",
+   "keywords": [
+    "탱글",
+    "탱글",
+    "터지지",
+    "물주머니",
+    "만들어요",
+    "알긴산",
+    "물주머니",
+    "어린",
+    "과학",
+    "실험",
+    "팡팡",
+    "과학",
+    "마법사",
+    "kbs",
+    "221107",
+    "방송",
+    "과학"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=C5BCRzzHNSY"
+   ]
+  },
+  {
+   "issue": 2,
+   "date": "2026-11-20",
+   "status": "실림",
+   "kind": "video",
+   "section": "영상",
+   "id": "video",
+   "title": "우주의 끝은 어디일까? 🪐 관측 가능한 우주 크기 비교 | 은하 | 시리우스 | 오르트구름",
+   "video_id": "ZSD_rq6X1dU",
+   "channel": "EBS 컬렉션 - 사이언스",
+   "keywords": [
+    "우주",
+    "어디일까",
+    "관측",
+    "가능한",
+    "우주",
+    "크기",
+    "비교",
+    "은하",
+    "시리우스",
+    "오르트구름",
+    "기사연결"
+   ],
+   "urls": [
+    "https://www.youtube.com/watch?v=ZSD_rq6X1dU"
+   ]
+  },
+  {
+   "issue": null,
+   "date": "2026-11-20",
+   "status": "보류",
+   "kind": "article",
+   "section": "과학",
+   "id": "frog",
+   "title": "거품 둥지 대신 젤리 덩어리… 술라웨시섬 산속에서 찾은 새 날개구리",
+   "deck": "인도네시아 술라웨시섬의 메콩가산지에서 사람 뺨에 올라앉을 만큼 작은 새 날개구리가 확인됐어요. 친척들이 거품 둥지에 알을 낳는 것과 달리, 이 개구리는 젤리 덩어리 속에 알을 낳아요.",
+   "keywords": [
+    "DNA",
+    "거품",
+    "거품 둥지",
+    "날개구리",
+    "논문",
+    "대신",
+    "덩어리",
+    "둥지",
+    "산속",
+    "속",
+    "술라웨시섬",
+    "올챙이",
+    "젤리",
+    "종",
+    "학명",
+    "학술지",
+    "활공"
+   ],
+   "urls": [
+    "https://www.sci.news/biology/rhacophorus-kurniatiae-15204.html",
+    "https://doi.org/10.11646/zootaxa.5900.4.3",
+    "https://ko.wikipedia.org/wiki/월리스날개구리",
+    "https://ko.wikipedia.org/wiki/술라웨시섬"
+   ]
+  },
+  {
+   "issue": null,
+   "date": "2026-11-20",
+   "status": "보류",
+   "kind": "article",
+   "section": "과학",
+   "id": "neanderthal",
+   "title": "발뒤꿈치뼈가 들려준 네안데르탈인의 걸음",
+   "deck": "볼로냐대학교 연구진 등이 네안데르탈인의 발뒤꿈치뼈 7개를 입체로 스캔해, 무거운 몸으로 울퉁불퉁한 땅을 오래 걷는 데 알맞은 발이었을 것으로 추정했어요.",
+   "keywords": [
+    "3D 스캔",
+    "걸음",
+    "네안데르탈인",
+    "들려준",
+    "발뒤꿈치뼈",
+    "추정",
+    "현생 인류"
+   ],
+   "urls": [
+    "https://www.sci.news/othersciences/anthropology/neanderthal-feet-15196.html"
+   ]
+  }
+ ]
+}
