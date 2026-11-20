@@ -251,7 +251,13 @@ class Handler(BaseHTTPRequestHandler):
             log("키 없음")
             return self._json(503, {"error": MSG["nokey"]})
         except urllib.error.HTTPError as e:
-            log("API 오류", e.code)
+            detail = ""
+            try:   # API가 돌려준 오류 종류와 짧은 설명만 남겨요(키나 질문 내용은 남기지 않음)
+                ej = json.loads(e.read().decode("utf-8", "replace")).get("error", {})
+                detail = f"{ej.get('type', '')}: {str(ej.get('message', ''))[:160]}"
+            except Exception:
+                pass
+            log("API 오류", e.code, detail)
             return self._json(502, {"error": MSG["api"]})
         except Exception as e:
             log("오류", type(e).__name__)
