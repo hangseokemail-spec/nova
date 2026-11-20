@@ -139,8 +139,11 @@ def call_claude(q, titles):
         "system": build_system(titles),
         "messages": [{"role": "user", "content": q}],
     }).encode("utf-8")
-    req = urllib.request.Request(API_URL, data=body, method="POST", headers={
-        "content-type": "application/json", "x-api-key": key, "anthropic-version": API_VERSION})
+    headers = {"content-type": "application/json", "x-api-key": key, "anthropic-version": API_VERSION}
+    ws = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()   # 워크스페이스에 묶이지 않은 콘솔 키일 때만 필요(wrkspc_...)
+    if ws:
+        headers["anthropic-workspace-id"] = ws
+    req = urllib.request.Request(API_URL, data=body, method="POST", headers=headers)
     with urllib.request.urlopen(req, timeout=40) as r:
         j = json.loads(r.read().decode("utf-8"))
     text = "".join(b.get("text", "") for b in j.get("content", []) if b.get("type") == "text").strip()
