@@ -62,7 +62,7 @@ Nova는 초등학교 4학년 서아가 기획한 주간 과학 교양지예요. 
 - 제작 도구: 편집실/ (template_v4.html, build_v4.py, test_v4.py, art_v2.py, comic_slice.py). 제1호 원고: 편집실/v3/, 제2호부터: 편집실/issues/<날짜>/(drafts → final). v4 템플릿은 지난 호(6×6 스도쿠, 먼작귀 탭)도 그대로 열어요.
 - build_v4.py 조립 순서와 저장소 반영 순서: 편집실/build_v4.py 머리 주석과 README_오퍼스4인.md. comic_slice.py는 출력이 편집실/comic_gpt 로 고정이라, 자른 뒤 옮기고 `git checkout 편집실/comic_gpt`로 되돌려요.
 - 새 호 만들기: 편집실을 작업 폴더로 복사 → 새 원고 폴더(예: issues/2026-11-20/) → build_v3.py를 복사해 새 호용으로 고쳐요(원고 폴더, SECTIONS의 원고 id, 표지·차례, issue 정보: no, label '제N호', date, dateText, dateShort, publishAt '날짜T22:00:00+09:00').
-- 저장소에 넣을 때: editions/<날짜>.json을 더하고, editions/index.json의 issues 목록에 새 호를 '덧붙여요'(지난 호를 지우지 않아요). 새 그림은 assets/img/에 겹치지 않는 이름으로(예: n2_art_0.jpg). index.html·config.js는 새 템플릿이면 바꿔요. 화면은 publishAt이 지난 호만 보여 주므로, 미리 올려도 금요일 밤 10시에 나타나요. 지난 호는 주소 뒤 ?d=날짜.
+- 저장소에 넣을 때: editions/<날짜>.json을 더하고, editions/index.json의 issues 목록에 새 호를 '덧붙여요'(지난 호를 지우지 않아요). 새 그림은 assets/img/에 겹치지 않는 이름으로(예: n2_art_0.jpg). index.html·config.js는 새 템플릿이면 바꿔요. (새 템플릿으로 바꿀 때도 맨 끝의 '가판대로 돌아가는 단추' 줄 — https://hangseokemail-spec.github.io/home.js, data-lift="60" — 은 그대로 남겨요.) 화면은 publishAt이 지난 호만 보여 주므로, 미리 올려도 금요일 밤 10시에 나타나요. 지난 호는 주소 뒤 ?d=날짜.
 - 깃 올리기: main 가지에 커밋하고 git push. 커밋 메시지는 한국어로.
 - 클로드 아티팩트로도 한 파일 HTML을 올려 편집인이 미리 볼 수 있게 해요(새 아티팩트, 제목 'Nova 제N호').
 - 드라이브: 02_발행본에 '제N호 (날짜)' 폴더 → 원고 모음 문서, 한 파일 HTML, 사이트 묶음. 01_기획·운영에 운영 기록(결정, 오케스트레이션 결과, 검수에서 고친 것).
