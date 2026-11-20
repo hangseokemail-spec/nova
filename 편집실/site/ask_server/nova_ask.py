@@ -136,6 +136,8 @@ def call_claude(q, titles):
     body = json.dumps({
         "model": os.environ.get("NOVA_MODEL", "claude-sonnet-5-5"),
         "max_tokens": env_int("NOVA_MAX_TOKENS", 700),
+        # 속으로 생각하는 단계에 토큰을 다 써서 답이 비는 일을 막아요(11/20 서버에서 확인하고 고친 설정)
+        "thinking": {"type": "between_tools"},
         "system": build_system(titles),
         "messages": [{"role": "user", "content": q}],
     }).encode("utf-8")
