@@ -34,7 +34,10 @@ cmd_set_key() {
   [ -f "$ENVF" ] || die "먼저 설치해 주세요: sudo bash install.sh"
   local K="" tmp line
   read -rsp "Anthropic API 키를 붙여 넣고 Enter를 누르세요(화면에는 보이지 않아요): " K; echo
-  K="${K//[[:space:]]/}"
+  # 브라우저 터미널의 '붙여 넣기 표시'(ESC[200~ … ESC[201~)와 보이지 않는 글자를 걸러 내요
+  K="${K//$'\e[200~'/}"; K="${K//$'\e[201~'/}"
+  K="$(printf '%s' "$K" | tr -cd 'A-Za-z0-9_-')"
+  echo "받은 키: ${K:0:10}… (${#K}글자)  ← 앞 10글자만 보여 줘요"
   [ -n "$K" ] || die "키가 비어 있어요. 다시 해 주세요."
   case "$K" in sk-ant-*) ;; *) echo "알림: 보통 Anthropic 키는 sk-ant- 로 시작해요. 그래도 저장할게요.";; esac
   tmp="$(mktemp "$ENVF.XXXX")"; chmod 600 "$tmp"
