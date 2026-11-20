@@ -364,9 +364,12 @@ async def test_final(br, vp, name):
     t = await pg.inner_text("article.art")
     ok(f"[{name}] 스도쿠 intro·규칙 세 줄", "처음이라면" in t and t.count("1부터 9까지가 한 번씩") >= 3)
     await pg.screenshot(path=os.path.join(SHOT, f"{name}_final_sudoku.png"))
-    await pg.click('.tab[data-s="video"]'); await pg.wait_for_selector(".vrow")
-    t = await pg.inner_text("article.art")
-    ok(f"[{name}] 영상 안내(끝까지 재생 못 함·광고·11월 19일)", "끝까지 재생해 확인하지 못했어요" in t and "어른과 함께" in t and "11월 19일" in t)
+    tabs = await pg.eval_on_selector_all(".tab", "es => es.map(e => e.dataset.s)")
+    ok(f"[{name}] 제2호: 영상 탭 없음, 사회 탭은 과학 바로 뒤(원고가 있을 때)", "video" not in tabs and (("society" not in [x["id"] for x in D2["sections"]]) or tabs[tabs.index("science") + 1] == "society"), ",".join(tabs))
+    # 제1호는 데이터대로 영상 탭이 그대로
+    await pg.goto(BASE + "?d=2026-11-17#video"); await pg.wait_for_selector(".vrow")
+    nv = await pg.eval_on_selector_all(".vrow", "es => es.length")
+    ok(f"[{name}] 제1호 영상 탭은 그대로({len(D1['video']['list'])}편)", nv == len(D1["video"]["list"]), str(nv))
     ok(f"[{name}] 최종 화면 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
     await ctx.close()
 
@@ -430,6 +433,47 @@ async def test_past(br, vp, name):
     ok(f"[{name}] 공개 전 시험 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
     await ctx.close()
 
+async def test_society(br, vp, name):
+    """제2호 사회 탭: 두 기사(있는 만큼), 국문 요약 단추, 다 읽음 도장, 가로 넘침, 콘솔 오류. 원고가 없으면 탭이 없어야 함"""
+    sec = next((x for x in D2["sections"] if x["id"] == "society"), None)
+    ids = [i for i in ["society_a", "society_b"] if i in D2["articles"]]
+    ctx, pg, errs = await new_page(br, vp, clock=True)
+    await pg.goto(BASE + "#contents"); await pg.wait_for_selector(".tab")
+    if not ids:
+        has = await pg.query_selector('.tab[data-s="society"]')
+        ok(f"[{name}] 사회 원고가 없으면 사회 탭 없이 조립", sec is None and not has); await ctx.close(); return
+    await pg.click('.tab[data-s="society"]'); await pg.wait_for_selector("article.art")
+    got = await pg.eval_on_selector_all("article.art", "es => es.map(e => e.id.replace('a-', ''))")
+    ok(f"[{name}] 사회 탭 기사 {len(ids)}편 열림", got == ids and sec["en"] == "SOCIETY" and sec["desc"] == "이번 주 세상 이야기", ",".join(got))
+    for i in ids:
+        en = sum(1 for x in D2["articles"][i].get("sources", []) if x.get("lang") == "en" and x.get("ko"))
+        nb = await pg.eval_on_selector_all(f"#a-{i} .kbtn", "es => es.length")
+        if nb:
+            await pg.click(f"#a-{i} .kbtn >> nth=0"); shown = await pg.eval_on_selector(f"#a-{i} .ko", "e => e.classList.contains('on')")
+        else: shown = True
+        ok(f"[{name}] {i} 국문 요약 단추(영어 출처 {en}개)", nb == en and shown, f"단추 {nb}개" + ("" if en else " · 이 기사 출처는 모두 한국어"))
+    toc = await pg.evaluate("() => 1")
+    i = ids[0]
+    need = await pg.eval_on_selector(f"#a-{i}", "e => +e.dataset.need")
+    await pg.evaluate(f"window.scrollTo(0, document.querySelector('#a-{i}').offsetTop)")
+    await pg.clock.run_for(need * 1000 + 500)
+    await pg.evaluate(f"document.querySelector('#a-{i} .endmark').scrollIntoView({{block:'center'}})"); await pg.wait_for_timeout(150)
+    await pg.clock.run_for(1000); await pg.wait_for_timeout(200)
+    on = await pg.eval_on_selector(f"#a-{i} .rstamp", "e => e.classList.contains('on')")
+    ok(f"[{name}] 사회 기사 다 읽음 도장", on)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_society_stamp.png"))
+    await pg.click('.tab[data-s="contents"]'); await pg.wait_for_timeout(200)
+    rows = await pg.eval_on_selector_all(".toc-row", "es => es.filter(r => r.dataset.go === 'society').map(r => !!r.querySelector('.tread'))")
+    ok(f"[{name}] 차례에 사회 기사 줄·읽음 표시", len(rows) == len(ids) and rows[0], str(rows))
+    await pg.click('.tab[data-s="society"]'); await pg.wait_for_timeout(200); await pg.evaluate("window.scrollTo(0,0)")
+    ov = await overflow(pg); ok(f"[{name}] 사회 탭 가로 넘침 없음", ov <= 1, f"{ov}px")
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_society_top.png"))
+    nq = sum(1 for lv in D2["newsQuiz"].values() for q in lv if q.get("from") in ids)
+    cl = [l for l in D2["cover"]["lines"] if l.get("go") == "society"]
+    ok(f"[{name}] 사회 기사가 뉴스 퀴즈 풀·표지 목록에", nq >= 3 and len(cl) >= 1, f"퀴즈 {nq}문제, 표지 줄 {len(cl)}")
+    ok(f"[{name}] 사회 탭 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+
 async def test_inline(br):
     ctx = await br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2); pg = await ctx.new_page()
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -468,6 +512,7 @@ async def main():
                 await test_ask(br, vp, name)
                 await test_final(br, vp, name)
                 await test_past(br, vp, name)
+                await test_society(br, vp, name)
             await test_figimg(br)
             await test_inline(br)
             await br.close()

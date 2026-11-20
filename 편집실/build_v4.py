@@ -54,7 +54,7 @@ if "cover" not in FIGS:   # 임시 표지: 밤하늘에 가까이 붙은 별 둘
                      f'<path d="M300 260 Q410 140 520 205" fill="none" stroke="#C8372D" stroke-width="2.5" stroke-dasharray="6 7"/></svg>')
 
 # ---------------- 원고 ----------------
-IDS = ["gorilla", "merger", "folding", "snowflake", "economy", "export", "art", "art2", "purr", "psytest", "comic"]
+IDS = ["gorilla", "merger", "society_a", "society_b", "folding", "snowflake", "economy", "export", "art", "art2", "purr", "psytest", "comic"]
 A, missing, MISS, FIG_MISSING = {}, [], [], []
 for i in IDS:
     d = L(i + ".json")
@@ -121,6 +121,7 @@ SECTIONS = [
   {"id": "cover", "name": "표지"},
   {"id": "contents", "name": "차례", "en": "CONTENTS", "desc": "이번 호에 실린 것", "kind": "contents"},
   {"id": "science", "name": "과학", "en": "SCIENCE", "desc": "이번 주 과학 뉴스", "items": ["gorilla", "merger"]},
+  {"id": "society", "name": "사회", "en": "SOCIETY", "desc": "이번 주 세상 이야기", "items": ["society_a", "society_b"]},   # 2026-11-20 편집인 결정: 영상 탭 대신 사회 탭
   {"id": "math", "name": "수학", "en": "MATHEMATICS", "desc": "깊이 읽기 두 편", "items": ["folding", "snowflake"]},
   {"id": "economy", "name": "경제", "en": "ECONOMY", "desc": "경제 깊이 읽기와 뉴스 읽기", "items": ["economy", "export"]},
   {"id": "art", "name": "예술", "en": "ART", "desc": "그림 읽기 두 편", "items": ["art", "art2"]},
@@ -129,9 +130,9 @@ SECTIONS = [
   {"id": "comic", "name": "만화", "en": "COMICS", "desc": "Nova 만화", "items": ["comic"]},
   {"id": "sudoku", "name": "스도쿠", "en": "PUZZLE", "desc": "두뇌 놀이", "kind": "sudoku"},
   {"id": "quiz", "name": "퀴즈", "en": "QUIZ", "desc": "기사 퀴즈와 수학 퀴즈", "kind": "quiz"},
-  {"id": "video", "name": "영상", "en": "VIDEO", "desc": "이번 주 영상", "kind": "video"},
 ]
 for s in SECTIONS: s["items"] = [i for i in s.get("items", []) if i in A]
+SECTIONS = [s for s in SECTIONS if s["id"] == "cover" or s.get("kind") or s["items"]]   # 원고가 하나도 없는 기사 탭은 빼고 조립
 sud = L("sudoku.json")
 KIND_T = {"sudoku": (f"9×9 스도쿠 {len(sud['puzzles'])}판" if sud and "puzzles" in sud else "스도쿠"), "quiz": "기사 퀴즈·수학 퀴즈", "video": "이번 주 영상"}
 def plen(i):
@@ -158,11 +159,14 @@ def cover_line(x):
         if i in A: return {"sec": x.get("sec") or SEC_OF.get(i, ("",))[0], "t": x.get("t") or A[i]["title"], "go": x.get("go") or SEC_OF.get(i, ("", "contents"))[1]}
         if x.get("t"): return {"sec": x.get("sec", ""), "t": x["t"], "go": x.get("go", "contents")}
     return None
-LINE_IDS = ["merger", "folding", "economy", "art", "purr", "books"]   # 탭마다 한 줄씩
+LINE_IDS = ["merger", "society_a", "folding", "economy", "art", "purr", "books"]   # 탭마다 한 줄씩
 COVER = {"kicker": "이번 호 주제", "headline": ED.get("coverTitle") or "둘이 만나면 생기는 일",
          "lead": [ED.get("coverLead") or head.get("deck", "")], "go": "science",
          "caption": ED.get("coverCaption") or "리샤가 받침이 되고 아멜리아가 손을 뻗었어요. 하늘에는 큰 별과 작은 별이 함께 있어요.",
          "lines": [l for l in (cover_line(x) for x in (ED.get("coverLines") or LINE_IDS)) if l]}
+if "society_a" in A and not any(l.get("go") == "society" for l in COVER["lines"]):   # editor.json에 사회 줄이 없으면 society_a 제목으로 한 줄(과학 줄 뒤에)
+    at = max([k + 1 for k, l in enumerate(COVER["lines"]) if l.get("go") == "science"] or [0])
+    COVER["lines"].insert(at, {"sec": "사회", "t": A["society_a"]["title"], "go": "society"})
 if "n2_cover" in FIGS: COVER["fit"] = "xMidYMax slice"   # 4:5 표지 도판은 칸을 꽉 채우고 아래(땅)를 맞춤
 if not ED: print("알림: final/editor.json이 없어 표지 문구와 편집장 글은 임시 문구예요.")
 
@@ -176,9 +180,10 @@ for lv, qs in pool.items():
     by = {}
     for q in qs: by.setdefault(q["from"], []).append(q)
     pick = []
-    while len(pick) < 10 and any(by.values()):
+    NQN = max(10, len(by))   # 기사마다 한 문제는 꼭 들어가게(기사가 10편이 넘으면 그만큼)
+    while len(pick) < NQN and any(by.values()):
         for k in list(by):
-            if by[k] and len(pick) < 10: pick.append(by[k].pop(0))
+            if by[k] and len(pick) < NQN: pick.append(by[k].pop(0))
     rng.shuffle(pick); NQ[lv] = pick
 
 math_q = L("math_quiz.json") or {"levels": {}}
@@ -307,7 +312,7 @@ inline = data(False)
 js = json.dumps(inline, ensure_ascii=False).replace("</", "<\\/")
 # 한 파일 미리보기에서는 시뮬레이터 코드를 eval 없이 쓰도록 <script>로 바로 넣음(아티팩트 보안 설정 대비)
 pre = "window.__NOVA_SIMS__ = {" + ",".join(f'{json.dumps(k)}: (function(){{\n{v["js"]}\nreturn {{html: {v["html"]}, bind: {v["bind"]}}};\n}})()' for k, v in SIMS.items()) + "};\n"
-html = tpl.replace('<script src="config.js" onerror="void 0"></script>\n', '').replace("/*__BOOT__*/", pre.replace("</", "<\\/") + "window.__INLINE__ = " + js + ";")
+html = re.sub(r'<!-- 석스 가판대[^\n]*\n<script src="https://hangseokemail-spec\.github\.io/home\.js"[^\n]*\n', '', tpl).replace('<script src="config.js" onerror="void 0"></script>\n', '').replace("/*__BOOT__*/", pre.replace("</", "<\\/") + "window.__INLINE__ = " + js + ";")
 open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(html)
 json.dump(inline, open(os.path.join(OUT, "data.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
