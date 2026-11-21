@@ -7,7 +7,69 @@
    "dateText": "2026년 11월 17일 화요일",
    "publishAt": "2026-11-17T20:00:00+09:00",
    "title": "보이저 1호, 18일 저녁 '1광일'에 닿는다… 빛도 꼬박 하루 걸리는 거리",
-   "file": "2026-11-17.json"
+   "file": "2026-11-17.json",
+   "arts": {
+    "voyager": {
+     "s": "science",
+     "n": 2099,
+     "k": 1
+    },
+    "leonid": {
+     "s": "science",
+     "n": 1867,
+     "k": 1
+    },
+    "crow": {
+     "s": "science",
+     "n": 2096,
+     "k": 1
+    },
+    "dino": {
+     "s": "science",
+     "n": 1879,
+     "k": 1
+    },
+    "kelp": {
+     "s": "science",
+     "n": 2095,
+     "k": 1
+    },
+    "icecube": {
+     "s": "science",
+     "n": 2545,
+     "k": 1
+    },
+    "kakeya": {
+     "s": "math",
+     "n": 2780,
+     "k": 1
+    },
+    "economy": {
+     "s": "economy",
+     "n": 2566,
+     "k": 1
+    },
+    "art": {
+     "s": "art",
+     "n": 2540,
+     "k": 1
+    },
+    "books": {
+     "s": "lit",
+     "n": 0,
+     "k": 0
+    },
+    "cute": {
+     "s": "mind",
+     "n": 2080,
+     "k": 1
+    },
+    "comic": {
+     "s": "comic",
+     "n": 0,
+     "k": 0
+    }
+   }
   },
   {
    "no": 2,
@@ -16,7 +78,74 @@
    "dateText": "2026년 11월 20일 금요일",
    "publishAt": "2026-11-20T22:00:00+09:00",
    "title": "둘이 만나면 생기는 일",
-   "file": "2026-11-20.json"
+   "file": "2026-11-20.json",
+   "arts": {
+    "gorilla": {
+     "s": "science",
+     "n": 2166,
+     "k": 1
+    },
+    "merger": {
+     "s": "science",
+     "n": 2595,
+     "k": 1
+    },
+    "society_a": {
+     "s": "society",
+     "n": 1650,
+     "k": 1
+    },
+    "society_b": {
+     "s": "society",
+     "n": 1654,
+     "k": 1
+    },
+    "folding": {
+     "s": "math",
+     "n": 2260,
+     "k": 1
+    },
+    "snowflake": {
+     "s": "math",
+     "n": 1748,
+     "k": 1
+    },
+    "economy": {
+     "s": "economy",
+     "n": 2310,
+     "k": 1
+    },
+    "export": {
+     "s": "economy",
+     "n": 1746,
+     "k": 1
+    },
+    "art": {
+     "s": "art",
+     "n": 1906,
+     "k": 1
+    },
+    "art2": {
+     "s": "art",
+     "n": 1564,
+     "k": 1
+    },
+    "books": {
+     "s": "lit",
+     "n": 0,
+     "k": 0
+    },
+    "purr": {
+     "s": "mind",
+     "n": 2444,
+     "k": 1
+    },
+    "comic": {
+     "s": "comic",
+     "n": 0,
+     "k": 0
+    }
+   }
   }
  ]
 }

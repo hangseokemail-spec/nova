@@ -33,8 +33,10 @@ D1 = json.load(open(os.path.join(SITE, "editions", "2026-11-17.json"), encoding=
 IDX = json.load(open(os.path.join(SITE, "editions", "index.json"), encoding="utf-8"))
 for x in IDX["issues"]: x["publishAt"] = "2026-11-01T00:00:00+09:00"   # 시험용: 두 호 모두 공개된 것처럼
 
-async def new_page(br, vp, ask_url=None, clock=False, idx=None):
-    ctx = await br.new_context(viewport=vp, device_scale_factor=2 if vp["width"] < 500 else 1)
+async def new_page(br, vp, ask_url=None, clock=False, idx=None, tz=None, ls=None):
+    ctx = await br.new_context(viewport=vp, device_scale_factor=2 if vp["width"] < 500 else 1, **({"timezone_id": tz} if tz else {}))
+    if ls is not None:   # 시험용 기기 기록(localStorage)을 미리 넣어 둠
+        await ctx.add_init_script("try { if (!sessionStorage.getItem('__ls')) { localStorage.setItem('nova-1', " + json.dumps(json.dumps(ls, ensure_ascii=False)) + "); sessionStorage.setItem('__ls', '1'); } } catch(e) {}")
     pg = await ctx.new_page()
     errs = []
     def on_console(m):
@@ -576,6 +578,104 @@ async def test_rating(br, vp, name):
     ok(f"[{name}] 서버 준비 전: '아직 준비 중이에요. 이 기기에만 저장할게요'", "아직 준비 중이에요. 이 기기에만 저장할게요" in m and closed and on == 5, m)
     await ctx.close()
 
+def kst(s):   # "2026-11-21 10:00" (한국 시각) → 밀리초
+    import datetime as _d
+    return int(_d.datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=_d.timezone(_d.timedelta(hours=9))).timestamp() * 1000)
+
+def fake_index(dates, base_arts):
+    """가짜 호 목록: 날짜마다 제2호와 같은 기사 구성(업적 계산용). 마지막 호는 진짜 제2호 파일"""
+    out = []
+    for n, d in enumerate(dates, 1):
+        out.append({"no": n, "date": d, "label": f"제{n}호", "dateText": d, "publishAt": d + "T22:00:00+09:00", "title": f"가짜 {n}호", "file": "2026-11-20.json", "arts": base_arts})
+    out[-1]["date"] = "2026-11-20"; out[-1]["publishAt"] = "2026-11-20T22:00:00+09:00"
+    return {"issues": out}
+
+async def test_ach(br, vp, name):
+    """업적: 도장 → 업적 알림, 업적 화면(요약·분류·잠금·진행 막대), 완독·제때 완독, 연속 4호 → 선물 상장, 끊기면 0, 숨은 업적, 두 호"""
+    arts2 = next(x for x in IDX["issues"] if x["date"] == "2026-11-20")["arts"]
+    # (가) 처음 도장 → '첫 도장' 알림, 업적 화면
+    ctx, pg, errs = await new_page(br, vp, clock=True)
+    await pg.goto(BASE + "?d=2026-11-20#science"); await pg.wait_for_selector("#a-gorilla .endmark")
+    need = await pg.eval_on_selector("#a-gorilla", "e => +e.dataset.need")
+    await pg.evaluate("window.scrollTo(0, document.querySelector('#a-gorilla').offsetTop)"); await pg.clock.run_for(need * 1000 + 500)
+    await pg.evaluate("document.querySelector('#a-gorilla .endmark').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(150)
+    await pg.clock.run_for(1200); await pg.wait_for_timeout(200)
+    await pg.wait_for_selector("#achToast.on", timeout=5000); t = await pg.inner_text("#achToast")
+    got = await pg.evaluate("Object.keys(JSON.parse(localStorage.getItem('nova-1')).ach || {})")
+    ok(f"[{name}] 첫 도장 → 업적 알림(화면 아래)", "첫 도장" in t and "st1" in got and "lg1" in got and "tab_science" in got, t.replace("\n", " "))
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_ach_toast.png"))
+    await pg.click("#achBtn"); await pg.wait_for_selector("#achv.on .badge")
+    n = await pg.eval_on_selector_all("#achv .badge", "es => es.length"); ng = await pg.eval_on_selector_all("#achv .badge.got", "es => es.length")
+    hid = await pg.eval_on_selector_all("#achv .badge.lock .bn", "es => es.filter(e => e.textContent === '???').length")
+    bars = await pg.eval_on_selector_all("#achv .badge.lock .bnum", "es => es.length")
+    sm = await pg.inner_text("#achv .achsum")
+    ov = await pg.evaluate("Math.max(document.documentElement.scrollWidth, document.querySelector('#achv').scrollWidth) - innerWidth")
+    ok(f"[{name}] 업적 화면: {n}개(달성 {ng}), 숨은 업적 ???, 진행 막대, 요약", 55 <= n <= 65 and ng >= 3 and hid >= 4 and bars > 20 and "모은 도장" in sm and "꾸준히" in sm, f"숨은 {hid}, 막대 {bars}, 넘침 {ov}px")
+    ok(f"[{name}] 업적 화면 가로 넘침 없음", ov <= 1, f"{ov}px")
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_ach_screen.png"))
+    await pg.evaluate("document.querySelector('#achv').scrollTo(0, document.querySelector('.achcat:nth-of-type(4)') ? document.querySelector('.achcat:nth-of-type(4)').offsetTop : 600)"); await pg.wait_for_timeout(100)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_ach_screen2.png"))
+    await pg.click("#achClose")
+    # 표지·차례 단추
+    await pg.click('.tab[data-s="cover"]'); await pg.wait_for_timeout(150)
+    b1 = await visible(pg, ".c-foot [data-ach]"); b2 = await visible(pg, ".c-top [data-ach]")
+    await pg.click('.tab[data-s="contents"]'); await pg.wait_for_selector(".achbox [data-ach]")
+    ok(f"[{name}] '업적' 단추: 표지 위·아래, 제호, 차례", b1 and b2, f"{b1} {b2}")
+    ov = await overflow(pg); ok(f"[{name}] 업적 단추가 있어도 가로 넘침 없음(표지·차례)", ov <= 1, f"{ov}px")
+    ok(f"[{name}] 업적 (가) 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+    # (나) 연속 4호 제때 완독 → 선물 상장(가짜 날짜 4호: 11/02 · 11/06 · 11/13 · 11/20)
+    dates = ["2026-10-30", "2026-11-06", "2026-11-13", "2026-11-20"]
+    read = {}
+    for d in dates:
+        for i in arts2: read[f"{d}:{i}"] = kst(d.replace("-", "-") + " 22:00") + 3600_000 * 20   # 공개 다음 날 저녁
+    ctx, pg, errs = await new_page(br, vp, idx=fake_index(dates, arts2), ls={"read": read})
+    await pg.goto(BASE); await pg.wait_for_selector("#cert.on .cert", timeout=8000)
+    ct = await pg.inner_text("#cert"); st = await pg.evaluate("JSON.parse(localStorage.getItem('nova-1'))")
+    ok(f"[{name}] 연속 4호 제때 완독 → '부모님께 선물 받기'·상장(날짜·확인 번호)", "네 번의 Nova를 한 번도 빠짐없이 다 읽었어요" in ct and "부모님께 보여 드리고" in ct and "확인 번호" in ct and "NOVA-" in ct and "1번째 선물" in ct and "sk4" in st["ach"] and len(st["gifts"]) == 1, ct.replace("\n", " ")[:120])
+    await pg.wait_for_timeout(400); await pg.screenshot(path=os.path.join(SHOT, f"{name}_ach_gift.png"))
+    ov = await overflow(pg); ok(f"[{name}] 상장 화면 가로 넘침 없음", ov <= 1, f"{ov}px")
+    await pg.click("#certClose"); await pg.click('.tab[data-s="contents"]'); await pg.wait_for_selector(".achbox")
+    sm = await pg.inner_text(".achbox")
+    ok(f"[{name}] 요약: 꾸준히 4주, 받은 선물 1", "4주" in sm.replace("\n", "") and "받은 선물" in sm, sm.replace("\n", " "))
+    await pg.reload(); await pg.wait_for_selector(".tab"); await pg.wait_for_timeout(1200)
+    again = await pg.query_selector("#cert.on")
+    ok(f"[{name}] 같은 선물은 한 번만 알림(새로 고침해도 다시 안 뜸)", not again)
+    ok(f"[{name}] 업적 (나) 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+    # (다) 8호 연속이면 두 번째 선물, 그 뒤 한 호를 놓치면 연속 0(받은 업적·선물은 남음)
+    d8 = ["2026-09-04", "2026-09-11", "2026-09-18", "2026-09-25", "2026-10-02", "2026-10-09", "2026-10-16", "2026-10-23", "2026-10-30", "2026-11-20"]
+    read = {}
+    for d in d8[:8]:
+        for i in arts2: read[f"{d}:{i}"] = kst(d + " 22:00") + 3600_000 * 30
+    for i in list(arts2)[:3]: read[f"2026-10-30:{i}"] = kst("2026-10-30 22:00") + 3600_000   # 10/30 호는 일부만 → 7일이 지나 연속이 끊김
+    ctx, pg, errs = await new_page(br, vp, idx=fake_index(d8, arts2), ls={"read": read})
+    await pg.goto(BASE + "#contents"); await pg.wait_for_selector(".achbox"); await pg.wait_for_timeout(1500)
+    st = await pg.evaluate("JSON.parse(localStorage.getItem('nova-1'))"); sm = await pg.inner_text(".achbox")
+    gifts = st.get("gifts", [])
+    ok(f"[{name}] 8호 연속 → 선물 2번(4호마다), 끊긴 뒤 지금 연속 0주, 업적은 남음", len(gifts) == 2 and gifts[1]["run"] == 8 and "0주" in sm.replace("\n", "") and "sk8" in st["ach"] and "sk4" in st["ach"], f"선물 {len(gifts)}, " + sm.replace("\n", " "))
+    if await pg.query_selector("#cert.on"): await pg.click("#certClose")
+    await pg.click("#achBtn"); await pg.wait_for_selector("#achv.on .giftrow")
+    ng = await pg.eval_on_selector_all("#achv .giftrow", "es => es.length")
+    await pg.click("#achv .giftrow >> nth=1"); await pg.wait_for_selector("#cert.on"); ct = await pg.inner_text("#cert")
+    ok(f"[{name}] 업적 화면에서 지난 선물 상장 다시 보기", ng == 2 and "2번째 선물" in ct, f"선물 줄 {ng}")
+    ok(f"[{name}] 업적 (다) 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+    # (라) 숨은 업적: 밤 9시 넘어 읽기, 주말 아침, 공개 첫날 / 지난 호 여행자 / 제1호에서도 업적 화면
+    read = {"2026-11-20:gorilla": kst("2026-11-21 21:30"), "2026-11-20:merger": kst("2026-11-22 08:10"), "2026-11-20:society_a": kst("2026-11-20 23:00"),
+            "2026-11-17:voyager": kst("2026-11-21 10:00")}
+    real = json.loads(json.dumps(IDX))   # 공개 시각을 진짜 값으로(첫날 독자 계산)
+    for x in real["issues"]: x["publishAt"] = {"2026-11-17": "2026-11-17T20:00:00+09:00", "2026-11-20": "2026-11-20T22:00:00+09:00"}.get(x["date"], x["publishAt"])
+    ctx, pg, errs = await new_page(br, vp, tz="Asia/Seoul", ls={"read": read}, idx=real)
+    await pg.goto(BASE + "?d=2026-11-17#contents"); await pg.wait_for_selector(".achbox"); await pg.wait_for_timeout(1500)
+    st = await pg.evaluate("JSON.parse(localStorage.getItem('nova-1')).ach")
+    await pg.click(".achbox [data-ach]"); await pg.wait_for_selector("#achv.on")
+    names = await pg.eval_on_selector_all('#achv .badge.got[data-aid^="hd_"] .bn', "es => es.map(e => e.textContent)")
+    ok(f"[{name}] 숨은 업적(달빛 한 편·주말 아침 신문·첫날 독자) 달성 뒤 이름이 보임", all(k in st for k in ("hd_night", "hd_wkm", "hd_first")) and "달빛 한 편" in names, json.dumps(names, ensure_ascii=False))
+    ok(f"[{name}] 지난 호 여행자(새 호가 나온 뒤 제1호 읽기)·제1호에서도 업적 화면", "past1" in st and "iss3" not in st, "")
+    ok(f"[{name}] 업적 (라) 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+
 async def test_inline(br):
     ctx = await br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2); pg = await ctx.new_page()
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -617,6 +717,7 @@ async def main():
                 await test_past(br, vp, name)
                 await test_society(br, vp, name)
                 await test_rating(br, vp, name)
+                await test_ach(br, vp, name)
             await test_figimg(br)
             await test_inline(br)
             await br.close()

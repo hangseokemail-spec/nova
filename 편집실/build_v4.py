@@ -303,7 +303,21 @@ for x in idx["issues"]:
     if not x.get("title"):   # title이 없는 지난 호는 그 호 파일의 표지 큰 제목으로 채움
         try: x["title"] = json.load(open(os.path.join(ROOT, "editions", x["file"]), encoding="utf-8"))["cover"]["headline"]
         except Exception as e: print("지난 호 제목을 못 읽음:", x.get("file"), e)
-idx["issues"] = [{k: x[k] for k in ("no", "date", "label", "dateText", "publishAt", "title", "file") if k in x} for x in idx["issues"]]
+def arts_of(d):   # 업적 계산용 기사 요약: 다 읽음 도장을 받는 기사마다 {탭 id, 본문 글자 수, '생각해 보기' 있음}
+    out = {}
+    for sec in d.get("sections", []):
+        for i in sec.get("items", []):
+            a = d["articles"].get(i)
+            if i == "psytest" or not isinstance(a, dict): continue
+            n = sum(len(b.get("x", "")) for b in a.get("body", []) or [] if b.get("t") == "p")
+            k = any(b.get("t") == "box" and "생각해 보기" in str(b.get("title", "")) for b in a.get("body", []) or [])
+            out[i] = {"s": sec["id"], "n": n, "k": 1 if k else 0}
+    return out
+for x in idx["issues"]:
+    try:
+        x["arts"] = arts_of({"sections": SECTIONS, "articles": A}) if x["date"] == DATE else arts_of(json.load(open(os.path.join(ROOT, "editions", x["file"]), encoding="utf-8")))
+    except Exception as e: print("업적용 기사 요약을 못 만듦:", x.get("file"), e)
+idx["issues"] = [{k: x[k] for k in ("no", "date", "label", "dateText", "publishAt", "title", "file", "arts") if k in x} for x in idx["issues"]]
 SITE_URL = "https://hangseokemail-spec.github.io/nova/"
 
 tpl = open(os.path.join(B, "template_v4.html"), encoding="utf-8").read()

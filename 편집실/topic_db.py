@@ -181,5 +181,59 @@ if __name__ == "__main__":
         show(json.load(open(sys.argv[2], encoding="utf-8")), load())
     elif cmd == "q":
         q = " ".join(sys.argv[2:]); show([{"title": q, "keywords": words(q)}], load())
+    elif cmd != "prefs":
+        sys.exit("사용법: build | check 후보.json | q \"찾을 말\" | prefs [별점.json]")
+
+
+# ---------------------------------------------------------------- 서아 별점으로 성향 보기
+#   python3 편집실/topic_db.py prefs [별점.json]
+#   별점은 질문 서버의 GET /ask/ratings(서아 기기에서 매긴 별점만 저장됨)에서 읽어요. 파일을 주면 그 파일을 써요.
+#   결과: 탭·종류·핵심 낱말별 평균 별점과, 다음 기획의 70/30 원칙(좋아한 결 70%, 낯선 결 30% 이상) 안내.
+def prefs(path=None):
+    import urllib.request, statistics
+    if path:
+        R_ = json.load(open(path, encoding="utf-8"))
     else:
-        sys.exit("사용법: build | check 후보.json | q \"찾을 말\"")
+        cfg = open(os.path.join(R, "config.js"), encoding="utf-8").read()
+        m = re.search(r'askUrl:\s*"([^"]+)"', cfg)
+        url = (m.group(1).rstrip("/") + "/ratings") if m else ""
+        try:
+            req = urllib.request.Request(url, headers={"Origin": "https://hangseokemail-spec.github.io", "User-Agent": "NovaEditor/1.0"})
+            R_ = json.loads(urllib.request.urlopen(req, timeout=15).read().decode("utf-8"))
+        except Exception as e:
+            print(f"별점을 읽지 못했어요({type(e).__name__}). 이번 기획은 별점 없이 해요."); return
+    ratings = R_.get("ratings", R_) if isinstance(R_, dict) else {}
+    db = load(); idx = {(e.get("date"), e.get("id")): e for e in db if e["status"] == "실림" and e["kind"] in ("article", "comic", "psytest")}
+    rows, by_sec, by_kw = [], {}, {}
+    for date, arts in (ratings or {}).items():
+        if not isinstance(arts, dict):
+            continue
+        for aid, v in arts.items():
+            s = v.get("stars") if isinstance(v, dict) else v
+            if not isinstance(s, (int, float)):
+                continue
+            e = idx.get((date, aid)) or next((x for x in db if x.get("date") == date and x.get("title") and aid in (x.get("id"), x.get("book_title"))), None)
+            sec = (e or {}).get("section", "?"); title = (e or {}).get("title", aid)
+            rows.append((date, sec, title, s))
+            by_sec.setdefault(sec, []).append(s)
+            for k in (e or {}).get("keywords", [])[:8]:
+                by_kw.setdefault(k, []).append(s)
+    if not rows:
+        print("아직 서아 별점이 없어요. 이번 기획은 별점 없이, 분야를 고르게 해요."); return
+    print(f"## 서아 별점 ({len(rows)}개)\n\n| 호 날짜 | 탭 | 기사 | 별 |\n|---|---|---|---|")
+    for r in sorted(rows, key=lambda r: (-r[3], r[0])):
+        print(f"| {r[0]} | {r[1]} | {r[2][:40]} | {'★' * int(r[3])} |")
+    print("\n## 탭별 평균\n\n| 탭 | 평균 별 | 개수 |\n|---|---|---|")
+    for sec, v in sorted(by_sec.items(), key=lambda kv: -statistics.mean(kv[1])):
+        print(f"| {sec} | {statistics.mean(v):.1f} | {len(v)} |")
+    kws = sorted(((k, statistics.mean(v), len(v)) for k, v in by_kw.items() if len(v) >= 2), key=lambda x: -x[1])
+    if kws:
+        print("\n## 자주 나온 낱말의 평균 별(2번 이상)\n\n" + ", ".join(f"{k} {m:.1f}" for k, m, n in kws[:15]))
+    print("\n## 다음 기획에 쓰는 법 (70/30 원칙)\n"
+          "- 별 4~5개를 받은 결(분야·글 방식·소재)은 더 깊고 좋게: 후보의 약 70%는 이 성향을 살려요.\n"
+          "- 나머지 약 30% 이상(한 호 기사 12편 기준 4편 안팎)은 반드시 서아가 아직 별로 안 접했거나 별이 낮았던 결, 전혀 다른 느낌의 글로 채워요(새 분야, 다른 글 방식, 낯선 관점).\n"
+          "- 별이 낮은 기사는 주제를 버리기보다 '왜 덜 좋았을까(어려움, 길이, 소재)'를 편집장이 짐작해 쓰는 법을 고쳐요.\n"
+          "- 기획안에 이 표와 '좋아한 결 70% / 새로운 결 30%' 배분 표를 붙여요.")
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "prefs":
+    prefs(sys.argv[2] if len(sys.argv) > 2 else None)
