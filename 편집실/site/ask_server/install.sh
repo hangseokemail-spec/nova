@@ -110,6 +110,11 @@ cmd_install() {
   o80="$(port_owner 80)"; o443="$(port_owner 443)"
   echo "80번: ${o80:-비어 있음} / 443번: ${o443:-비어 있음}"
   mode=""
+  # 이미 Caddy가 443에서 이 주소를 맡고 있으면(다른 프로그램이 80을 써도) https 설정은 건드리지 않고 서버 프로그램만 바꿔요
+  if [ "$o443" = "caddy" ] && grep -q "$DOMAIN" /etc/caddy/Caddyfile 2>/dev/null; then
+    echo "Caddy가 이미 https($DOMAIN)를 맡고 있어요. 서버 프로그램만 새로 깔게요."
+    NOVA_NO_HTTPS=1; o80=""; o443=""
+  fi
   for o in "$o80" "$o443"; do
     case "$o" in
       "") ;;
@@ -148,7 +153,7 @@ EOF
   curl -s --max-time 5 http://127.0.0.1:8787/ask/health >/dev/null && echo "서버 프로그램이 127.0.0.1:8787에서 켜졌어요." || die "서버가 켜지지 않았어요: sudo journalctl -u nova-ask -n 30"
 
   if [ "$mode" = "none" ]; then
-    say "https 설정은 건너뛰었어요(NOVA_NO_HTTPS=1). README의 nginx/apache 설정을 넣어 주세요."; return
+    say "https 설정은 그대로 두었어요(이미 Caddy가 맡고 있거나 NOVA_NO_HTTPS=1)."; return
   fi
 
   say "3) Caddy(https 자동 인증서) 준비"
