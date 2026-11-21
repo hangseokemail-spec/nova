@@ -292,6 +292,7 @@ def data(embed):
       "quizNote": "수학 퀴즈는 이번 호 수학 기사 두 편과 4학년 2학기 범위에서 냈어요. 아빠가 문제 파일을 주시면 거기에 맞춰요.",
       "sudoku": sud, "video": VIDEO, "askPrompt": ASK, "askExample": "예: 고릴라는 왜 손가락 마디로 땅을 짚나요?",
       "sims": SIMS, "embed": embed,
+      **({} if embed or ACH_DATA is None else {"achData": ACH_DATA}),
       **({} if embed else {"issuesIndex": [{k: v for k, v in x.items() if k != "file"} for x in idx["issues"]], "siteUrl": SITE_URL}),
       "images": {k: src(p) for k, p in IMAGES.items() if not k.startswith("cover_")},
     }
@@ -320,6 +321,40 @@ for x in idx["issues"]:
 idx["issues"] = [{k: x[k] for k in ("no", "date", "label", "dateText", "publishAt", "title", "file", "arts") if k in x} for x in idx["issues"]]
 SITE_URL = "https://hangseokemail-spec.github.io/nova/"
 
+# 데이터 업적(editions/achievements.json, 저장소 것이 원본): 조립 때 검사하고 사이트에 복사, 한 파일 미리보기에는 내장
+ACH_TYPES = {"stamps", "longReads", "issuesComplete", "termTaps", "thinkReads", "tabFirst", "tabCount", "allTabsInIssue", "pastIssueReads",
+             "onTimeStreak", "onTimeTotal", "crowns", "quizPlays", "quizCorrect", "quizPerfect", "mathPerfect", "quizPerfectTotal", "quizPerfectLevels",
+             "simUsed", "starsGiven", "questions", "psytest", "issueComplete", "stampsInIssue", "sudokuCrownsInIssue", "readDays", "readWeekdays"}
+ACH_ARG = {"tabFirst", "tabCount", "quizPerfect", "mathPerfect", "issueComplete", "stampsInIssue", "sudokuCrownsInIssue"}
+ACH_CATS = {"많이 읽기", "깊이 읽기", "다양하게 읽기", "꾸준히 읽기", "두뇌 놀이", "생각하기·참여", "숨은 업적", "특별 업적", "many", "deep", "wide", "steady", "brain", "join", "secret", "special"}
+ACH_DATA, ACH_ERR = None, []
+_ap = os.path.join(ROOT, "editions", "achievements.json")
+if os.path.exists(_ap):
+    try:
+        ACH_DATA = json.load(open(_ap, encoding="utf-8"))
+        builtin = set(re.findall(r'A_\("[a-z]+", "([a-z0-9_]+)"', open(os.path.join(B, "template_v4.html"), encoding="utf-8").read()))
+        builtin.discard("tab_"); builtin |= {"tab_" + t for t in ("science", "society", "math", "economy", "art", "mind", "lit", "comic")}
+        seen = set()
+        from datetime import datetime as _dt
+        for x in ACH_DATA.get("achievements", []):
+            i = x.get("id", "")
+            if not re.match(r"^[a-z0-9_]{2,40}$", i): ACH_ERR.append(f"아이디 형식: {i!r}")
+            if i in seen or i in builtin: ACH_ERR.append(f"아이디 겹침: {i}")
+            seen.add(i)
+            tn, _, arg = str(x.get("type", "")).partition(":")
+            if tn not in ACH_TYPES: ACH_ERR.append(f"지원하지 않는 type: {i} {x.get('type')}")
+            elif (tn in ACH_ARG) != bool(arg): ACH_ERR.append(f"type 뒤 값(:…) 확인: {i} {x.get('type')}")
+            if not isinstance(x.get("goal"), int) or x["goal"] < 1: ACH_ERR.append(f"goal은 1 이상 정수: {i}")
+            if x.get("cat") not in ACH_CATS: ACH_ERR.append(f"분류 이름: {i} {x.get('cat')}")
+            if not x.get("name"): ACH_ERR.append(f"이름 없음: {i}")
+            if x.get("since"):
+                try: _dt.fromisoformat(x["since"])
+                except Exception: ACH_ERR.append(f"since 형식: {i} {x['since']}")
+        print(f"데이터 업적: {len(seen)}개 (화면에 박힌 업적 {len(builtin)}개와 합쳐 {len(seen) + len(builtin)}개)", "| 문제:", ACH_ERR or "없음")
+    except Exception as e:
+        ACH_ERR.append(f"achievements.json을 읽지 못함: {e}"); print("데이터 업적 오류:", e)
+if ACH_ERR: raise SystemExit("데이터 업적(editions/achievements.json)을 고쳐 주세요:\n  " + "\n  ".join(ACH_ERR))
+
 tpl = open(os.path.join(B, "template_v4.html"), encoding="utf-8").read()
 assert "/*__BOOT__*/" in tpl and '<script src="config.js" onerror="void 0"></script>\n' in tpl
 inline = data(False)
@@ -335,6 +370,7 @@ ed = os.path.join(SITE, "editions"); os.makedirs(ed, exist_ok=True)
 open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(tpl.replace("/*__BOOT__*/", ""))
 json.dump(data(True), open(os.path.join(ed, f"{DATE}.json"), "w", encoding="utf-8"), ensure_ascii=False)
 json.dump(idx, open(os.path.join(ed, "index.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+if ACH_DATA is not None: shutil.copy(_ap, os.path.join(ed, "achievements.json"))
 for x in idx["issues"]:   # 함께 시험하려고 지난 호 파일도 옆에 둠(저장소에 이미 있는 그대로)
     p = os.path.join(ROOT, "editions", x["file"])
     if x["date"] != DATE and os.path.exists(p): shutil.copy(p, os.path.join(ed, x["file"]))

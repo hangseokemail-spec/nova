@@ -391,6 +391,19 @@ body.achv-open{overflow:hidden}
 .cert .cseal{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 14px;font-family:'Noto Sans KR';font-weight:900;font-size:12px;line-height:1.2;color:var(--red)}
 .cert .cseal svg{width:58px;height:auto}
 @media(max-width:600px){.cert h2{font-size:34px}.cert .cw{font-size:16px}}
+.achn{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:9px;background:var(--red);color:#fff;font-family:'Noto Sans KR';font-weight:900;font-size:10.5px;text-align:center;padding:0 4px;margin-left:5px;vertical-align:1px}
+.go.ghost .achn{vertical-align:0}
+.achtabs{display:flex;gap:0;margin:18px 0 4px;border-bottom:3px solid var(--ink)}
+.achtabs button{flex:1;font-family:'Noto Sans KR';font-weight:900;font-size:14.5px;border:2px solid var(--ink);border-bottom:0;background:var(--paper2);color:var(--gray);padding:10px 6px;cursor:pointer;margin-right:-2px}
+.achtabs button.on{background:var(--ink);color:var(--paper)}
+.achtabs button b{color:var(--red);margin-left:3px}.achtabs button.on b{color:#F2C14E}
+.achempty{font-family:'Noto Sans KR';font-size:14px;line-height:1.7;border:1.5px dashed var(--ink);background:var(--paper2);padding:14px;margin:16px 0}
+.hallcount{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 0 6px;font-family:'Noto Sans KR';font-size:12.5px}
+.hallcount .hc i{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ink);margin-right:5px;vertical-align:-1px}
+.hallcount i.c-many{background:var(--navy)}.hallcount i.c-deep{background:var(--red)}.hallcount i.c-wide{background:#2D6A3E}.hallcount i.c-steady{background:#E3B448}.hallcount i.c-brain{background:#5A4A7A}.hallcount i.c-join{background:#B5642A}.hallcount i.c-secret{background:var(--ink)}.hallcount i.c-special{background:#1F7A7A}
+.badges.hall{margin-top:12px;padding:14px;background:linear-gradient(#EFE6D2,#E6DAC0);border:2px solid var(--ink);box-shadow:inset 0 -10px 0 rgba(28,26,23,.08)}
+.medal.c-special{background:#1F7A7A}
+.newach{position:absolute;top:7px;left:-4px;background:var(--red);color:#fff;font-family:'Noto Sans KR';font-weight:900;font-size:10px;letter-spacing:.06em;padding:2px 7px 2px 6px;box-shadow:2px 2px 0 var(--ink);z-index:2}
 /* 기사 별점(서아 별점만 Nova에 모아요) */
 .rate{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:12px 0 4px;font-family:'Noto Sans KR';font-size:13px}
 .rate .rl{font-weight:900;letter-spacing:.04em}
@@ -835,6 +848,7 @@ function stampNow(id){
     const r = st.getBoundingClientRect(); FX.burst(r.left + r.width/2, r.top + r.height/2, "mini");
   }
   toast("끝까지 읽었어요! 읽음 도장 쾅");
+  markDay(); save();
   markTabs();
   achCheck("stamp");
 }
@@ -1034,6 +1048,7 @@ function go(id, push){
   if (s.items && s.items.includes("psytest")) bindPsy();
   if (s.kind === "chiikawa") loadX();
   Object.keys(SIMS).forEach(k => { try { SIMS[k][1](); } catch(e) { console.warn("시뮬레이터 오류:", k, e); } });
+  try { paintAchCount(); } catch(e) {}
   readSetup();
   if (s.id === "cover") { const sv = document.querySelector(".c-art svg"); if (sv) sv.setAttribute("preserveAspectRatio", (DATA.cover && DATA.cover.fit) || "xMidYMid meet"); }
   if (push) { try { history.replaceState(null, "", "#" + s.id); } catch(e) { location.hash = s.id; } window.scrollTo(0, 0); }
@@ -1354,7 +1369,7 @@ function runQuiz(type, level){
       let ok;
       if (q.type === "mc") ok = (+a === q.answer); else if (q.type === "ox") ok = (a === q.answer);
       else { const norm = s => String(s).replace(/\s+/g,"").replace(/°|도|개|cm|초|곳|년|명|마리|km|m$/g,""); ok = (q.accept || [q.answer]).some(x => norm(x) === norm(a)); }
-      if (ok) score++;
+      if (ok) { score++; S.cnt.quizCorrect = (+S.cnt.quizCorrect || 0) + 1; markDay(); save(); }
       el.querySelectorAll("button").forEach(b => b.disabled = true);
       $("#fb").innerHTML = `<div class="fb ${ok?"good":"bad"}"><b>${ok?"맞았어요":"아쉬워요"}</b>${ok?"":"정답: " + esc(q.type==="mc"?q.options[q.answer]:q.answer) + "<br>"}${esc(q.explain||"")}</div><div style="margin-top:12px"><button class="go" id="nx">${i < qs.length-1 ? "다음 문제" : "결과 보기"}</button></div>`;
       $("#nx").disabled = false; $("#nx").onclick = () => { i++; if (i < qs.length) show(); else done(); };
@@ -1511,7 +1526,9 @@ if (!S.ach || typeof S.ach !== "object") S.ach = {};          // 달성한 업�
 if (!S.cnt || typeof S.cnt !== "object") S.cnt = {};          // 횟수: term(낱말 풀이), ask(질문), psy(심리검사)
 if (!Array.isArray(S.quizLog)) S.quizLog = [];                // 퀴즈 결과
 if (!S.simUsed || typeof S.simUsed !== "object") S.simUsed = {};   // 써 본 시뮬레이터: "날짜:id"
-if (!Array.isArray(S.gifts)) S.gifts = [];                    // 받은 선물(연속 4호 제때 완독마다)
+if (!Array.isArray(S.gifts)) S.gifts = [];
+if (!Array.isArray(S.days)) S.days = [];                      // 활동한 날(읽은 날 수·요일 수)
+function markDay(){ try { const k = ymdKey(Date.now()); if (!S.days.includes(k)) { S.days.push(k); if (S.days.length > 1500) S.days = S.days.slice(-1500); } } catch(e) {} }                    // 받은 선물(연속 4호 제때 완독마다)
 const DAYMS = 864e5;
 function bodyLen(id){ return ((A[id] || {}).body || []).filter(b => b.t === "p").reduce((n, b) => n + String(b.x || "").length, 0); }
 function hasThink(id){ return ((A[id] || {}).body || []).some(b => b.t === "box" && String(b.title || "").includes("생각해 보기")); }
@@ -1539,6 +1556,10 @@ function achStats(){
     perDay[ymdKey(r.t)] = (perDay[ymdKey(r.t)] || 0) + 1;
   });
   st.sameDay = Math.max(0, ...Object.values(perDay));
+  st.stampsBy = {}; reads.forEach(r => st.stampsBy[r.d] = (st.stampsBy[r.d] || 0) + 1);
+  const days = new Set(Object.keys(perDay)); (S.days || []).forEach(d => days.add(d));   // 읽은 날: 도장 찍은 날 + 활동 기록한 날
+  st.readDays = days.size;
+  st.readWeekdays = new Set([...days].map(k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d).getDay(); })).size;
   // 호마다 완독·제때 완독(공개 뒤 7일 안), 꾸준히(연속 제때 완독)
   st.complete = 0; st.onTime = 0; st.allTabs = 0; st.cur = 0; st.best = 0; st.runs = [];
   let run = [];
@@ -1547,7 +1568,7 @@ function achStats(){
     const ts = ids.map(id => +S.read[I.date + ":" + id] || 0), done = ts.every(Boolean), ct = done ? Math.max(...ts) : 0;
     const secs = [...new Set(ids.map(id => I.arts[id].s))];
     if (secs.length && secs.every(s => ids.some(id => I.arts[id].s === s && S.read[I.date + ":" + id]))) st.allTabs++;
-    if (done) st.complete++;
+    if (done) { st.complete++; (st.completeBy = st.completeBy || {})[I.date] = 1; }
     if (done && ct <= I.pub + 7 * DAYMS) {
       st.onTime++; run.push({date: I.date, no: I.no, label: I.label, dateText: I.dateText, t: ct});
       st.cur = run.length; st.best = Math.max(st.best, st.cur);
@@ -1565,6 +1586,9 @@ function achStats(){
   st.five = Object.values(S.rate || {}).some(v => +v === 5) ? 1 : 0;
   st.ask = Math.max(cnt("ask"), (S.qa || []).length);
   st.psy = cnt("psy"); st.term = cnt("term");
+  st.completeBy = st.completeBy || {};
+  st.quizCorrect = Math.max(cnt("quizCorrect"), S.quizLog.reduce((n, q) => n + (+q.score || 0), 0));
+  st.perfectTotal = S.quizLog.filter(q => q.total > 0 && q.score === q.total).length;
   return st;
 }
 const TABS8 = [["science", "과학"], ["society", "사회"], ["math", "수학"], ["economy", "경제"], ["art", "예술"], ["mind", "심리"], ["lit", "문학"], ["comic", "만화"]];
@@ -1624,7 +1648,39 @@ const ACH = [
   A_("secret", "hd_three", "하루 세 편", "하루에 기사 3편 끝까지", "三", 3, s => s.sameDay, {hidden: 1}),
   A_("secret", "hd_five", "별 다섯 개!", "기사에 별 다섯 개 주기", "★", 1, s => s.five, {hidden: 1}),
 ];
-const ACH_BY = {}; ACH.forEach(a => ACH_BY[a.id] = a);
+/* 데이터로 더하는 업적(editions/achievements.json). type은 계산 규칙 이름, since가 지나야 나타나요 */
+const ACH_TYPES = {
+  stamps: s => s.stamps, longReads: s => s.long, issuesComplete: s => s.complete, termTaps: s => s.term, thinkReads: s => s.think,
+  "tabFirst": (s, a) => (s.tab[a] || 0) > 0 ? 1 : 0, "tabCount": (s, a) => s.tab[a] || 0, allTabsInIssue: s => s.allTabs, pastIssueReads: s => s.past,
+  onTimeStreak: s => s.best, onTimeTotal: s => s.onTime, crowns: s => s.crowns, quizPlays: s => s.quiz, quizCorrect: s => s.quizCorrect,
+  "quizPerfect": (s, a) => s.perfect(a) ? 1 : 0,
+  "mathPerfect": (s, a) => S.quizLog.some(q => q.type === "math" && q.level === a && q.total > 0 && q.score === q.total) ? 1 : 0,
+  quizPerfectTotal: s => s.perfectTotal, simUsed: s => s.sims, starsGiven: s => s.rates, questions: s => s.ask, psytest: s => s.psy,
+  "issueComplete": (s, a) => s.completeBy[a] ? 1 : 0, "stampsInIssue": (s, a) => s.stampsBy[a] || 0,
+  "sudokuCrownsInIssue": (s, a) => Object.keys(S.crown).filter(k => k.startsWith(a + ":")).length,
+  readDays: s => s.readDays, readWeekdays: s => s.readWeekdays,
+  quizPerfectLevels: s => ["쉬움", "보통", "어려움"].filter(lv => s.perfect(lv)).length,
+};
+const CAT_ID = {}; ACH_CATS.forEach(([c, nm]) => { CAT_ID[c] = c; CAT_ID[nm] = c; }); CAT_ID["특별 업적"] = "special";
+const ACH_DATA = (() => {
+  const src = DATA.__achData || DATA.achData; const list = Array.isArray(src) ? src : (src && Array.isArray(src.achievements) ? src.achievements : []);
+  const seen = new Set(ACH.map(a => a.id)), out = [];
+  list.forEach(x => {
+    try {
+      if (!x || typeof x.id !== "string" || seen.has(x.id) || typeof x.type !== "string") return;
+      const c = x.type.indexOf(":"), tn = c < 0 ? x.type : x.type.slice(0, c), arg = c < 0 ? "" : x.type.slice(c + 1), fn = ACH_TYPES[tn];
+      const goal = Math.max(1, Math.floor(+x.goal || 1)); if (!fn) return;
+      seen.add(x.id);
+      out.push({cat: CAT_ID[x.cat] || "special", id: x.id, name: String(x.name || x.id), desc: String(x.desc || ""), g: String(x.icon || (goal > 1 ? goal : String(x.name || "★").slice(0, 1))).slice(0, 4),
+        goal, val: s => fn(s, arg), big: !!x.big, hidden: !!x.hidden, since: x.since ? Date.parse(x.since) : 0, fromData: 1});
+    } catch(e) {}
+  });
+  return out;
+})();
+if (ACH_DATA.some(a => a.cat === "special") && !ACH_CATS.some(c => c[0] === "special")) ACH_CATS.push(["special", "특별 업적", "이번 호에 새로 생긴 업적"]);
+const achList = () => { const now = Date.now(); return ACH.concat(ACH_DATA.filter(a => !a.since || a.since <= now)); };   // 공개 전 업적은 숨김
+const isNewAch = a => a.since && Date.now() - a.since < 7 * DAYMS;
+const ACH_BY = {}; ACH.concat(ACH_DATA).forEach(a => ACH_BY[a.id] = a);
 function giftCode(g){   // 날짜에서 만든 짧은 확인 번호(같은 선물이면 늘 같음)
   let h = 2166136261; const str = g.from + "~" + g.to + "~" + g.n;
   for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
@@ -1647,7 +1703,7 @@ function achNext(){
 function achCheck(src){
   try {
     const st = achStats(), now = Date.now(), fresh = [];
-    ACH.forEach(a => { if (!S.ach[a.id] && a.val(st) >= a.goal) { S.ach[a.id] = now; fresh.push(a); } });
+    achList().forEach(a => { if (!S.ach[a.id] && a.val(st) >= a.goal) { S.ach[a.id] = now; fresh.push(a); } });
     const newGifts = [];
     st.runs.forEach(rn => {   // 연속 4호마다 선물 한 번(받은 선물은 연속이 끊겨도 남아요)
       const key = rn.from.date + "~" + rn.to.date;
@@ -1661,30 +1717,45 @@ function achCheck(src){
     const out = (src === "load" && items.length > 3) ? [{many: items.length, big: items.some(a => a.big)}] : items;
     achNotify(out.concat(newGifts.map(g => ({gift: g}))));
     const box = $("#achSum"); if (box) box.outerHTML = achSummaryHtml(true);
+    paintAchCount();
   } catch(e) { console.warn("업적 계산 오류", e); }
 }
+function paintAchCount(){   // 업적 단추 옆 작은 숫자(달성 개수)
+  const n = achList().filter(a => S.ach[a.id]).length;
+  document.querySelectorAll('button[data-ach]').forEach(b => { if (b.closest(".achsum")) return; let c = b.querySelector(".achn"); if (!n) { if (c) c.remove(); return; } if (!c) { c = document.createElement("span"); c.className = "achn"; b.appendChild(c); } c.textContent = n; });
+}
 function achSummaryHtml(inContents){
-  const st = achStats(), got = ACH.filter(a => S.ach[a.id]).length;
-  return `<div class="achsum" id="achSum"><div class="as-row"><div><b>${st.stamps}</b><span>모은 도장</span></div><div><b>${got}<small>/${ACH.length}</small></b><span>달성한 업적</span></div><div><b>${st.cur}<small>주</small></b><span>꾸준히 이어 가는 중</span></div>${S.gifts.length ? `<div><b>${S.gifts.length}</b><span>받은 선물</span></div>` : ""}</div>${inContents ? `<button class="go" data-ach="1">업적 보기</button>` : ""}</div>`;
+  const st = achStats(), L = achList(), got = L.filter(a => S.ach[a.id]).length;
+  return `<div class="achsum" id="achSum"><div class="as-row"><div><b>${st.stamps}</b><span>모은 도장</span></div><div><b>${got}<small>/${L.length}</small></b><span>달성한 업적</span></div><div><b>${st.cur}<small>주</small></b><span>꾸준히 이어 가는 중</span></div>${S.gifts.length ? `<div><b>${S.gifts.length}</b><span>받은 선물</span></div>` : ""}</div>${inContents ? `<button class="go" data-ach="1">업적 보기</button>` : ""}</div>`;
 }
 function achCard(a, st){
   const t = S.ach[a.id], v = Math.min(a.goal, a.val(st)), hid = a.hidden && !t;
-  return `<div class="badge ${t ? "got" : "lock"} ${a.big ? "big" : ""}" data-aid="${a.id}"><div class="medal c-${a.cat}"><span>${hid ? "?" : esc(a.g)}</span></div>
+  return `<div class="badge ${t ? "got" : "lock"} ${a.big ? "big" : ""}" data-aid="${a.id}">${isNewAch(a) ? `<span class="newach">새 업적</span>` : ""}<div class="medal c-${a.cat}"><span>${hid ? "?" : esc(a.g)}</span></div>
     <div class="bn">${hid ? "???" : esc(a.name)}</div><div class="bd">${hid ? "숨은 업적이에요. 어떻게 얻는지는 비밀!" : esc(a.desc)}</div>
     ${t ? `<div class="bdate">${md(t)} 달성${a.gift && S.gifts.length ? ` · 선물 ${S.gifts.length}번` : ""}</div>` : hid ? "" : `<div class="bbar"><i style="width:${Math.round(v / a.goal * 100)}%"></i></div><div class="bnum">${v} / ${a.goal}</div>`}</div>`;
 }
-function openAch(){
-  const st = achStats();
+let achView = "todo";   // 도전 중인 업적 / 명예의 전당
+function giftListHtml(){ return S.gifts.length ? `<div class="giftlist">${S.gifts.map(g => `<button class="giftrow" data-gift="${esc(g.key)}"><span class="gm">선물</span><span><b>${g.n}번째 선물</b> · ${esc(g.fromText)} ~ ${esc(g.toText)}</span><span class="gv">상장 보기 →</span></button>`).join("")}</div>` : ""; }
+function openAch(view){
+  if (view) achView = view;
+  const st = achStats(), L = achList(), got = L.filter(a => S.ach[a.id]), todo = L.filter(a => !S.ach[a.id]);
   let el = $("#achv"); if (!el) { el = document.createElement("div"); el.id = "achv"; el.className = "achv"; document.body.appendChild(el); }
+  const todoHtml = (todo.length ? ACH_CATS.map(([c, nm, sub]) => { const xs = todo.filter(a => a.cat === c); return xs.length ? `<section class="achcat"><h3>${esc(nm)} <small>${esc(sub)}</small></h3><div class="badges">${xs.map(a => achCard(a, st)).join("")}</div></section>` : ""; }).join("") : `<p class="achempty">지금 있는 업적을 모두 달성했어요. 다음 호에 새 업적이 생겨요.</p>`);
+  const hallHtml = got.length ? `<div class="hallcount">${ACH_CATS.map(([c, nm]) => { const n = got.filter(a => a.cat === c).length; return n ? `<span class="hc"><i class="c-${c}"></i>${esc(nm)} <b>${n}</b></span>` : ""; }).join("")}</div>
+      ${giftListHtml()}
+      <div class="badges hall">${got.slice().sort((a, b) => S.ach[b.id] - S.ach[a.id]).map(a => achCard(a, st)).join("")}</div>`
+    : `<p class="achempty">아직 진열장이 비어 있어요. 기사 한 편을 끝까지 읽으면 첫 메달이 들어와요.</p>`;
   el.innerHTML = `<div class="wrap achv-in"><div class="achv-top"><button class="go ghost" id="achClose">← 돌아가기</button><span class="achv-k">${esc(DATA.issue.label)} · 이 기기의 기록</span></div>
     <div class="sec-head"><h2>업적</h2><span class="en">ACHIEVEMENTS</span></div>
-    <div class="sec-sub"><span>많이, 깊이, 다양하게, 꾸준히 읽은 기록이에요</span><span>${ACH.filter(a => S.ach[a.id]).length} / ${ACH.length}</span></div>
+    <div class="sec-sub"><span>많이, 깊이, 다양하게, 꾸준히 읽은 기록이에요</span><span>${got.length} / ${L.length}</span></div>
     ${achSummaryHtml(false)}
-    ${S.gifts.length ? `<div class="giftlist">${S.gifts.map(g => `<button class="giftrow" data-gift="${esc(g.key)}"><span class="gm">선물</span><span><b>${g.n}번째 선물</b> · ${esc(g.fromText)} ~ ${esc(g.toText)}</span><span class="gv">상장 보기 →</span></button>`).join("")}</div>` : ""}
-    ${ACH_CATS.map(([c, nm, sub]) => `<section class="achcat"><h3>${esc(nm)} <small>${esc(sub)}</small></h3><div class="badges">${ACH.filter(a => a.cat === c).map(a => achCard(a, st)).join("")}</div></section>`).join("")}
-    <p class="note">업적과 도장은 이 기기에만 기억돼요. 다른 기기에서는 처음부터 모아요. '제때 완독'은 새 호가 나온 뒤 7일 안에 그 호의 기사를 모두 끝까지 읽는 거예요.</p></div>`;
-  el.classList.add("on"); document.body.classList.add("achv-open"); el.scrollTop = 0;
+    <div class="achtabs" role="tablist"><button role="tab" class="${achView === "todo" ? "on" : ""}" data-achview="todo" aria-selected="${achView === "todo"}">도전 중인 업적 <b>${todo.length}</b></button><button role="tab" class="${achView === "hall" ? "on" : ""}" data-achview="hall" aria-selected="${achView === "hall"}">명예의 전당 <b>${got.length}</b></button></div>
+    <div id="achBody">${achView === "hall" ? hallHtml : todoHtml}</div>
+    <p class="note">업적과 도장은 이 기기에만 기억돼요. 다른 기기에서는 처음부터 모아요. '제때 완독'은 새 호가 나온 뒤 7일 안에 그 호의 기사를 모두 끝까지 읽는 거예요. 새 호가 나올 때마다 새 업적이 더해져요.</p></div>`;
+  el.classList.add("on"); document.body.classList.add("achv-open");
+  if (!view) el.scrollTop = 0;
   $("#achClose").onclick = () => { el.classList.remove("on"); document.body.classList.remove("achv-open"); };
+  el.querySelectorAll("[data-achview]").forEach(b => b.onclick = () => openAch(b.dataset.achview));
 }
 function showGift(g, fresh){
   let el = $("#cert"); if (!el) { el = document.createElement("div"); el.id = "cert"; el.className = "certw"; document.body.appendChild(el); }
@@ -1702,7 +1773,7 @@ function showGift(g, fresh){
 document.addEventListener("click", e => {
   const t = e.target.closest && e.target.closest("[data-ach], [data-gift], .tw");
   if (!t) return;
-  if (t.matches("[data-ach]")) { openAch(); return; }
+  if (t.matches("[data-ach]")) { openAch(null); return; }
   if (t.matches("[data-gift]")) { const g = S.gifts.find(x => x.key === t.dataset.gift); if (g) showGift(g, false); return; }
   if (t.matches(".tw")) { S.cnt.term = (+S.cnt.term || 0) + 1; save(); clearTimeout(achCheck.tw); achCheck.tw = setTimeout(() => achCheck("term"), 400); }
 });
@@ -1715,7 +1786,7 @@ document.addEventListener("pointerdown", e => {   // 시뮬레이터를 써 본 
 markTabs();
 const start = (location.hash || "").replace("#", "");
 go(SECS.some(s => s.id === start) ? start : "cover", false);
-setTimeout(() => achCheck("load"), 600);
+setTimeout(() => { achCheck("load"); paintAchCount(); }, 600);
 };
 (async function(){
   if (window.__INLINE__) { window.boot(window.__INLINE__); return; }
@@ -1727,7 +1798,9 @@ setTimeout(() => achCheck("load"), 600);
     const pick = list.find(i => i.date === want) || list[0];
     if (!pick) { document.getElementById("page").innerHTML = "<p>첫 호를 준비하고 있어요. 금요일 밤 10시에 만나요.</p>"; return; }
     const data = await (await fetch("editions/" + pick.file, {cache: "no-store"})).json();
-    data.__issues = list; data.__current = pick.date; window.boot(data);
+    data.__issues = list; data.__current = pick.date;
+    try { const ar = await fetch("editions/achievements.json", {cache: "no-store"}); if (ar.ok) data.__achData = await ar.json(); } catch(e) {}   // 데이터 업적(없거나 깨져도 괜찮아요)
+    window.boot(data);
   } catch(e) { document.getElementById("page").innerHTML = "<p>신문을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>"; }
 })();
 </script>
