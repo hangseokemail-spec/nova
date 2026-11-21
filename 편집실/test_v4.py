@@ -10,6 +10,8 @@ B = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(B)
 SITE = os.path.join(B, "out4", "site"); SHOT = os.path.join(B, "out4", "test_shots")
 TMP = os.environ.get("NOVA_TEST_DIR") or os.path.join(B, "out4", "_testroot")
 PORT, ASKPORT = 8811, 8797
+SEOA_CODE = "별빛 서아7"   # 시험용 서아 확인 암호(진짜 암호는 서버에서 편집인이 넣어요)
+ASKDATA = os.path.join(B, "out4", "_askdata")
 BASE = f"http://127.0.0.1:{PORT}/"
 RESULTS = []
 def ok(name, cond, detail=""):
@@ -58,6 +60,8 @@ async def tabs_tour(br, vp, name, date, data):
     await pg.goto(BASE + f"?d={date}"); await pg.wait_for_selector(".tab")
     label = await pg.eval_on_selector(".dateline b", "e => e.textContent")
     ok(f"[{name}] {date} 열림", data["issue"]["label"] in label, label)
+    body = await pg.evaluate("document.body.innerText + ' ' + document.title")
+    ok(f"[{name}] {date} 제호에 '서아가 기획한 주간 과학 교양지' 없음·<title> Nova", "주간 과학 교양지" not in body.replace(" ", "") and "주 간 과 학 교 양 지" not in body and (await pg.title()) == "Nova" and "노바(Nova)" in await pg.content())
     secs = [s["id"] for s in data["sections"]]
     tabs = await pg.eval_on_selector_all(".tab", "es => es.map(e => e.dataset.s)")
     ok(f"[{name}] {date} 탭 목록", tabs == secs, ",".join(tabs))
@@ -474,6 +478,104 @@ async def test_society(br, vp, name):
     ok(f"[{name}] 사회 탭 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
     await ctx.close()
 
+def server_ratings():
+    import urllib.request
+    with urllib.request.urlopen(f"http://127.0.0.1:{ASKPORT}/ask/ratings", timeout=5) as r:
+        return json.loads(r.read().decode("utf-8"))["ratings"]
+
+async def star(pg, sel, n):
+    await pg.click(f'{sel} .star[data-v="{n}"]')
+
+async def test_rating(br, vp, name):
+    """기사 별점: 다른 기기(이 기기에만 저장), 서아 기기(등록 실패·성공, 전송, 다시 누르면 바뀜), 준비 안 됨, 전송 실패, 두 호"""
+    ASK = f"http://127.0.0.1:{ASKPORT}/ask"
+    G = '.rate[data-rid2="gorilla"]'
+    # (가) 친구 기기: 처음 누르면 확인 창 → '그냥 이 기기에만 저장'
+    before = server_ratings()
+    ctx, pg, errs = await new_page(br, vp, ask_url=ASK)
+    await pg.goto(BASE + "#science"); await pg.wait_for_selector(G)
+    await pg.evaluate(f"document.querySelector('{G}').scrollIntoView({{block:'center'}})")
+    await star(pg, G, 3); await pg.wait_for_selector("#modal.on #seoaCode")
+    t = await pg.inner_text("#sheet")
+    ok(f"[{name}] 별을 처음 누르면 서아 확인 창", "서아만 Nova에 별점을 보낼 수 있어요" in t and "처음 한 번만" in t)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_rate_modal.png"))
+    await pg.click("#seoaLocal"); await pg.wait_for_timeout(150)
+    on = await pg.eval_on_selector_all(f"{G} .star.on", "es => es.length"); rs = await pg.inner_text(f"{G} .rs")
+    await star(pg, '.rate[data-rid2="merger"]', 5); await pg.wait_for_timeout(150)
+    again = await pg.query_selector("#modal.on")
+    ok(f"[{name}] 이 기기에만 저장: 별 칠해짐·다시 묻지 않음", on == 3 and "이 기기에 ★3" in rs and not again, rs)
+    await pg.reload(); await pg.wait_for_selector(G)
+    on = await pg.eval_on_selector_all(f"{G} .star.on", "es => es.length"); badge = await pg.query_selector(".seoa-b")
+    srv = server_ratings()
+    ok(f"[{name}] 친구 기기 별점은 기기에만(새로 고침 뒤 남음, 서버에 안 감, 서아 표시 없음)", on == 3 and not badge and srv == before, "서버 그대로" if srv == before else json.dumps(srv, ensure_ascii=False)[:80])
+    ok(f"[{name}] 친구 기기 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+    # (나) 서아 기기: 틀린 암호 → 맞는 암호 → 전송, 다시 누르면 바뀜
+    ctx, pg, errs = await new_page(br, vp, ask_url=ASK)
+    await pg.goto(BASE + "#science"); await pg.wait_for_selector(G)
+    await pg.evaluate(f"document.querySelector('{G}').scrollIntoView({{block:'center'}})")
+    await star(pg, G, 4); await pg.wait_for_selector("#modal.on #seoaCode")
+    await pg.fill("#seoaCode", "틀린암호"); await pg.click("#seoaOk"); await pg.wait_for_function("document.querySelector('#seoaMsg').textContent.includes('맞지')")
+    m = await pg.inner_text("#seoaMsg")
+    ok(f"[{name}] 틀린 암호 → '암호가 맞지 않아요'", "암호가 맞지 않아요" in m, m)
+    await pg.fill("#seoaCode", SEOA_CODE); await pg.click("#seoaOk")
+    await pg.wait_for_function("!document.querySelector('#modal.on')")
+    await pg.wait_for_function("document.querySelector('.rate[data-rid2=\"gorilla\"] .rs').textContent.includes('보냈어요')")
+    rs = await pg.inner_text(f"{G} .rs"); badge = await pg.inner_text("#a-gorilla > .title .seoa-b")
+    tok = await pg.evaluate("JSON.parse(localStorage.getItem('nova-1')).seoa")
+    srv = server_ratings()
+    ok(f"[{name}] 맞는 암호 → 서아 기기 등록·별점 전송·제목 옆 '서아 별점 ★4'", tok.get("mode") == "seoa" and len(tok.get("token", "")) >= 32 and srv["2026-11-20"]["gorilla"]["stars"] == 4 and "★4" in badge, rs)
+    await pg.screenshot(path=os.path.join(SHOT, f"{name}_rate_article_end.png"))
+    await star(pg, G, 2); await pg.wait_for_function("document.querySelector('.rate[data-rid2=\"gorilla\"] .rs').textContent.includes('★2') && document.querySelector('.rate[data-rid2=\"gorilla\"] .rs').textContent.includes('보냈어요')")
+    srv = server_ratings(); badge = await pg.inner_text("#a-gorilla > .title .seoa-b")
+    ok(f"[{name}] 다시 누르면 새 값(★2)으로 바뀜", srv["2026-11-20"]["gorilla"]["stars"] == 2 and "★2" in badge)
+    # 책(책마다)·만화·사회
+    await pg.click('.tab[data-s="lit"]'); await pg.wait_for_selector(".book .rate")
+    bid = await pg.eval_on_selector(".book .rate", "e => e.dataset.rid2")
+    await star(pg, f'.rate[data-rid2="{bid}"]', 5); await pg.wait_for_function(f"document.querySelector('.rate[data-rid2=\"{bid}\"] .rs').textContent.includes('보냈어요')")
+    nb = await pg.eval_on_selector_all(".book .rate", "es => es.length")
+    await pg.click('.tab[data-s="comic"]'); await pg.wait_for_selector('.rate[data-rid2="comic"]')
+    await star(pg, '.rate[data-rid2="comic"]', 4); await pg.wait_for_function("document.querySelector('.rate[data-rid2=\"comic\"] .rs').textContent.includes('보냈어요')")
+    srv = server_ratings()["2026-11-20"]
+    ok(f"[{name}] 책마다·만화 별점 전송", nb == 3 and srv.get(bid, {}).get("stars") == 5 and srv.get("comic", {}).get("stars") == 4, f"책 칸 {nb}, {bid}")
+    secs = {"society": ["society_a", "society_b"], "math": ["folding", "snowflake"], "economy": ["economy", "export"], "art": ["art", "art2"], "mind": ["purr"]}
+    miss = []
+    for sid, ids in secs.items():
+        if not any(x["id"] == sid for x in D2["sections"]): continue
+        await pg.click(f'.tab[data-s="{sid}"]'); await pg.wait_for_timeout(150)
+        for i in ids:
+            if i in D2["articles"] and not await pg.query_selector(f'.rate[data-rid2="{i}"]'): miss.append(i)
+    nopsy = not await pg.query_selector('.rate[data-rid2="psytest"]')
+    ok(f"[{name}] 사회·수학·경제·예술·심리 기사마다 별점 칸", not miss and nopsy, f"없음: {miss}")
+    await pg.click('.tab[data-s="contents"]'); await pg.wait_for_selector(".toc-row")
+    tb = await pg.eval_on_selector_all(".toc-row .seoa-b", "es => es.map(e => e.textContent)"); ss = await pg.inner_text("#seoaSet")
+    ok(f"[{name}] 서아 기기 차례에 '서아 별점' 표시·설정 칸", "서아 별점 ★2" in tb and "서아 기기" in ss, json.dumps(tb, ensure_ascii=False))
+    # 지난 호(제1호)도 별점 칸이 있고 호마다 따로 저장
+    await pg.goto(BASE + "?d=2026-11-17#science"); await pg.wait_for_selector('.rate[data-rid2="voyager"]')
+    on1 = await pg.query_selector_all('.rate .star.on')
+    await star(pg, '.rate[data-rid2="voyager"]', 5); await pg.wait_for_function("document.querySelector('.rate[data-rid2=\"voyager\"] .rs').textContent.includes('보냈어요')")
+    srv = server_ratings()
+    ok(f"[{name}] 제1호에서도 별점(호마다 따로)", not on1 and srv["2026-11-17"]["voyager"]["stars"] == 5, "")
+    # 보내기 실패해도 화면은 멀쩡
+    await pg.route(f"http://127.0.0.1:{ASKPORT}/ask/rate", lambda r: r.abort())
+    await star(pg, '.rate[data-rid2="voyager"]', 3); await pg.wait_for_function("document.querySelector('.rate[data-rid2=\"voyager\"] .rs').textContent.includes('못 보냈어요')")
+    on = await pg.eval_on_selector_all('.rate[data-rid2="voyager"] .star.on', "es => es.length")
+    ok(f"[{name}] 전송 실패해도 별은 기기에 남음", on == 3)
+    ok(f"[{name}] 서아 기기 콘솔 오류 없음", not errs, "; ".join(errs[:3]))
+    await ctx.close()
+    # (다) 서버에 암호가 아직 없을 때
+    ctx, pg, errs = await new_page(br, vp, ask_url=ASK)
+    async def nr(route): await route.fulfill(status=503, content_type="application/json", headers={"Access-Control-Allow-Origin": "*"}, body='{"error":"not_ready"}')
+    await pg.route(f"http://127.0.0.1:{ASKPORT}/ask/seoa/register", nr)
+    await pg.goto(BASE + "#science"); await pg.wait_for_selector(G)
+    await star(pg, G, 5); await pg.wait_for_selector("#modal.on #seoaCode")
+    await pg.fill("#seoaCode", "아무거나"); await pg.click("#seoaOk")
+    await pg.wait_for_function("document.querySelector('#seoaMsg') && document.querySelector('#seoaMsg').textContent.includes('준비 중')")
+    m = await pg.inner_text("#seoaMsg"); await pg.wait_for_timeout(1900)
+    closed = not await pg.query_selector("#modal.on"); on = await pg.eval_on_selector_all(f"{G} .star.on", "es => es.length")
+    ok(f"[{name}] 서버 준비 전: '아직 준비 중이에요. 이 기기에만 저장할게요'", "아직 준비 중이에요. 이 기기에만 저장할게요" in m and closed and on == 5, m)
+    await ctx.close()
+
 async def test_inline(br):
     ctx = await br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2); pg = await ctx.new_page()
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -495,7 +597,8 @@ async def test_inline(br):
 async def main():
     prepare()
     web = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1"], cwd=TMP, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    env = dict(os.environ, NOVA_FAKE="1", NOVA_ALLOW_LOCAL="1", NOVA_PORT=str(ASKPORT)); env.pop("ANTHROPIC_API_KEY", None)
+    shutil.rmtree(ASKDATA, ignore_errors=True)
+    env = dict(os.environ, NOVA_FAKE="1", NOVA_ALLOW_LOCAL="1", NOVA_PORT=str(ASKPORT), NOVA_SEOA_CODE=SEOA_CODE, NOVA_DATA_DIR=ASKDATA); env.pop("ANTHROPIC_API_KEY", None)
     ask = subprocess.Popen([sys.executable, os.path.join(B, "site", "ask_server", "nova_ask.py")], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     wait_port(PORT); wait_port(ASKPORT)
     try:
@@ -513,6 +616,7 @@ async def main():
                 await test_final(br, vp, name)
                 await test_past(br, vp, name)
                 await test_society(br, vp, name)
+                await test_rating(br, vp, name)
             await test_figimg(br)
             await test_inline(br)
             await br.close()

@@ -282,7 +282,7 @@ body.cover-mode .page{padding-top:0;padding-bottom:0}
 .c-top{display:flex;justify-content:space-between;gap:8px;font-family:'Noto Sans KR';font-size:11.5px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);padding:4px 0}
 .c-top b{color:var(--red)}
 .c-name{font-family:'Playfair Display','Noto Serif KR',serif;font-weight:900;font-size:clamp(64px,19vw,150px);line-height:.9;margin:6px 0 0;text-align:center;letter-spacing:-.01em}
-.c-sub{text-align:center;font-family:'Noto Sans KR';font-weight:700;font-size:12px;letter-spacing:.32em;border-bottom:4px double var(--ink);padding:4px 0 7px}
+.c-sub{border-bottom:4px double var(--ink);padding:0;margin-top:6px;height:0}
 .c-art{position:relative;flex:1 1 auto;min-height:0;margin-top:10px;border:1.5px solid var(--ink);overflow:hidden;background:var(--navy);cursor:pointer}
 .c-art svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .c-head{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(244,239,228,.0) 0%,rgba(244,239,228,.96) 22%);padding:34px 14px 12px}
@@ -336,6 +336,23 @@ figure .fig.figimg{position:relative;line-height:0}
 figure .fig.figimg img{width:100%;height:auto;display:block}
 .illu{position:absolute;left:8px;top:8px;line-height:1.4;font-family:'Noto Sans KR';font-weight:700;font-size:11px;letter-spacing:.08em;background:var(--paper);color:var(--ink);border:1px solid var(--ink);padding:1px 6px}
 figcaption .credit{display:block;font-size:11.5px;margin-top:2px}
+/* 기사 별점(서아 별점만 Nova에 모아요) */
+.rate{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:12px 0 4px;font-family:'Noto Sans KR';font-size:13px}
+.rate .rl{font-weight:900;letter-spacing:.04em}
+.rate .stars{display:inline-flex;gap:2px}
+.rate .star{font-size:27px;line-height:1;background:none;border:0;padding:2px 3px;cursor:pointer;color:var(--line);font-family:inherit}
+.rate .star.on{color:var(--red)}
+.rate .star:focus-visible{outline:2px solid var(--navy);outline-offset:1px}
+.rate .rs{color:var(--gray);font-size:12px}
+.rate .rs.ok{color:#2D6A3E}
+.book .rate{margin-top:10px}.book .rate .star{font-size:23px}
+.linkbtn{background:none;border:0;padding:0;font-family:'Noto Sans KR';font-size:12px;color:var(--navy);text-decoration:underline;cursor:pointer}
+.seoa-b{display:inline-block;font-family:'Noto Sans KR';font-weight:900;font-size:12px;color:#fff;background:var(--red);padding:1px 7px;margin-left:8px;vertical-align:middle;letter-spacing:0;border-radius:2px;white-space:nowrap}
+.title .seoa-b{font-size:13px;vertical-align:6px}
+.seoa-set{border:1.5px dashed var(--ink);background:var(--paper2);padding:9px 12px;margin-top:18px;font-family:'Noto Sans KR';font-size:13px;line-height:1.6}
+.seoa-modal input{width:100%;font-size:18px;padding:10px;border:1.5px solid var(--ink);background:#fff;font-family:'Noto Sans KR';margin:8px 0}
+.seoa-modal .smsg{font-family:'Noto Sans KR';font-size:13.5px;min-height:20px;margin-top:8px}
+.seoa-modal .smsg.bad{color:var(--red);font-weight:700}
 /* 지난 호 보기 */
 .tbtn.past{border:1.5px solid var(--red);color:var(--red);background:var(--paper2);font-size:12.5px;padding:5px 10px}
 .tbtn.past:hover{background:var(--red);color:#fff}
@@ -504,7 +521,7 @@ Object.keys(DATA.sims || {}).forEach(id => {
 /* ---------- 제호와 탭 ---------- */
 $("#mast").innerHTML = `
   <div class="dateline"><span><b>${esc(DATA.issue.label)}</b> · ${esc(DATA.issue.dateText)}</span><span>기획 서아 · 매주 금요일 밤 10시 발행</span></div>
-  <div class="nameplate"><h1>Nova</h1><div class="en">서아가 기획한 주간 과학 교양지</div><div class="motto">노바(Nova): 어느 날 갑자기 밝게 빛나는 '새 별'이라는 뜻이에요</div></div>
+  <div class="nameplate"><h1>Nova</h1><div class="motto">노바(Nova): 어느 날 갑자기 밝게 빛나는 '새 별'이라는 뜻이에요</div></div>
   <div class="mast-tools"><button class="tbtn past" id="calBtn" data-past="1">지난 호 보기</button></div>`;
 $("#askIc").innerHTML = F.teacher || "";
 $("#tabs").innerHTML = SECS.map(s => `<button class="tab" data-s="${s.id}">${esc(s.name)}</button>`).join("");
@@ -595,7 +612,7 @@ function articleHtml(id){
   const long = (a.body||[]).filter(b=>b.t==="p").map(b=>b.x).join("").length > 900;
   return `<article class="art" id="a-${id}" ${readAttrs(id)}>
     <div class="kicker">${esc(a.kicker||a.section)}</div>
-    ${stampHtml(id)}<h3 class="title">${esc(a.title)}</h3>
+    ${stampHtml(id)}<h3 class="title">${esc(a.title)}${seoaBadge(id)}</h3>
     <p class="deck">${esc(a.deck||"")}</p>
     <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
     ${a.note?`<div class="anote">${esc(a.note)}</div>`:""}
@@ -604,10 +621,99 @@ function articleHtml(id){
     <div class="body ${long?"cols":""}">${bodyHtml(a.body, termCtx(a), id, figNo)}</div>
     ${termsHtml(a.terms)}
     ${endHtml(id)}
+    ${rateHtml(id)}
     ${srcHtml(id, a.sources)}
     ${reactHtml(id)}
   </article>`;
 }
+
+/* ---------- 기사 별점 ----------
+   별점은 기기마다·호마다·기사마다 기억(S.rate). 서아 기기(서버에 등록한 토큰이 있는 기기)에서만 서버로 보내요.
+   S.seoa = {mode:"seoa", token} 서아 기기 / {mode:"local"} 이 기기에만 저장 / 없음 = 아직 정하지 않음 */
+if (!S.rate || typeof S.rate !== "object") S.rate = {};
+const askRoot = () => String(CFG.askUrl || "").replace(/\/+$/, "");
+const isSeoa = () => !!(S.seoa && S.seoa.mode === "seoa" && S.seoa.token);
+const bookId = b => "book-" + ((String(b.url || "").match(/ItemId=(\d+)/) || [])[1] || String(b.title || "").length);
+const rk = id => IKEY + ":" + id;
+let seoaAskedThisVisit = false, seoaPending = null;
+function rateHtml(id, label){
+  const v = S.rate[rk(id)] || 0;
+  return `<div class="rate" data-rid2="${esc(id)}"><span class="rl">${esc(label || "이 기사 별점")}</span><span class="stars" role="radiogroup" aria-label="${esc(label || "이 기사 별점")}">${[1,2,3,4,5].map(n => `<button class="star ${n <= v ? "on" : ""}" data-v="${n}" role="radio" aria-checked="${n === v}" aria-label="별 ${n}개">★</button>`).join("")}</span><span class="rs">${v ? rateStatus(v) : "별을 눌러 보세요"}</span>${(!isSeoa() && askRoot()) ? `<button class="linkbtn" data-seoa-reg="1">서아 기기 등록</button>` : ""}</div>`;
+}
+function rateStatus(v){ return isSeoa() ? `서아 별점 ★${v}` : `이 기기에 ★${v} 저장`; }
+function seoaBadge(id){ const v = S.rate[rk(id)]; return (isSeoa() && v) ? `<span class="seoa-b" data-seoa-b="${esc(id)}">서아 별점 ★${v}</span>` : ""; }
+function seoaSetupHtml(){
+  const st = isSeoa() ? "이 기기는 <b>서아 기기</b>예요. 누른 별점이 Nova 편집부에 전해져요." : (S.seoa && S.seoa.mode === "local") ? "이 기기는 별점을 <b>이 기기에만</b> 저장해요." : "기사 끝의 별을 누르면 별점을 남길 수 있어요.";
+  return `<div class="seoa-set" id="seoaSet">별점 · ${st}${(!isSeoa() && askRoot()) ? ` <button class="linkbtn" data-seoa-reg="1">서아 기기 등록</button>` : ""}</div>`;
+}
+function paintRate(id){
+  const v = S.rate[rk(id)] || 0;
+  document.querySelectorAll(`.rate[data-rid2="${id}"]`).forEach(r => {
+    r.querySelectorAll(".star").forEach(b => { const n = +b.dataset.v; b.classList.toggle("on", n <= v); b.setAttribute("aria-checked", String(n === v)); });
+    const rs = r.querySelector(".rs"); rs.textContent = v ? rateStatus(v) : "별을 눌러 보세요"; rs.classList.remove("ok");
+  });
+  document.querySelectorAll(`[data-seoa-b="${id}"]`).forEach(b => b.remove());
+  if (isSeoa() && v) {   // 서아 기기: 제목 옆 '서아 별점 ★n'
+    const t = document.querySelector(`#a-${CSS.escape(id)} > .title`); if (t) t.insertAdjacentHTML("beforeend", seoaBadge(id));
+    document.querySelectorAll(`.book .rate[data-rid2="${id}"]`).forEach(r => { const h = r.closest(".book").querySelector("h4"); if (h) h.insertAdjacentHTML("beforeend", seoaBadge(id)); });
+  }
+}
+function rateNote(id, text, ok){ document.querySelectorAll(`.rate[data-rid2="${id}"] .rs`).forEach(rs => { rs.textContent = text; rs.classList.toggle("ok", !!ok); }); }
+async function postJSON(url, body){
+  const ctl = ("AbortController" in window) ? new AbortController() : null; const tm = setTimeout(() => { if (ctl) ctl.abort(); }, 15000);
+  try { const r = await fetch(url, {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined}); let j = null; try { j = await r.json(); } catch(e) {} return {status: r.status, j: j || {}}; }
+  catch(e) { return {status: 0, j: {}}; } finally { clearTimeout(tm); }
+}
+async function sendRate(id){
+  const v = S.rate[rk(id)]; if (!v || !isSeoa() || !askRoot()) return;
+  const r = await postJSON(askRoot() + "/rate", {date: IKEY, issue: DATA.issue.no, article: id, stars: v, token: S.seoa.token});
+  if (r.status === 200) rateNote(id, `서아 별점 ★${v} · Nova에 보냈어요`, true);
+  else if (r.status === 403 && r.j.error === "bad_token") rateNote(id, `서아 별점 ★${v} · 기기 확인이 풀렸어요(다시 등록해 주세요)`);
+  else rateNote(id, `서아 별점 ★${v} · 지금은 못 보냈어요(이 기기에는 저장했어요)`);
+}
+function openSeoaReg(pendingId){
+  seoaPending = pendingId || null;
+  openModal(`<div class="seoa-modal"><div class="kicker">서아 기기 확인</div><h3>서아만 Nova에 별점을 보낼 수 있어요</h3>
+    <p class="note" style="margin:4px 0 0">서아 확인 암호를 넣어 주세요(처음 한 번만). 다른 친구들은 '그냥 이 기기에만 저장'을 누르면 돼요.</p>
+    <input type="password" id="seoaCode" autocomplete="off" placeholder="서아 확인 암호" maxlength="100">
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="go" id="seoaOk">확인</button><button class="go ghost" id="seoaLocal">그냥 이 기기에만 저장</button></div>
+    <div class="smsg" id="seoaMsg"></div></div>`);
+  const msg = (t, bad) => { const m = $("#seoaMsg"); m.textContent = t; m.classList.toggle("bad", !!bad); };
+  $("#seoaLocal").onclick = () => { S.seoa = {mode: "local", t: Date.now()}; save(); closeModal(); refreshRateUI(); toast("이 기기에만 저장할게요"); };
+  $("#seoaCode").onkeydown = e => { if (e.key === "Enter") $("#seoaOk").click(); };
+  $("#seoaOk").onclick = async () => {
+    const code = $("#seoaCode").value.trim(); if (!code) { msg("암호를 넣어 주세요", true); return; }
+    $("#seoaOk").disabled = true; msg("확인하고 있어요…");
+    const r = await postJSON(askRoot() + "/seoa/register", {code});
+    $("#seoaOk").disabled = false;
+    if (r.status === 200 && r.j.token) {
+      S.seoa = {mode: "seoa", token: String(r.j.token), t: Date.now()}; save(); closeModal(); toast("서아 기기로 등록했어요");
+      refreshRateUI(); if (seoaPending) sendRate(seoaPending); seoaPending = null; return;
+    }
+    if (r.j.error === "wrong_code") msg("암호가 맞지 않아요", true);
+    else if (r.j.error === "not_ready") { msg("아직 준비 중이에요. 이 기기에만 저장할게요"); seoaAskedThisVisit = true; setTimeout(closeModal, 1600); }
+    else if (r.status === 429) msg("여러 번 틀려서 잠시 쉬어야 해요. 한 시간 뒤에 다시 해 보세요.", true);
+    else msg("서버에 닿지 않았어요. 별점은 이 기기에 저장했어요.", true);
+  };
+  setTimeout(() => { const i = $("#seoaCode"); if (i) i.focus(); }, 50);
+}
+function refreshRateUI(){   // 등록 상태가 바뀌면 지금 쪽의 별점 칸·표시를 다시 그림
+  document.querySelectorAll(".rate[data-rid2]").forEach(r => { r.outerHTML = rateHtml(r.dataset.rid2, r.querySelector(".rl").textContent); });
+  document.querySelectorAll("[data-seoa-b]").forEach(b => b.remove());
+  document.querySelectorAll(".rate[data-rid2]").forEach(r => paintRate(r.dataset.rid2));
+  const ss = $("#seoaSet"); if (ss) ss.outerHTML = seoaSetupHtml();
+}
+document.addEventListener("click", e => {
+  const reg = e.target.closest && e.target.closest("[data-seoa-reg]");
+  if (reg) { openSeoaReg(null); return; }
+  const st = e.target.closest && e.target.closest(".rate .star");
+  if (!st) return;
+  const id = st.closest(".rate").dataset.rid2, v = +st.dataset.v;
+  S.rate[rk(id)] = v; save(); paintRate(id);
+  if (!askRoot()) return;                       // 답하는 서버가 없는 곳(미리보기 등)은 이 기기에만
+  if (isSeoa()) { sendRate(id); return; }
+  if (!S.seoa && !seoaAskedThisVisit) { seoaAskedThisVisit = true; openSeoaReg(id); }
+});
 
 /* ---------- 다 읽음 도장 ---------- */
 // 기사를 연 뒤 '그 기사가 화면에 보인 시간'이 글 길이에 맞는 최소 시간을 넘고, 끝부분(끝 표시)이 화면에 들어오면 도장을 찍어요.
@@ -881,7 +987,7 @@ function coverHtml(){
   return `<section class="cover1">
     <div class="c-top"><span><b>${esc(DATA.issue.label)}</b></span><span>${esc(DATA.issue.dateText)}</span><span class="c-every">매주 금요일 밤 10시</span><button class="tbtn past c-past" data-past="1">지난 호 보기</button></div>
     <h1 class="c-name">Nova</h1>
-    <div class="c-sub">서아가 기획한 주간 과학 교양지</div>
+    <div class="c-sub" aria-hidden="true"></div>
     <div class="c-art" data-go="${C.go}">${C.img ? `<img class="c-img" src="${esc((DATA.images||{})[C.img] || ("assets/img/" + C.img + ".jpg"))}" alt="${esc(C.caption||C.headline)}">` : (F.cover || "")}<div class="c-head"><div class="kicker">${esc(C.kicker || "이번 호 머리기사")}</div><h2>${esc(C.headline)}</h2></div></div>
     <div class="c-lines"><div class="c-deck">${esc((C.lead||[])[0]||"")}</div><div class="c-lh">이번 호에는</div>${C.lines.map(l=>`<div class="c-l" data-go="${l.go}"><span class="cs">${esc(l.sec)}</span><span class="ct">${esc(l.t)}</span></div>`).join("")}</div>
     <div class="c-foot"><button class="go ghost" data-go="contents">차례 보기</button><button class="go ghost past-go" data-past="1">지난 호 보기</button><button class="go" data-go="${C.go}">머리기사 읽기 →</button></div>
@@ -895,10 +1001,11 @@ function contentsHtml(s){
   const all = []; SECS.forEach(x => sectionIds(x).forEach(i => all.push(i)));
   const done = all.filter(isRead).length;
   const bar = all.length ? `<div class="readbar"><span>읽음 도장</span><span class="rb-bar"><i style="width:${Math.round(done/all.length*100)}%"></i></span><span><b>${done}</b> / ${all.length}</span></div>` : "";
-  return secHead(s) + bar + `<section class="toc">${DATA.toc.map(t=>{ const id = tocId(t); return `<div class="toc-row" data-go="${t.go}"><div class="ts">${esc(t.sec)}</div><div class="tt">${esc(t.t)}${(id && READABLE(id) && isRead(id))?`<span class="tread" title="다 읽었어요">읽음</span>`:""}</div><div class="tp">${esc(t.p)}</div></div>`; }).join("")}</section>
+  return secHead(s) + bar + `<section class="toc">${DATA.toc.map(t=>{ const id = tocId(t); return `<div class="toc-row" data-go="${t.go}"><div class="ts">${esc(t.sec)}</div><div class="tt">${esc(t.t)}${(id && READABLE(id) && isRead(id))?`<span class="tread" title="다 읽었어요">읽음</span>`:""}${id?seoaBadge(id):""}</div><div class="tp">${esc(t.p)}</div></div>`; }).join("")}</section>
     <div class="howread"><b>Nova 읽는 법</b><br>· 맨 위의 이름표(과학, 수학, 경제…)를 누르면 그 쪽으로 가요.<br>· 기사 속 <span style="border-bottom:2px dotted var(--red)">밑줄 친 낱말</span>을 누르면 뜻이 나와요.<br>· 영어로 된 출처에는 '국문 요약' 단추가 있어요. 누르면 우리말 요약이 나와요.<br>· 기사를 끝까지 읽으면 제목 옆에 <b>'잘했어요' 도장</b>이 찍히고, 이 차례에도 '읽음'이 표시돼요.<br>· 궁금한 것은 오른쪽 아래 '무엇이든 물어보세요'를 눌러 물어보세요.</div>
     <div class="editor"><div class="m">${F.mascot || ""}</div><p>${esc(DATA.editorNote)}</p></div>
-    ${pastListHtml(true)}`;
+    ${pastListHtml(true)}
+    ${seoaSetupHtml()}`;
 }
 
 /* ---------- 책 ---------- */
@@ -908,10 +1015,10 @@ function booksHtml(){
     <div class="byline"><span>글 Nova 편집부</span><span>${esc(DATA.issue.dateShort)}</span></div>
     ${(B.intro||[]).map(x=>`<p class="bintro">${esc(x.x)}</p>`).join("")}
     ${B.books.map(b=>`<div class="book"><div>${b.img?`<img src="${b.img}" alt="${esc(b.title)} 표지" loading="lazy">`:""}</div><div>
-      <h4>${esc(b.title)}</h4><div class="bm">${esc(b.field)} · ${esc(b.by)} · ${esc(b.pub)}</div><p>${esc(b.about)}</p><p class="why">${esc(b.why)}</p>
+      <h4>${esc(b.title)}${seoaBadge(bookId(b))}</h4><div class="bm">${esc(b.field)} · ${esc(b.by)} · ${esc(b.pub)}</div><p>${esc(b.about)}</p><p class="why">${esc(b.why)}</p>
       ${b.metrics?`<div class="bscore"><a href="${esc(b.metrics.aladin.url)}" target="_blank" rel="noopener">알라딘 <b>★ ${b.metrics.aladin.star.toFixed(1)}</b> <span class="nw">리뷰 ${b.metrics.aladin.reviews.toLocaleString()}개</span> · <span class="nw">세일즈포인트 ${b.metrics.aladin.salesPoint.toLocaleString()}</span></a><a href="${esc(b.metrics.yes24.url)}" target="_blank" rel="noopener">예스24 <b>★ ${b.metrics.yes24.star.toFixed(1)}</b> <span class="nw">${esc(b.metrics.yes24.reviewsLabel || "리뷰")} ${b.metrics.yes24.reviews.toLocaleString()}개</span> · <span class="nw">판매지수 ${b.metrics.yes24.salesIndex.toLocaleString()}</span></a></div>`:""}
       ${b.metricsNote?`<div class="bmnote">${esc(b.metricsNote)}</div>`:""}
-      <a class="sbtn" href="${esc(b.url)}" target="_blank" rel="noopener">책 정보 보기 ↗</a></div></div>`).join("")}
+      <a class="sbtn" href="${esc(b.url)}" target="_blank" rel="noopener">책 정보 보기 ↗</a>${rateHtml(bookId(b), "이 책 별점")}</div></div>`).join("")}
     ${(B.method&&B.method.length)?`<div class="box bmethod"><div class="bt">어떻게 골랐나요?</div><div class="bb">${B.method.map((x,i)=>`<p>${esc(i===0?String(x.x||x).replace(/^어떻게 골랐나요\?\s*/,""):(x.x||x))}</p>`).join("")}</div></div>`:""}
     <div class="note">표지 이미지: 알라딘 상품 정보 · 평점과 리뷰 수는 ${esc((B.books[0].metrics||{}).checkedText || ((B.books[0].metrics||{}).checked||"") + " 기준")}(10점 만점), 이후 달라질 수 있어요.</div>${endHtml("books")}${reactHtml("books")}</article>`;
 }
@@ -920,7 +1027,7 @@ function booksHtml(){
 function comicHtml(){
   const M = A.comic, IM = DATA.images || {};
   const imgs = M.panels.map((p, i) => IM["comic_" + (i+1)]).filter(Boolean);
-  const head = `<article class="art" id="a-comic" ${readAttrs("comic")}><div class="kicker">${esc(M.kicker||"만화")}</div>${stampHtml("comic")}<h3 class="title">${esc(M.title)}</h3><p class="deck">${esc(M.deck||"")}</p>`;
+  const head = `<article class="art" id="a-comic" ${readAttrs("comic")}><div class="kicker">${esc(M.kicker||"만화")}</div>${stampHtml("comic")}<h3 class="title">${esc(M.title)}${seoaBadge("comic")}</h3><p class="deck">${esc(M.deck||"")}</p>`;
   const bub = (l, st) => `<div class="bub ${l.who==="효과음"?"fx":l.who==="해설"?"nar":""}"${st?` style="${st}"`:""}>${l.who==="효과음"||l.who==="해설"||l.who==="나"?"":`<span style="color:var(--gray);font-weight:500">${esc(l.who)}</span> `}${esc(l.say)}</div>`;
   // 대사를 그림 위에 얹기(제2호부터 panels[].place, caption, lines[].pos): 자리 힌트가 있을 때만
   const ovPanel = (p, i) => {
@@ -941,7 +1048,7 @@ function comicHtml(){
   else mid = `<div class="comic-wait">이번 호 만화는 그림을 <b>GPT 이미지 모델</b>에게 맡겼어요. 그림이 도착하면 이 쪽에 실려요. 그동안 이야기(콘티)를 먼저 읽어 보세요.</div>
     <div class="conti">${M.panels.map((p,i)=>`<div class="ct-p"><span class="pn">${i+1}</span>${p.lines.map(l=>`<div class="ln ${l.who==="해설"?"nar":l.who==="효과음"?"fx":""}">${l.who==="해설"||l.who==="효과음"?"":`<b>${esc(l.who==="나"?"마스코트":l.who)}</b>`}${esc(l.say)}</div>`).join("")}</div>`).join("")}</div>`;
   return head + mid + `${M.after?`<div class="box"><div class="bt">만화 속 과학</div><div class="bb">${esc(M.after)}</div></div>`:""}
-    <div class="note">${(IM.comic_page||imgs.length)?"그림: GPT 이미지 모델(Nova 편집부 의뢰)":"그림 준비 중: GPT 이미지 모델에 의뢰"} · 마스코트는 서아가 그린 캐릭터예요.</div>${endHtml("comic")}${reactHtml("comic")}</article>`;
+    <div class="note">${(IM.comic_page||imgs.length)?"그림: GPT 이미지 모델(Nova 편집부 의뢰)":"그림 준비 중: GPT 이미지 모델에 의뢰"} · 마스코트는 서아가 그린 캐릭터예요.</div>${endHtml("comic")}${rateHtml("comic", "이 만화 별점")}${reactHtml("comic")}</article>`;
 }
 
 /* ---------- 심리검사 ---------- */

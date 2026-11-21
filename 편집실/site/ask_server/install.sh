@@ -2,6 +2,7 @@
 # Nova 질문 서버 설치 (Ubuntu, AWS Lightsail)
 #   sudo bash install.sh            설치(서버 프로그램 + 서비스 + 80·443이 비어 있으면 Caddy로 https)
 #   sudo bash install.sh set-key    Anthropic API 키 넣기(화면에 보이지 않게 입력)
+#   sudo bash install.sh set-seoa-code  서아 확인 암호 넣기(서아 기기 등록용, 화면에 보이지 않게 입력)
 #   sudo bash install.sh check      동작 확인
 #   sudo bash install.sh fake on|off  키 없이 '시험용 답' 모드 켜기/끄기
 # 다른 IP를 쓰면: sudo NOVA_IP=1.2.3.4 bash install.sh
@@ -50,6 +51,33 @@ cmd_set_key() {
   set_env NOVA_FAKE 0
   systemctl restart nova-ask
   echo "키를 저장했어요(/etc/nova-ask.env, root만 읽기). 서비스를 다시 켰어요."
+}
+
+cmd_set_seoa_code() {
+  need_root set-seoa-code
+  [ -f "$ENVF" ] || die "먼저 설치해 주세요: sudo bash install.sh"
+  local C="" C2="" tmp line
+  read -rsp "서아 확인 암호를 정해 입력하고 Enter(화면에는 보이지 않아요): " C; echo
+  read -rsp "같은 암호를 한 번 더 입력하고 Enter: " C2; echo
+  # 브라우저 터미널의 '붙여 넣기 표시'(ESC[200~ … ESC[201~)와 보이지 않는 글자를 걸러 내요
+  C="${C//$'\e[200~'/}"; C="${C//$'\e[201~'/}"; C2="${C2//$'\e[200~'/}"; C2="${C2//$'\e[201~'/}"
+  C="$(printf '%s' "$C" | tr -d '\000-\037\177')"; C2="$(printf '%s' "$C2" | tr -d '\000-\037\177')"
+  C="${C#"${C%%[![:space:]]*}"}"; C="${C%"${C##*[![:space:]]}"}"; C2="${C2#"${C2%%[![:space:]]*}"}"; C2="${C2%"${C2##*[![:space:]]}"}"
+  [ -n "$C" ] || die "암호가 비어 있어요. 다시 해 주세요."
+  [ "$C" = "$C2" ] || die "두 번 입력한 암호가 달라요. 다시 해 주세요."
+  [ "${#C}" -ge 4 ] || die "암호는 4글자 이상으로 정해 주세요."
+  case "$C" in *=*|*\"*|*\'*|*\\*) die "암호에 = 따옴표 \\ 는 쓰지 말아 주세요." ;; esac
+  echo "받은 암호: ${#C}글자 (화면에 보이지 않게 저장해요)"
+  tmp="$(mktemp "$ENVF.XXXX")"; chmod 600 "$tmp"
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in NOVA_SEOA_CODE=*) ;; *) printf '%s\n' "$line" ;; esac
+  done < "$ENVF" > "$tmp"
+  printf 'NOVA_SEOA_CODE=%s\n' "$C" >> "$tmp"
+  unset C C2
+  mv "$tmp" "$ENVF"; chown root:root "$ENVF"; chmod 600 "$ENVF"
+  systemctl restart nova-ask
+  echo "서아 확인 암호를 저장했어요(/etc/nova-ask.env, root만 읽기). 서비스를 다시 켰어요."
+  echo "서아 기기에서 별을 처음 누를 때 이 암호를 한 번 넣으면 돼요."
 }
 
 cmd_fake() {
@@ -108,6 +136,7 @@ NOVA_MAX_TOKENS=700
 NOVA_PER_IP_HOUR=20
 NOVA_DAILY_MAX=300
 NOVA_FAKE=0
+NOVA_SEOA_CODE=
 EOF
     )
   fi
@@ -174,7 +203,8 @@ EOF
 case "${1:-install}" in
   install) cmd_install ;;
   set-key) cmd_set_key ;;
+  set-seoa-code) cmd_set_seoa_code ;;
   check)   cmd_check ;;
   fake)    cmd_fake "${2:-}" ;;
-  *) die "알 수 없는 명령: $1 (install | set-key | check | fake on|off)" ;;
+  *) die "알 수 없는 명령: $1 (install | set-key | set-seoa-code | check | fake on|off)" ;;
 esac

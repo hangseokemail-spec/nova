@@ -26,7 +26,10 @@ class T(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.lim = N.Limiter(per_ip_hour=3, daily_max=5)
-        cls.srv = N.make_server("127.0.0.1", 0, cls.lim)
+        import tempfile
+        cls.tmp = tempfile.mkdtemp(prefix="nova_ask_test_")
+        cls.store = N.Store(cls.tmp)
+        cls.srv = N.make_server("127.0.0.1", 0, cls.lim, store=cls.store, fail_limiter=N.FailLimiter(5), rate_limiter=N.Limiter(1000, 0))
         cls.port = cls.srv.server_address[1]
         cls.seen = []
         def fake_answer(q, titles):
@@ -37,6 +40,66 @@ class T(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.srv.shutdown()
+
+    # ---------- 서아 별점 ----------
+    def _reg(self, code, ip="7.7.7.7"):
+        return req(self.port, "POST", "/ask/seoa/register", json.dumps({"code": code}), headers={"X-Forwarded-For": ip})
+
+    def test_seoa_not_ready(self):
+        os.environ.pop("NOVA_SEOA_CODE", None)
+        c, _, j = self._reg("아무거나")
+        self.assertEqual((c, j), (503, {"error": "not_ready"}))
+
+    def test_seoa_register_and_rate(self):
+        os.environ["NOVA_SEOA_CODE"] = "별빛 서아7"
+        try:
+            c, h, j = self._reg("  별빛 서아7 ")
+            self.assertEqual(c, 200); tok = j["token"]; self.assertGreaterEqual(len(tok), 32)
+            self.assertEqual(h.get("Access-Control-Allow-Origin"), GH)
+            # 파일에는 토큰 그대로가 아니라 해시만, 권한 600
+            p = os.path.join(self.tmp, "seoa_tokens.json")
+            self.assertNotIn(tok, open(p).read()); self.assertEqual(os.stat(p).st_mode & 0o777, 0o600)
+            body = {"date": "2026-11-20", "issue": 2, "article": "gorilla", "stars": 4, "token": tok}
+            c, _, j = req(self.port, "POST", "/ask/rate", json.dumps(body)); self.assertEqual((c, j), (200, {"ok": True}))
+            body["stars"] = 2
+            c, _, j = req(self.port, "POST", "/ask/rate", json.dumps(body)); self.assertEqual(c, 200)   # 다시 누르면 덮어쓰기
+            c, h, j = req(self.port, "GET", "/ask/ratings", origin=None)
+            self.assertEqual(c, 200); self.assertEqual(j["ratings"]["2026-11-20"]["gorilla"]["stars"], 2)
+            self.assertEqual(h.get("Access-Control-Allow-Origin"), "*")
+            self.assertEqual(os.stat(os.path.join(self.tmp, "ratings.json")).st_mode & 0o777, 0o600)
+            # 잘못된 값들
+            for bad in [dict(body, stars=0), dict(body, stars=6), dict(body, stars="5"), dict(body, stars=True), dict(body, stars=3.5),
+                        dict(body, article="../etc"), dict(body, article="A"), dict(body, article="x" * 60), dict(body, date="20261120"), dict(body, date="2026-11-20T1")]:
+                c, _, j = req(self.port, "POST", "/ask/rate", json.dumps(bad)); self.assertEqual(c, 400, bad)
+            for t in ["", "x" * 40, None]:
+                c, _, j = req(self.port, "POST", "/ask/rate", json.dumps(dict(body, token=t))); self.assertEqual((c, j), (403, {"error": "bad_token"}))
+            c, _, j = req(self.port, "POST", "/ask/rate", json.dumps(body), origin="https://evil.example"); self.assertEqual(c, 403)
+            c, _, _ = req(self.port, "OPTIONS", "/ask/rate"); self.assertEqual(c, 204)
+        finally:
+            os.environ.pop("NOVA_SEOA_CODE", None)
+
+    def test_seoa_wrong_code_limit(self):
+        os.environ["NOVA_SEOA_CODE"] = "정답암호"
+        try:
+            codes = [self._reg("틀림", ip="8.8.8.8")[0] for _ in range(6)]
+            self.assertEqual(codes, [403] * 5 + [429])
+            self.assertEqual(self._reg("정답암호", ip="8.8.8.8")[0], 429)   # 막힌 동안은 맞는 암호도 못 씀
+            self.assertEqual(self._reg("정답암호", ip="8.8.8.9")[0], 200)   # 다른 IP는 괜찮음
+        finally:
+            os.environ.pop("NOVA_SEOA_CODE", None)
+
+    def test_seoa_size_limit(self):
+        st = N.Store(self.tmp + "_size")
+        old = N.MAX_ARTS; N.MAX_ARTS = 2
+        try:
+            self.assertTrue(st.rate("2026-11-20", "a", 3)); self.assertTrue(st.rate("2026-11-20", "b", 3))
+            self.assertFalse(st.rate("2026-11-20", "c", 3)); self.assertTrue(st.rate("2026-11-20", "a", 5))
+        finally:
+            N.MAX_ARTS = old
+
+    def test_thinking_setting_kept(self):
+        import inspect
+        self.assertIn('"thinking": {"type": "between_tools"}', inspect.getsource(N.call_claude))
 
     def setUp(self):
         self.lim.hits.clear(); self.lim.day_count = 0

@@ -13,6 +13,10 @@ Restart=on-failure
 RestartSec=3
 # 따로 만든 이름 없는 사용자로 실행하고, 할 수 있는 일을 좁혀요
 DynamicUser=yes
+# 서아 기기 토큰·별점은 /var/lib/nova-ask 에만 써요(이 서비스만 쓸 수 있는 폴더, 권한 700)
+StateDirectory=nova-ask
+StateDirectoryMode=0700
+UMask=0077
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes

@@ -6,6 +6,10 @@
                    돌려주는 값: {"a": "답"}  /  실패하면 {"error": "4학년이 읽을 수 있는 안내 문구"}
 - GET  /ask/health 살아 있는지 확인: {"ok": true, ...}
 - OPTIONS /ask     CORS 미리 묻기(preflight) 응답
+- 서아 별점(서아 기기에서 누른 별점만 Nova에 모아요)
+  POST /ask/seoa/register {"code": "서아 확인 암호"} → {"token": "..."}  (틀리면 {"error":"wrong_code"}, 암호가 아직 없으면 {"error":"not_ready"})
+  POST /ask/rate {"date":"2026-11-20","issue":2,"article":"gorilla","stars":4,"token":"..."} → {"ok": true}
+  GET  /ask/ratings → {"ratings": {날짜: {기사id: {"stars": 4, "t": "..."}}}}  (별점 숫자만이라 누구나 읽을 수 있어요)
 
 환경 변수(/etc/nova-ask.env, 권한 600. 키는 편집인이 직접 넣어요)
   ANTHROPIC_API_KEY   (필수) Anthropic API 키. 코드와 저장소에는 절대 쓰지 않아요.
@@ -17,8 +21,10 @@
   NOVA_ALLOW_LOCAL    1 이면 http://localhost·127.0.0.1 Origin도 허용(시험용)
   NOVA_FAKE           1 이면 API를 부르지 않고 시험용 답을 돌려줘요(설치 확인·시험용)
   NOVA_HOST, NOVA_PORT 기다릴 주소 (기본값 127.0.0.1, 8787)
+  NOVA_SEOA_CODE      서아 확인 암호('sudo bash install.sh set-seoa-code'로 넣어요). 비어 있으면 서아 기기 등록을 받지 않아요
+  NOVA_DATA_DIR       서아 기기 토큰·별점을 두는 곳 (기본값 /var/lib/nova-ask, 파일 권한 600)
 """
-import json, os, re, sys, threading, time, urllib.request, urllib.error
+import json, os, re, sys, threading, time, urllib.request, urllib.error, secrets, hashlib, hmac
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -154,6 +160,100 @@ def call_claude(q, titles):
     return text
 
 
+# ---------------- 서아 별점 ----------------
+DATE_RE = re.compile(r"^20\d\d-[01]\d-[0-3]\d$")
+ART_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,47}$")
+MAX_TOKENS_KEEP = 20          # 서아 기기 토큰은 최근 20개까지
+MAX_DATES, MAX_ARTS = 600, 80  # 별점 파일 크기 제한(호 수, 호마다 기사 수)
+
+
+class Store:
+    """서아 기기 토큰(sha256 해시만 저장)과 별점을 JSON 파일에 둡니다. 파일 권한 600, 바꿀 때는 임시 파일에 쓴 뒤 바꿔 끼워요."""
+
+    def __init__(self, base=None):
+        self.base = base or os.environ.get("NOVA_DATA_DIR", "/var/lib/nova-ask")
+        self.lock = threading.Lock()
+
+    def _p(self, name):
+        return os.path.join(self.base, name)
+
+    def _load(self, name, default):
+        try:
+            with open(self._p(name), encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return default
+        except Exception:
+            return default
+
+    def _save(self, name, obj):
+        os.makedirs(self.base, mode=0o700, exist_ok=True)
+        tmp = self._p(name + ".tmp")
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(obj, f, ensure_ascii=False)
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, self._p(name))
+
+    @staticmethod
+    def _h(token):
+        return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+    def new_token(self):
+        tok = secrets.token_urlsafe(32)   # 43글자
+        with self.lock:
+            d = self._load("seoa_tokens.json", {"tokens": []})
+            lst = [x for x in d.get("tokens", []) if isinstance(x, dict) and x.get("h")]
+            lst.append({"h": self._h(tok), "t": datetime.now(KST).isoformat(timespec="seconds")})
+            self._save("seoa_tokens.json", {"tokens": lst[-MAX_TOKENS_KEEP:]})
+        return tok
+
+    def token_ok(self, token):
+        if not isinstance(token, str) or not (20 <= len(token) <= 200):
+            return False
+        h = self._h(token)
+        with self.lock:
+            d = self._load("seoa_tokens.json", {"tokens": []})
+        return any(isinstance(x, dict) and hmac.compare_digest(str(x.get("h", "")), h) for x in d.get("tokens", []))
+
+    def rate(self, date, article, stars):
+        with self.lock:
+            r = self._load("ratings.json", {})
+            if not isinstance(r, dict):
+                r = {}
+            if date not in r and len(r) >= MAX_DATES:
+                return False
+            day = r.setdefault(date, {})
+            if article not in day and len(day) >= MAX_ARTS:
+                return False
+            day[article] = {"stars": stars, "t": datetime.now(KST).isoformat(timespec="seconds")}
+            self._save("ratings.json", r)
+        return True
+
+    def ratings(self):
+        with self.lock:
+            r = self._load("ratings.json", {})
+        return r if isinstance(r, dict) else {}
+
+
+class FailLimiter:
+    """틀린 암호 시도를 IP마다 한 시간에 n번까지만 받아요."""
+
+    def __init__(self, n=5, clock=time.time):
+        self.n, self.clock, self.fails, self.lock = n, clock, {}, threading.Lock()
+
+    def blocked(self, ip):
+        now = self.clock()
+        with self.lock:
+            lst = [t for t in self.fails.get(ip, []) if now - t < 3600]
+            self.fails[ip] = lst
+            return len(lst) >= self.n
+
+    def fail(self, ip):
+        with self.lock:
+            self.fails.setdefault(ip, []).append(self.clock())
+
+
 def client_ip(handler):
     """Caddy·nginx 뒤에 있으므로, 바로 앞(127.0.0.1)이 붙여 준 X-Forwarded-For의 맨 오른쪽 값을 씁니다."""
     peer = handler.client_address[0]
@@ -176,6 +276,9 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "NovaAsk/1.0"
     limiter = None          # main()에서 넣어요
     answer = staticmethod(call_claude)
+    store = None            # 서아 별점 저장소
+    fail_limiter = None     # 틀린 암호 시도
+    rate_limiter = None     # 별점·등록 요청 횟수(질문 횟수와 따로 셈)
 
     def log_message(self, fmt, *args):   # 기본 접속 기록(질문 내용은 남기지 않음)
         pass
@@ -204,7 +307,7 @@ class Handler(BaseHTTPRequestHandler):
         return self.path.split("?", 1)[0].rstrip("/") or "/"
 
     def do_OPTIONS(self):
-        if self._path() not in ("/ask", "/ask/health"):
+        if self._path() not in ("/ask", "/ask/health", "/ask/seoa/register", "/ask/rate", "/ask/ratings"):
             return self._json(404, {"error": MSG["notfound"]})
         if not allowed_origin(self.headers.get("Origin", "")):
             return self._json(403, {"error": MSG["origin"]})
@@ -218,25 +321,82 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {"ok": True, "fake": os.environ.get("NOVA_FAKE") == "1",
                                     "key": bool(os.environ.get("ANTHROPIC_API_KEY", "").strip()),
                                     "model": os.environ.get("NOVA_MODEL", "claude-sonnet-5-5")})
+        if self._path() == "/ask/ratings":   # 서아 별점 전체(숫자만, 누구나 읽기)
+            b = json.dumps({"ratings": self.store.ratings()}, ensure_ascii=False).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(b)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(b)
+            return
         return self._json(404, {"error": MSG["notfound"]})
 
-    def do_POST(self):
-        if self._path() != "/ask":
-            return self._json(404, {"error": MSG["notfound"]})
-        if not allowed_origin(self.headers.get("Origin", "")):
-            return self._json(403, {"error": MSG["origin"]})
+    def _body(self):
+        """본문(JSON 객체)을 읽어요. 문제가 있으면 (None, 응답 코드, 오류) 를 돌려줘요."""
         try:
             n = int(self.headers.get("Content-Length", "0"))
         except ValueError:
             n = -1
         if n <= 0 or n > MAX_BODY:
-            return self._json(413 if n > MAX_BODY else 400, {"error": MSG["long"] if n > MAX_BODY else MSG["bad"]})
+            return None, (413 if n > MAX_BODY else 400), (MSG["long"] if n > MAX_BODY else MSG["bad"])
         try:
             d = json.loads(self.rfile.read(n).decode("utf-8"))
             if not isinstance(d, dict):
                 raise ValueError
         except Exception:
-            return self._json(400, {"error": MSG["bad"]})
+            return None, 400, MSG["bad"]
+        return d, 200, None
+
+    def _register(self, d):
+        ip = client_ip(self)
+        if self.rate_limiter.check(ip):
+            return self._json(429, {"error": "too_many"})
+        code_env = os.environ.get("NOVA_SEOA_CODE", "").strip()
+        if not code_env:
+            return self._json(503, {"error": "not_ready"})
+        if self.fail_limiter.blocked(ip):
+            log("서아 등록 막음(틀린 시도 많음)", "ip끝자리", ip[-4:])
+            return self._json(429, {"error": "too_many"})
+        code = d.get("code")
+        code = code.strip() if isinstance(code, str) else ""
+        if not code or len(code) > 200 or not hmac.compare_digest(code.encode("utf-8"), code_env.encode("utf-8")):
+            self.fail_limiter.fail(ip)
+            log("서아 등록 실패(암호 틀림)", "ip끝자리", ip[-4:])
+            return self._json(403, {"error": "wrong_code"})
+        tok = self.store.new_token()
+        log("서아 기기 등록")
+        return self._json(200, {"token": tok})
+
+    def _rate(self, d):
+        ip = client_ip(self)
+        if self.rate_limiter.check(ip):
+            return self._json(429, {"error": "too_many"})
+        date, art, stars = d.get("date"), d.get("article"), d.get("stars")
+        if not (isinstance(date, str) and DATE_RE.match(date)) or not (isinstance(art, str) and ART_RE.match(art)) \
+                or isinstance(stars, bool) or not isinstance(stars, int) or not (1 <= stars <= 5):
+            return self._json(400, {"error": "bad"})
+        if not self.store.token_ok(d.get("token")):
+            return self._json(403, {"error": "bad_token"})
+        if not self.store.rate(date, art, stars):
+            return self._json(507, {"error": "full"})
+        log("서아 별점", date, art, stars)
+        return self._json(200, {"ok": True})
+
+    def do_POST(self):
+        path = self._path()
+        if path not in ("/ask", "/ask/seoa/register", "/ask/rate"):
+            return self._json(404, {"error": MSG["notfound"]})
+        if not allowed_origin(self.headers.get("Origin", "")):
+            return self._json(403, {"error": MSG["origin"]})
+        d, code, err = self._body()
+        if d is None:
+            return self._json(code, {"error": err})
+        if path == "/ask/seoa/register":
+            return self._register(d)
+        if path == "/ask/rate":
+            return self._rate(d)
         q = d.get("q")
         q = q.strip() if isinstance(q, str) else ""
         q = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", q)
@@ -271,8 +431,11 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(200, {"a": a})
 
 
-def make_server(host=None, port=None, limiter=None):
+def make_server(host=None, port=None, limiter=None, store=None, fail_limiter=None, rate_limiter=None):
     Handler.limiter = limiter or Limiter(env_int("NOVA_PER_IP_HOUR", 20), env_int("NOVA_DAILY_MAX", 300))
+    Handler.store = store or Store()
+    Handler.fail_limiter = fail_limiter or FailLimiter(5)
+    Handler.rate_limiter = rate_limiter or Limiter(env_int("NOVA_RATE_PER_IP_HOUR", 120), env_int("NOVA_RATE_DAILY_MAX", 2000))
     return ThreadingHTTPServer((host or os.environ.get("NOVA_HOST", "127.0.0.1"), int(port or os.environ.get("NOVA_PORT", 8787))), Handler)
 
 

@@ -28,6 +28,20 @@ curl -fsSL "https://raw.githubusercontent.com/hangseokemail-spec/nova/main/%ED%8
 
 ---
 
+## 서버 갱신하기 (이미 설치한 서버에 새 기능 넣기: 서아 별점)
+
+이미 설치한 서버는 아래 **한 줄**을 브라우저 SSH 창에 붙여 넣으면 돼요. 새 `nova_ask.py`·`install.sh`·서비스 파일을 받고, 서비스를 다시 켠 뒤, 서아 확인 암호를 물어봐요(화면에 보이지 않게 두 번 입력).
+
+```bash
+B="https://raw.githubusercontent.com/hangseokemail-spec/nova/main/%ED%8E%B8%EC%A7%91%EC%8B%A4/site/ask_server"; sudo install -d -m 755 /opt/nova-ask-src && for f in nova_ask.py nova-ask.service install.sh; do sudo curl -fsSL "$B/$f" -o "/opt/nova-ask-src/$f" || echo "받기 실패: $f"; done && sudo bash /opt/nova-ask-src/install.sh && sudo bash /opt/nova-ask-src/install.sh set-seoa-code
+```
+
+- API 키와 다른 설정(`/etc/nova-ask.env`)은 그대로 남아요. 질문 답하기도 그대로예요.
+- **서아 확인 암호**는 서아 기기에서 별을 처음 누를 때 한 번만 넣는 암호예요. 서아와 편집인만 알게 정하고, 저장소·채팅에 적지 마세요. 바꾸려면 `sudo bash /opt/nova-ask-src/install.sh set-seoa-code`를 다시 하면 돼요(이미 등록한 서아 기기는 그대로 보낼 수 있어요).
+- 서아 별점은 서버의 `/var/lib/nova-ask/ratings.json`(권한 600)에 쌓여요. 서아 기기 토큰은 해시로만 `seoa_tokens.json`에 남아요.
+- 별점 확인: `curl -s https://3-34-169-45.sslip.io/ask/ratings; echo` (별점 숫자만 나와요)
+- 서아 기기를 모두 다시 등록하게 하려면: `sudo rm /var/lib/nova-ask/seoa_tokens.json && sudo systemctl restart nova-ask`
+
 ## 1단계. Lightsail에 접속하기
 
 Lightsail 콘솔 → 인스턴스 → **'브라우저를 사용하여 연결'(Connect using SSH)** 을 눌러 검은 창을 엽니다.
@@ -130,6 +144,7 @@ window.SEOA_CONFIG = { gasUrl: "", askUrl: "https://3-34-169-45.sslip.io/ask" };
 | `NOVA_DAILY_MAX` | `300` | 하루(한국 시각) 전체 질문 상한. 요금이 걱정되면 줄여요 |
 | `NOVA_FAKE` | `0` | `1`이면 API를 부르지 않고 '시험용 답'만 돌려줘요 |
 | `NOVA_ALLOWED_ORIGINS` | (비어 있음) | 더 허용할 사이트 주소(쉼표로 구분) |
+| `NOVA_SEOA_CODE` | (비어 있음) | 서아 확인 암호. `install.sh set-seoa-code`로 넣어요. 비어 있으면 서아 기기 등록을 받지 않아요 |
 
 - 키 없이 연결만 시험하기: `sudo bash install.sh fake on` → 확인 뒤 `sudo bash install.sh fake off`
 - 기록 보기: `sudo journalctl -u nova-ask -n 50` (질문 내용은 기록하지 않고 글자 수와 걸린 시간만 남겨요)
